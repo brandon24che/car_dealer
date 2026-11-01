@@ -4,12 +4,12 @@
  * ─────────────────────────────────────────────────────────────
  *  CHANGE THE DEALER WHATSAPP NUMBER HERE (single constant).
  *  Use the full international format, digits only — no + or spaces.
- *  Example: US 1 (800) 555-0199 → "18005550199"
+ *  Example: US +1 (541) 391-0293 → "15413910293"
  * ─────────────────────────────────────────────────────────────
  */
-export const DEALER_WHATSAPP_NUMBER = "18005550199";
+export const DEALER_WHATSAPP_NUMBER = "15413910293";
 export const DEALER_NAME = "AutoSelect Dallas";
-export const DEALER_PHONE_DISPLAY = "+1 (800) 555-0199";
+export const DEALER_PHONE_DISPLAY = "+1 (541) 391-0293";
 
 /** Build a wa.me deep link. Falls back to the generic composer if no number is set. */
 export function waLink(message = "") {

@@ -171,7 +171,7 @@ Open `/admin/`, go to **Overview → Add 15 Cars & Bids listings** to publish th
 Edit `js/whatsapp.js`:
 
 ```js
-export const DEALER_WHATSAPP_NUMBER = "18005550199";
+export const DEALER_WHATSAPP_NUMBER = "15413910293";
 ```
 
 Use E.164 digits only (country code + number, no `+`, spaces or dashes). Vehicle, quiz, sell and contact pages all build `wa.me` links from this constant.
