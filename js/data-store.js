@@ -981,6 +981,57 @@ export async function seedDemoInventory() {
   return vehicles.length;
 }
 
+/**
+ * Upsert a fixed set of listings without touching the rest of the inventory.
+ * Used to publish the Cars & Bids imports bundled in `demo-data.js`; once they
+ * land in Firestore they can be edited or deleted from the portal like any
+ * other vehicle.
+ */
+export async function importVehicles(list = []) {
+  const incoming = (Array.isArray(list) ? list : []).filter((vehicle) => vehicle?.id);
+  if (!incoming.length) return 0;
+
+  const f = await live();
+  if (f) {
+    try {
+      const m = f.firestoreModule;
+      const jobs = incoming.map((vehicle) => {
+        const { id, createdAt, ...data } = vehicle;
+        const date = createdAt ? new Date(createdAt) : null;
+        return {
+          ref: m.doc(f.db, "vehicles", id),
+          data: {
+            ...data,
+            updatedAt: m.serverTimestamp(),
+            createdAt:
+              date && !Number.isNaN(date.getTime())
+                ? m.Timestamp.fromDate(date)
+                : m.serverTimestamp(),
+          },
+        };
+      });
+      for (let index = 0; index < jobs.length; index += 400) {
+        const batch = m.writeBatch(f.db);
+        jobs.slice(index, index + 400).forEach(({ ref, data }) => batch.set(ref, data, { merge: true }));
+        await batch.commit();
+      }
+    } catch (error) {
+      throw firestoreWriteError(error, "import vehicles");
+    }
+    clearCache();
+    return incoming.length;
+  }
+
+  const current = localVehicles();
+  incoming.forEach((vehicle) => {
+    const index = current.findIndex((item) => item.id === vehicle.id);
+    if (index >= 0) current[index] = { ...current[index], ...vehicle };
+    else current.unshift({ ...vehicle });
+  });
+  writeLocalVehicles(current);
+  return incoming.length;
+}
+
 export async function resetDemoInventory() {
   const f = await live();
   if (f) return false;

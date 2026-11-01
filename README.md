@@ -21,7 +21,8 @@ The site ships with a complete demo mode, so every page — including the dealer
 - Dashboard metrics, most-viewed stock and recent leads.
 - Vehicle CRUD with every listing field, multi-image upload with drag-reorder/cover selection, featured/status flags, inline validation and delete confirmation.
 - Leads table with search, type/status filters, persistent status changes and CSV export.
-- One-click seed of the 24-vehicle demo catalogue and a demo-data reset.
+- One-click import of the 15 Cars & Bids auction listings bundled in `js/demo-data.js`; imported cars use the normal CRUD editor, so any of them can be edited or deleted.
+- One-click seed of the 39-vehicle showcase catalogue and a demo-data reset.
 
 ---
 
@@ -140,7 +141,7 @@ The user must refresh their ID token (sign out/in) after the claim is set. Rules
 
 ### 6. Seed inventory
 
-Open `/admin/`, go to **Overview → Seed 24 demo vehicles**. In Firebase mode this batch-writes 24 vehicles and 4 reviews into Firestore. Existing documents with the same IDs are overwritten.
+Open `/admin/`, go to **Overview → Add 15 Cars & Bids listings** to publish the auction cars, or **Seed showcase vehicles** to batch-write the full 39-vehicle catalogue and 4 reviews. Existing documents with the same IDs are overwritten by the seed; the auction import only touches its own 15 records.
 
 ### 7. Set the dealer WhatsApp number
 
@@ -222,7 +223,7 @@ css/
 js/
   firebase-config.js    Firebase bootstrap (public web config)
   data-store.js         Unified async data facade + demo fallback
-  demo-data.js          24 demo vehicles, reviews
+  demo-data.js          39 showcase vehicles (24 demo + 15 Cars & Bids), reviews
   auth.js               Auth + demo session + admin guard
   ui.js                 Shared shell, toasts, modal, skeletons
   quiz-engine.js        Pure scoring logic

@@ -2,8 +2,10 @@
  * Dealer portal controller: access guard, navigation, dashboard and actions.
  */
 import { requireAdmin, signOutUser, userInitials } from "../auth.js?v=20261101a";
+import { carsAndBidsVehicles } from "../demo-data.js?v=20261101a";
 import {
   getAllVehicles,
+  importVehicles,
   listLeads,
   resetDemoInventory,
   seedDemoInventory,
@@ -272,7 +274,7 @@ async function seedInventory() {
   const confirmed = await confirmAction({
     title: "Seed the demo catalogue?",
     message:
-      "This loads the 24 showcase vehicles. In demo mode it replaces the locally edited inventory; when connected to Firestore it writes the demo records to your vehicles collection.",
+      "This loads the 39 showcase vehicles. In demo mode it replaces the locally edited inventory; when connected to Firestore it writes the demo records to your vehicles collection.",
     confirmLabel: "Seed vehicles",
     danger: false,
   });
@@ -285,6 +287,26 @@ async function seedInventory() {
   } catch (error) {
     console.error("[AutoSelect] seed failed", error);
     showToast(error.message || "Could not seed demo inventory.", "error");
+  }
+}
+
+async function importAuctionInventory() {
+  const confirmed = await confirmAction({
+    title: "Add the 15 Cars & Bids listings?",
+    message:
+      "The 15 newest Cars & Bids auctions bundled in the code will be added to inventory. Existing vehicles are untouched, and each imported car can be edited or deleted here afterwards.",
+    confirmLabel: "Add listings",
+    danger: false,
+  });
+  if (!confirmed) return;
+  try {
+    const count = await importVehicles(carsAndBidsVehicles);
+    showToast(`${count} Cars & Bids listings added.`, "success");
+    await loadData({ silent: true });
+    showView("inventory");
+  } catch (error) {
+    console.error("[AutoSelect] auction import failed", error);
+    showToast(error.message || "Could not import the auction listings.", "error");
   }
 }
 
@@ -340,6 +362,9 @@ function bindShell() {
   qs("[data-side-open]")?.addEventListener("click", openSidebar);
   qs("[data-side-close]")?.addEventListener("click", closeSidebar);
   qs("[data-admin-signout]")?.addEventListener("click", signOut);
+  qsa("[data-import-auction]").forEach((button) =>
+    button.addEventListener("click", importAuctionInventory)
+  );
   qsa("[data-seed-inventory]").forEach((button) => button.addEventListener("click", seedInventory));
   qsa("[data-reset-inventory]").forEach((button) => button.addEventListener("click", resetInventory));
 

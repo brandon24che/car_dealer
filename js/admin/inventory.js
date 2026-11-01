@@ -110,7 +110,7 @@ function emptyMarkup() {
       <div class="adm-empty">
         <div class="adm-empty__icon"><span class="material-symbols-outlined" aria-hidden="true">directions_car</span></div>
         <h3>No vehicles in stock</h3>
-        <p>Add a vehicle manually or seed the 24-vehicle demo catalogue to explore the portal.</p>
+        <p>Add a vehicle manually or seed the showcase catalogue to explore the portal.</p>
         <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
           <button class="btn btn--primary btn--sm" type="button" data-add-vehicle><span class="material-symbols-outlined" aria-hidden="true">add</span>Add vehicle</button>
           <button class="btn btn--ghost btn--sm" type="button" data-seed-inventory><span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span>Seed demo stock</button>
