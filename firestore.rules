@@ -1,0 +1,285 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /* ------------------------------------------------------------------ */
+    /* Helpers                                                             */
+    /* ------------------------------------------------------------------ */
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() && (
+        request.auth.uid == 'NL3B6fmiZVUAMxaaAtwRYavYYY92' ||
+        request.auth.token.get('admin', false) == true ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function text(value, max) {
+      return value is string && value.size() <= max;
+    }
+
+    function filledText(value, max) {
+      return value is string && value.size() >= 1 && value.size() <= max;
+    }
+
+    function timestampOrText(value) {
+      return value is timestamp || (value is string && value.size() <= 40);
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Vehicles — public catalogue, dealer writes, view counter            */
+    /* ------------------------------------------------------------------ */
+
+    function validVehicle() {
+      let d = request.resource.data;
+      return d.keys().hasAll([
+          'make', 'model', 'year', 'price', 'mileage', 'stockNumber',
+          'status', 'images', 'featured', 'createdAt'
+        ])
+        && d.keys().hasOnly([
+          'make', 'model', 'trim', 'year', 'price', 'msrp', 'mileage',
+          'bodyStyle', 'fuelType', 'transmission', 'transmissionCategory',
+          'drivetrain', 'engine', 'mpg', 'mpgCity', 'mpgHwy', 'rangeMiles',
+          'seats', 'exteriorColor', 'interiorColor', 'vin', 'stockNumber',
+          'images', 'featured', 'status', 'dealRating', 'belowMarketAmount',
+          'certified', 'inspected150', 'carfaxClean', 'oneOwner', 'features',
+          'inspection', 'location', 'viewCount', 'tagline', 'createdAt', 'updatedAt'
+        ])
+        && filledText(d.make, 40)
+        && filledText(d.model, 60)
+        && d.year is number && d.year >= 1990 && d.year <= 2100
+        && d.price is number && d.price >= 0
+        && d.mileage is number && d.mileage >= 0
+        && d.stockNumber is string && d.stockNumber.size() <= 40
+        && d.status in ['available', 'reserved', 'sold']
+        && d.images is list && d.images.size() <= 24
+        && d.features is list && d.features.size() <= 100
+        && d.featured is bool
+        && d.inspection is map && d.inspection.keys().size() <= 8
+        && d.createdAt is timestamp
+        && timestampOrText(d.get('updatedAt', ''))
+        && text(d.get('tagline', ''), 80)
+        && text(d.get('vin', ''), 17)
+        && text(d.get('trim', ''), 60)
+        && text(d.get('bodyStyle', ''), 30)
+        && text(d.get('fuelType', ''), 30)
+        && text(d.get('transmission', ''), 60)
+        && text(d.get('transmissionCategory', ''), 20)
+        && text(d.get('drivetrain', ''), 10)
+        && text(d.get('engine', ''), 80)
+        && text(d.get('exteriorColor', ''), 40)
+        && text(d.get('interiorColor', ''), 40)
+        && text(d.get('dealRating', ''), 40)
+        && text(d.get('location', ''), 60);
+    }
+
+    match /vehicles/{vehicleId} {
+      allow read: if true;
+      allow create: if isAdmin() && validVehicle();
+      allow update: if (isAdmin() && validVehicle())
+        || (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['viewCount'])
+          && request.resource.data.viewCount is number
+          && request.resource.data.viewCount == resource.data.get('viewCount', 0) + 1
+        );
+      allow delete: if isAdmin();
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Reviews — public read, dealer managed                               */
+    /* ------------------------------------------------------------------ */
+
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow write: if isAdmin()
+        && request.resource.data.keys().hasOnly(['name', 'city', 'rating', 'text', 'verified', 'vehicle', 'createdAt', 'order'])
+        && filledText(request.resource.data.name, 80)
+        && text(request.resource.data.get('city', ''), 80)
+        && text(request.resource.data.get('text', ''), 1200)
+        && request.resource.data.rating is number
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.get('verified', false) is bool
+        && request.resource.data.createdAt is timestamp;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Users — own profile, dealer read access                             */
+    /* ------------------------------------------------------------------ */
+
+    match /users/{uid} {
+      allow read: if isSelf(uid) || isAdmin();
+      allow create, update: if isSelf(uid)
+        && request.resource.data.keys().hasOnly(['name', 'email', 'phone', 'role', 'lastLoginAt'])
+        && text(request.resource.data.get('name', ''), 80)
+        && text(request.resource.data.get('email', ''), 120)
+        && text(request.resource.data.get('phone', ''), 30)
+        && request.resource.data.get('role', 'member') in ['member', 'admin']
+        && (
+          request.resource.data.get('role', 'member') == 'member' ||
+          isAdmin()
+        );
+      allow delete: if false;
+    }
+
+    match /users/{uid}/favorites/{vehicleId} {
+      allow read: if isSelf(uid);
+      allow create, update: if isSelf(uid)
+        && request.resource.data.keys().hasOnly(['vehicleId', 'createdAt'])
+        && request.resource.data.vehicleId == vehicleId
+        && request.resource.data.createdAt is timestamp;
+      allow delete: if isSelf(uid);
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Leads — public create with validation, dealer manages               */
+    /* ------------------------------------------------------------------ */
+
+    match /leads/{leadId} {
+      allow create: if request.resource.data.keys().hasAll([
+          'type', 'name', 'email', 'phone', 'message', 'status', 'createdAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'type', 'name', 'email', 'phone', 'message', 'status', 'createdAt',
+          'vehicleId', 'vehicleName', 'meta'
+        ])
+        && request.resource.data.type in ['whatsapp', 'testDrive', 'valuation', 'contact']
+        && (
+          request.resource.data.type == 'whatsapp' ||
+          filledText(request.resource.data.name, 80)
+        )
+        && text(request.resource.data.email, 120)
+        && text(request.resource.data.phone, 30)
+        && (
+          request.resource.data.type == 'whatsapp' ||
+          request.resource.data.email.size() > 0 ||
+          request.resource.data.phone.size() > 0
+        )
+        && (
+          request.resource.data.type != 'whatsapp' ||
+          (
+            filledText(request.resource.data.get('vehicleId', ''), 120) &&
+            filledText(request.resource.data.get('vehicleName', ''), 160)
+          )
+        )
+        && text(request.resource.data.message, 1000)
+        && text(request.resource.data.get('vehicleId', ''), 120)
+        && text(request.resource.data.get('vehicleName', ''), 160)
+        && request.resource.data.get('meta', {}) is map
+        && request.resource.data.get('meta', {}).keys().size() <= 40
+        && request.resource.data.status == 'new'
+        && request.resource.data.createdAt == request.time;
+
+      allow read, update, delete: if isAdmin();
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Test drives — public request, dealer follows up                     */
+    /* ------------------------------------------------------------------ */
+
+    match /testDrives/{driveId} {
+      allow create: if request.resource.data.keys().hasAll([
+          'name', 'phone', 'email', 'preferredDate', 'dateOption',
+          'locationPreference', 'status', 'createdAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'vehicleId', 'vehicleName', 'name', 'phone', 'email',
+          'preferredDate', 'dateOption', 'locationPreference', 'status', 'createdAt'
+        ])
+        && filledText(request.resource.data.name, 80)
+        && text(request.resource.data.phone, 30)
+        && text(request.resource.data.email, 120)
+        && (
+          request.resource.data.phone.size() > 0 ||
+          request.resource.data.email.size() > 0
+        )
+        && text(request.resource.data.preferredDate, 40)
+        && text(request.resource.data.dateOption, 40)
+        && text(request.resource.data.locationPreference, 80)
+        && text(request.resource.data.get('vehicleId', ''), 120)
+        && text(request.resource.data.get('vehicleName', ''), 160)
+        && request.resource.data.status == 'new'
+        && request.resource.data.createdAt == request.time;
+
+      allow read, update, delete: if isAdmin();
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Trade-in valuations — public request with photos                    */
+    /* ------------------------------------------------------------------ */
+
+    match /valuations/{valuationId} {
+      allow create: if request.resource.data.keys().hasAll([
+          'make', 'model', 'mileage', 'condition', 'name', 'phone',
+          'email', 'status', 'createdAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'year', 'make', 'model', 'trim', 'mileage', 'condition', 'vin',
+          'name', 'phone', 'email', 'estimateLow', 'estimateHigh', 'photos',
+          'status', 'createdAt'
+        ])
+        && filledText(request.resource.data.make, 40)
+        && filledText(request.resource.data.model, 60)
+        && text(request.resource.data.get('trim', ''), 60)
+        && text(request.resource.data.get('vin', ''), 20)
+        && request.resource.data.mileage is number
+        && request.resource.data.mileage >= 0
+        && filledText(request.resource.data.name, 80)
+        && text(request.resource.data.phone, 30)
+        && text(request.resource.data.email, 120)
+        && (
+          request.resource.data.phone.size() > 0 ||
+          request.resource.data.email.size() > 0
+        )
+        && request.resource.data.estimateLow is number
+        && request.resource.data.estimateHigh is number
+        && request.resource.data.photos is list
+        && request.resource.data.photos.size() <= 8
+        && request.resource.data.status == 'new'
+        && request.resource.data.createdAt == request.time;
+
+      allow read, update, delete: if isAdmin();
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Quiz results — signed-in feedback only                              */
+    /* ------------------------------------------------------------------ */
+
+    match /quizResults/{resultId} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['answers', 'results', 'uid', 'email', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.answers is map
+        && request.resource.data.answers.keys().size() <= 20
+        && request.resource.data.results is list
+        && request.resource.data.results.size() <= 12
+        && request.resource.data.get('email', '') == request.auth.token.get('email', '')
+        && request.resource.data.createdAt == request.time;
+
+      allow read, delete: if isAdmin();
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Admins — read your own record; grant/revoke via console or Admin SDK */
+    /* ------------------------------------------------------------------ */
+
+    match /admins/{uid} {
+      allow read: if isSelf(uid) || isAdmin();
+      allow write: if false;
+    }
+
+    /* Default deny for anything not matched above. */
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

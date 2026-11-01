@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>AutoSelect — Certified Pre-Owned Cars in Dallas, TX</title>
+  <meta name="description" content="Find your perfect car among 1,450+ 150-point inspected, CARFAX-verified pre-owned vehicles. Transparent fixed pricing, 7-day money-back guarantee, and WhatsApp checkout in Dallas, TX.">
+  <meta name="theme-color" content="#0B132B">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="AutoSelect — Certified Pre-Owned Cars in Dallas, TX">
+  <meta property="og:description" content="1,450+ inspected vehicles, fixed pricing, 7-day money-back guarantee and direct WhatsApp checkout.">
+  <meta property="og:image" content="assets/cars/suv-black-luxury.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css?v=20261101a">
+  <link rel="stylesheet" href="css/base.css?v=20261101a">
+  <link rel="stylesheet" href="css/components.css?v=20261101a">
+  <link rel="stylesheet" href="css/pages/home.css?v=20261101a">
+</head>
+<body data-page="home">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="page home-page">
+    <div class="container">
+      <section class="hero" aria-labelledby="heroTitle">
+        <div class="hero__media" aria-hidden="true"></div>
+        <div class="hero__content">
+          <span class="hero__badge"><span class="material-symbols-outlined">verified</span>AutoSelect Certified Inventory</span>
+          <h1 id="heroTitle">Find Your Perfect Car. Drive Your Next Chapter.</h1>
+          <p>Over 1,450+ 150-point inspected pre-owned vehicles with CARFAX history and guaranteed transparent pricing in Dallas, TX.</p>
+          <div class="hero__stats">
+            <div><strong data-stat-total>1,450+</strong><span>Inspected Cars</span></div>
+            <div><strong>100%</strong><span>Fixed Price</span></div>
+            <div><strong>7 Days</strong><span>Money-Back</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="search-card" aria-labelledby="searchTitle">
+        <div class="search-card__top">
+          <h2 id="searchTitle" class="search-card__title">Search certified inventory</h2>
+          <span class="search-card__live"><span class="pulse-dot"></span><span data-live-label>Live in Dallas, TX</span></span>
+        </div>
+        <div class="tabs search-tabs" role="tablist" aria-label="Vehicle body type">
+          <button type="button" class="tabs__btn is-active" role="tab" aria-selected="true" data-body="">All Types</button>
+          <button type="button" class="tabs__btn" role="tab" aria-selected="false" data-body="SUV">SUVs</button>
+          <button type="button" class="tabs__btn" role="tab" aria-selected="false" data-body="Sedan">Sedans</button>
+          <button type="button" class="tabs__btn" role="tab" aria-selected="false" data-body="Truck">Trucks</button>
+        </div>
+        <form class="search-grid" id="heroSearch" novalidate>
+          <div class="field">
+            <label class="label" for="homeMake">Make</label>
+            <div class="select-wrap"><select class="select" id="homeMake" name="make"><option value="">Any Make</option></select></div>
+          </div>
+          <div class="field">
+            <label class="label" for="homeModel">Model</label>
+            <div class="select-wrap"><select class="select" id="homeModel" name="model" disabled><option value="">Any Model</option></select></div>
+          </div>
+          <div class="field field--budget">
+            <div class="row-between">
+              <label class="label" for="homeBudget">Max budget (USD)</label>
+              <span class="range-value" data-budget-label>$45,000</span>
+            </div>
+            <input class="range" id="homeBudget" name="priceMax" type="range" min="10000" max="80000" step="1000" value="45000" aria-describedby="budgetHelp">
+            <div class="range-meta"><span id="budgetHelp">$10,000</span><span>$80,000</span></div>
+          </div>
+          <div class="field">
+            <label class="label" for="homeYear">Min year</label>
+            <div class="select-wrap"><select class="select" id="homeYear" name="yearMin"></select></div>
+          </div>
+          <div class="field">
+            <label class="label" for="homeTransmission">Transmission</label>
+            <div class="select-wrap"><select class="select" id="homeTransmission" name="transmission">
+              <option value="">Any</option>
+              <option value="Automatic">Automatic</option>
+              <option value="Manual">Manual</option>
+            </select></div>
+          </div>
+          <button class="btn btn--primary btn--lg search-submit" type="submit">
+            <span class="material-symbols-outlined">search</span>
+            <span>Search <span data-search-count>1,450</span> Verified Cars</span>
+          </button>
+        </form>
+      </section>
+
+      <section class="trust-strip" aria-label="Why buy from AutoSelect">
+        <div class="trust-strip__item"><span class="trust-strip__icon material-symbols-outlined">fact_check</span><div><strong>150-Point Inspection</strong><span>Master-tech certified</span></div></div>
+        <div class="trust-strip__item"><span class="trust-strip__icon material-symbols-outlined">event_available</span><div><strong>7-Day Guarantee</strong><span>100% money-back</span></div></div>
+        <div class="trust-strip__item"><span class="trust-strip__icon material-symbols-outlined">verified_user</span><div><strong>Free CARFAX</strong><span>Complete vehicle history</span></div></div>
+        <div class="trust-strip__item"><span class="trust-strip__icon material-symbols-outlined">chat</span><div><strong>Direct WhatsApp</strong><span>Reply in under 5 min</span></div></div>
+      </section>
+
+      <section class="section" aria-labelledby="bodyTitle">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Browse by body style</p>
+            <h2 id="bodyTitle">Shop your way</h2>
+          </div>
+          <a class="section-head__link" href="inventory.html">View All <span class="material-symbols-outlined" style="font-size:16px">arrow_forward</span></a>
+        </div>
+        <div class="body-tiles" id="bodyTiles" aria-live="polite">
+          <div class="body-tile skeleton" style="height:84px"></div>
+          <div class="body-tile skeleton" style="height:84px"></div>
+          <div class="body-tile skeleton" style="height:84px"></div>
+          <div class="body-tile skeleton" style="height:84px"></div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="featuredTitle">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Verified deals</p>
+            <h2 id="featuredTitle">Hand-Picked Vehicles</h2>
+          </div>
+          <span class="section-head__meta"><span class="material-symbols-outlined" style="font-size:15px">update</span>Updated today</span>
+        </div>
+        <div class="cards-grid featured-grid" id="featuredGrid" aria-live="polite" aria-busy="true">
+          <div class="skeleton-card" aria-hidden="true"><div class="skeleton skeleton-card__media"></div><div class="skeleton-card__body"><div class="skeleton skeleton-line skeleton-line--sm"></div><div class="skeleton skeleton-line skeleton-line--lg"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line" style="height:44px"></div></div></div>
+          <div class="skeleton-card" aria-hidden="true"><div class="skeleton skeleton-card__media"></div><div class="skeleton-card__body"><div class="skeleton skeleton-line skeleton-line--sm"></div><div class="skeleton skeleton-line skeleton-line--lg"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line" style="height:44px"></div></div></div>
+          <div class="skeleton-card" aria-hidden="true"><div class="skeleton skeleton-card__media"></div><div class="skeleton-card__body"><div class="skeleton skeleton-line skeleton-line--sm"></div><div class="skeleton skeleton-line skeleton-line--lg"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line" style="height:44px"></div></div></div>
+          <div class="skeleton-card" aria-hidden="true"><div class="skeleton skeleton-card__media"></div><div class="skeleton-card__body"><div class="skeleton skeleton-line skeleton-line--sm"></div><div class="skeleton skeleton-line skeleton-line--lg"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line" style="height:44px"></div></div></div>
+        </div>
+      </section>
+
+      <section class="quiz-cta" aria-labelledby="quizCtaTitle">
+        <div class="quiz-cta__icon" aria-hidden="true"><span class="material-symbols-outlined">auto_awesome</span></div>
+        <div class="quiz-cta__copy">
+          <span class="quiz-cta__eyebrow">Unsure what fits you?</span>
+          <h2 id="quizCtaTitle">Find Your Perfect Match in 60 Seconds</h2>
+          <p>Answer 6 lifestyle questions to unlock recommendations curated precisely to your daily commute, family size, and exact monthly budget.</p>
+          <ul class="quiz-cta__points">
+            <li><span class="material-symbols-outlined">check_circle</span>Personalized % match scores</li>
+            <li><span class="material-symbols-outlined">check_circle</span>Budget-aware results</li>
+          </ul>
+        </div>
+        <div class="quiz-cta__action">
+          <a class="btn btn--ghost btn--lg" href="quiz.html">Start Match Quiz <span class="material-symbols-outlined">arrow_forward</span></a>
+          <span class="quiz-cta__note">Free • No sign-in required</span>
+        </div>
+      </section>
+
+      <section class="tradein-banner" aria-labelledby="tradeinTitle">
+        <div class="tradein-banner__media" aria-hidden="true"></div>
+        <div class="tradein-banner__copy">
+          <span class="tradein-banner__eyebrow">Limited offer</span>
+          <h2 id="tradeinTitle">Weekend Trade-In Bonus: $500 Value</h2>
+          <p>Plus complimentary 50-state home delivery when you trade your current vehicle this weekend.</p>
+        </div>
+        <a class="btn btn--accent btn--lg" href="sell.html">Value My Trade <span class="material-symbols-outlined">price_change</span></a>
+      </section>
+
+      <section class="section" id="reviews" aria-labelledby="reviewsTitle">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Owner stories</p>
+            <h2 id="reviewsTitle">Rated by DFW drivers</h2>
+          </div>
+          <a class="section-head__link" href="contact.html">Talk to concierge <span class="material-symbols-outlined" style="font-size:16px">arrow_forward</span></a>
+        </div>
+        <div class="reviews-layout">
+          <div class="review-summary">
+            <div class="review-summary__score" data-review-score>4.9</div>
+            <div class="review-summary__stars" data-review-stars aria-hidden="true"></div>
+            <p class="review-summary__caption">Based on <strong>1,286</strong> verified car buyer reviews</p>
+            <div class="review-summary__badges">
+              <span class="badge badge--verified"><span class="material-symbols-outlined">verified</span>Verified buyers</span>
+              <span class="badge badge--neutral">Google reviews</span>
+            </div>
+          </div>
+          <div class="review-cards" id="reviewCards" aria-live="polite">
+            <div class="review-card skeleton" style="height:150px"></div>
+            <div class="review-card skeleton" style="height:150px"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script type="module" src="js/pages/home.js?v=20261101a"></script>
+</body>
+</html>

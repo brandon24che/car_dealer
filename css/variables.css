@@ -1,0 +1,106 @@
+/* ==========================================================================
+   AutoSelect — Precision Automotive design tokens
+   ========================================================================== */
+:root {
+  /* Brand */
+  --navy: #0b132b;
+  --navy-tint: #1c2541;
+  --navy-soft: #131a33;
+  --blue: #2563eb;
+  --blue-dark: #1d4ed8;
+  --blue-soft: #eff4ff;
+  --orange: #f97316;
+  --orange-ink: #c2410c;
+  --orange-soft: #fff3e9;
+
+  /* Surfaces */
+  --canvas: #f8fafc;
+  --subtle: #f1f5f9;
+  --white: #ffffff;
+  --surface-soft: #f8f9ff;
+  --surface-tint: #e5eeff;
+
+  /* Text */
+  --ink: #0b132b;
+  --ink-2: #1c2541;
+  --slate: #64748b;
+  --slate-strong: #475569;
+  --outline: #76767e;
+
+  /* Lines */
+  --border: #e2e8f0;
+  --border-hover: #cbd5e1;
+  --border-strong: #94a3b8;
+
+  /* Status */
+  --green: #10b981;
+  --green-ink: #059669;
+  --green-soft: #ecfdf5;
+  --wa: #25d366;
+  --wa-ink: #128c7e;
+  --error: #ba1a1a;
+  --error-soft: #fef2f2;
+
+  /* Type */
+  --font-display: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-body: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  --text-hero: clamp(32px, 4vw, 48px);
+  --leading-hero: clamp(40px, 4.6vw, 56px);
+  --text-h1: clamp(26px, 2.6vw, 36px);
+  --text-h2: clamp(23px, 2.1vw, 28px);
+  --text-h3: 20px;
+  --text-h4: 16px;
+  --text-body: 14px;
+  --text-small: 12px;
+  --text-micro: 11px;
+
+  /* Shape */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --r-full: 9999px;
+
+  /* Elevation */
+  --shadow-1: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px -1px rgba(15, 23, 42, 0.03);
+  --shadow-2: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --shadow-3: 0 20px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.06);
+  --shadow-wa: 0 6px 20px rgba(37, 211, 102, 0.35);
+
+  /* Layout */
+  --container: 1440px;
+  --gutter: 16px;
+  --gutter-desktop: 32px;
+  --promo-h: 32px;
+  --header-h: 68px;
+  --bottom-nav-h: 64px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --speed: 180ms;
+
+  /* Z layers */
+  --z-promo: 60;
+  --z-header: 55;
+  --z-fab: 40;
+  --z-bottomnav: 50;
+  --z-drawer: 70;
+  --z-modal: 80;
+  --z-toast: 90;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: 24px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --gutter: 32px;
+    --header-h: 76px;
+  }
+}

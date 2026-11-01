@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Vehicle Details — AutoSelect Dallas</title>
+  <meta name="description" content="Inspect this 150-point certified pre-owned vehicle: photos, CARFAX history, financing estimate, inspection report and instant WhatsApp checkout with AutoSelect Dallas.">
+  <meta name="theme-color" content="#0B132B">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="product">
+  <meta property="og:title" id="ogTitle" content="Vehicle Details — AutoSelect">
+  <meta property="og:description" id="ogDescription" content="150-point inspected, CARFAX-verified and ready for delivery from AutoSelect Dallas.">
+  <meta property="og:image" id="ogImage" content="assets/cars/sedan-blue.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css?v=20261101a">
+  <link rel="stylesheet" href="css/base.css?v=20261101a">
+  <link rel="stylesheet" href="css/components.css?v=20261101a">
+  <link rel="stylesheet" href="css/pages/vehicle.css?v=20261101a">
+  <link rel="canonical" id="canonicalLink" href="">
+  <script type="application/ld+json" id="vehicleJsonLd">{}</script>
+</head>
+<body data-page="vehicle" class="has-sticky-buy">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="page vehicle-page">
+    <div class="container">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="index.html">Home</a>
+        <span class="crumbs__sep" aria-hidden="true">/</span>
+        <a href="inventory.html">Inventory</a>
+        <span class="crumbs__sep" aria-hidden="true">/</span>
+        <span aria-current="page" data-crumb>Vehicle details</span>
+      </nav>
+
+      <div id="vehicleRoot">
+        <div class="veh-skeleton" data-veh-skeleton aria-hidden="true">
+          <div class="veh-skeleton__gallery">
+            <div class="skeleton veh-skeleton__image"></div>
+            <div class="veh-skeleton__thumbs">
+              <div class="skeleton"></div>
+              <div class="skeleton"></div>
+              <div class="skeleton"></div>
+              <div class="skeleton"></div>
+            </div>
+          </div>
+          <div class="veh-skeleton__side">
+            <div class="skeleton skeleton-line skeleton-line--sm" style="width:60%"></div>
+            <div class="skeleton skeleton-line skeleton-line--lg" style="height:32px"></div>
+            <div class="skeleton skeleton-line" style="width:45%"></div>
+            <div class="skeleton veh-skeleton__card"></div>
+            <div class="skeleton veh-skeleton__card" style="height:96px"></div>
+          </div>
+        </div>
+
+        <div class="state" id="vehicleError" hidden>
+          <span class="state__icon"><span class="material-symbols-outlined">search_off</span></span>
+          <h1>Vehicle not found</h1>
+          <p>This listing may have sold or the link is incomplete. Browse our certified inventory to find your next car.</p>
+          <div class="state__actions">
+            <a class="btn btn--primary" href="inventory.html"><span class="material-symbols-outlined">directions_car</span>Browse inventory</a>
+            <a class="btn btn--ghost" href="index.html">Back home</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <!-- Test drive reservation modal -->
+  <div class="modal modal--md" id="testDriveModal" data-modal hidden>
+    <div class="modal__backdrop" data-modal-close></div>
+    <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="tdTitle">
+      <div class="modal__head">
+        <div>
+          <h2 id="tdTitle">Schedule a Test Drive</h2>
+          <p data-td-subtitle>Pick a time — our concierge confirms within 5 minutes.</p>
+        </div>
+        <button type="button" class="modal__close" data-modal-close aria-label="Close test drive form">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal__body">
+        <form class="td-form" id="testDriveForm" novalidate>
+          <div class="td-choices" role="group" aria-label="Preferred date">
+            <button type="button" class="td-choice" data-date-option="Today" aria-pressed="false">Today</button>
+            <button type="button" class="td-choice is-active" data-date-option="Tomorrow" aria-pressed="true">Tomorrow</button>
+            <button type="button" class="td-choice" data-date-option="Weekend" aria-pressed="false">This weekend</button>
+          </div>
+          <div class="form-grid form-grid--2">
+            <div class="field">
+              <label class="field__label" for="tdName">Full name</label>
+              <input class="input" id="tdName" name="name" type="text" autocomplete="name" placeholder="Jordan Ellis" maxlength="80" aria-describedby="tdNameError" required>
+              <span class="field__error" id="tdNameError" data-error-for="tdName">Please enter your full name.</span>
+            </div>
+            <div class="field">
+              <label class="field__label" for="tdPhone">Phone / WhatsApp</label>
+              <input class="input" id="tdPhone" name="phone" type="tel" autocomplete="tel" placeholder="(214) 555-0182" maxlength="30" aria-describedby="tdPhoneError" required>
+              <span class="field__error" id="tdPhoneError" data-error-for="tdPhone">Enter a valid phone number.</span>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field__label" for="tdEmail">Email</label>
+            <input class="input" id="tdEmail" name="email" type="email" autocomplete="email" placeholder="you@email.com" maxlength="120" aria-describedby="tdEmailError" required>
+            <span class="field__error" id="tdEmailError" data-error-for="tdEmail">Enter a valid email address.</span>
+          </div>
+          <div class="form-grid form-grid--2">
+            <div class="field">
+              <label class="field__label" for="tdDate">Preferred date</label>
+              <input class="input" id="tdDate" name="date" type="date" aria-describedby="tdDateError" required>
+              <span class="field__error" id="tdDateError" data-error-for="tdDate">Choose a date from today onward.</span>
+            </div>
+            <div class="field">
+              <label class="field__label" for="tdTime">Preferred time</label>
+              <select class="select" id="tdTime" name="time">
+                <option value="Morning (9–12)">Morning (9–12)</option>
+                <option value="Afternoon (12–4)" selected>Afternoon (12–4)</option>
+                <option value="Evening (4–7)">Evening (4–7)</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <span class="field__label">Where would you like to drive?</span>
+            <div class="td-choices td-choices--wide" role="group" aria-label="Test drive location">
+              <button type="button" class="td-choice is-active" data-loc="Dealership Hub" aria-pressed="true"><span class="material-symbols-outlined">storefront</span>Dealership hub</button>
+              <button type="button" class="td-choice" data-loc="Home Delivery" aria-pressed="false"><span class="material-symbols-outlined">home_work</span>Bring it to me</button>
+            </div>
+          </div>
+          <div class="td-summary" data-td-vehicle></div>
+          <p class="td-note"><span class="material-symbols-outlined">info</span>No charge, no pressure. Bring a valid driver's license; coverage is included.</p>
+          <div class="td-actions">
+            <button type="button" class="btn btn--ghost" data-modal-close>Cancel</button>
+            <button type="submit" class="btn btn--primary" id="tdSubmit">
+              <span class="material-symbols-outlined">event_available</span>
+              <span>Confirm Reservation</span>
+            </button>
+          </div>
+        </form>
+
+        <div class="td-success" id="tdSuccess" role="status" hidden>
+          <span class="td-success__icon"><span class="material-symbols-outlined">check_circle</span></span>
+          <h3>Reservation confirmed</h3>
+          <p data-td-success-copy>Your test drive is reserved. Our concierge will text you shortly to confirm the details.</p>
+          <div class="td-success__meta" data-td-success-meta></div>
+          <div class="td-actions">
+            <button type="button" class="btn btn--ghost" data-modal-close>Done</button>
+            <a class="btn btn--wa" data-td-wa href="#" target="_blank" rel="noopener noreferrer">Message concierge</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Photo lightbox -->
+  <div class="modal modal--wide" id="galleryModal" data-modal hidden>
+    <div class="modal__backdrop" data-modal-close></div>
+    <div class="modal__panel lightbox" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle">
+      <div class="modal__head">
+        <div>
+          <h2 id="lightboxTitle">Photo Gallery</h2>
+          <p data-lightbox-caption></p>
+        </div>
+        <button type="button" class="modal__close" data-modal-close aria-label="Close gallery">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal__body lightbox__body">
+        <div class="lightbox__stage">
+          <img id="lightboxImage" alt="" data-lightbox-image>
+          <button type="button" class="lightbox__nav lightbox__nav--prev" data-lightbox-prev aria-label="Previous photo">
+            <span class="material-symbols-outlined">chevron_left</span>
+          </button>
+          <button type="button" class="lightbox__nav lightbox__nav--next" data-lightbox-next aria-label="Next photo">
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+          <span class="lightbox__count" data-lightbox-count></span>
+        </div>
+        <div class="lightbox__thumbs" data-lightbox-thumbs></div>
+      </div>
+    </div>
+  </div>
+
+  <noscript>
+    <div class="container" style="padding:24px 0">
+      <div class="state">
+        <h2>JavaScript is required</h2>
+        <p>This vehicle page loads live inventory and gallery details. Enable JavaScript, or call the concierge at +1 (800) 555-0199.</p>
+      </div>
+    </div>
+  </noscript>
+
+  <script type="module" src="js/pages/vehicle.js?v=20261101a"></script>
+</body>
+</html>

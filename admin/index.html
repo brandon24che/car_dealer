@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Dealer Portal — AutoSelect</title>
+  <meta name="description" content="AutoSelect dealer portal: inventory, leads and showroom performance.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0B132B">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/variables.css?v=20261101a">
+  <link rel="stylesheet" href="../css/base.css?v=20261101a">
+  <link rel="stylesheet" href="../css/components.css?v=20261101a">
+  <link rel="stylesheet" href="../css/pages/admin.css?v=20261101a">
+</head>
+<body class="admin-body is-loading">
+  <a class="skip-link" href="#adminContent">Skip to content</a>
+
+  <div class="admin-boot" id="adminBoot" role="status" aria-live="polite">
+    <div class="admin-boot__inner">
+      <div class="admin-boot__mark">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none">
+          <path d="M3.2 15.1 4.9 9.9A2.7 2.7 0 0 1 7.5 8h9a2.7 2.7 0 0 1 2.6 1.9l1.7 5.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M3.6 14.6h16.8v3.5a1.1 1.1 0 0 1-1.1 1.1h-1.5a1.1 1.1 0 0 1-1.1-1.1v-.6H7.3v.6a1.1 1.1 0 0 1-1.1 1.1H4.7a1.1 1.1 0 0 1-1.1-1.1v-3.5Z" fill="currentColor"/>
+        </svg>
+      </div>
+      <div class="admin-boot__spinner" aria-hidden="true"></div>
+      <p>Checking dealer access…</p>
+    </div>
+  </div>
+
+  <div class="admin-shell">
+    <aside class="admin-side" id="adminSide" aria-label="Dealer portal">
+      <a class="admin-side__brand" href="../index.html">
+        <span class="admin-side__mark">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none">
+            <path d="M3.2 15.1 4.9 9.9A2.7 2.7 0 0 1 7.5 8h9a2.7 2.7 0 0 1 2.6 1.9l1.7 5.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M3.6 14.6h16.8v3.5a1.1 1.1 0 0 1-1.1 1.1h-1.5a1.1 1.1 0 0 1-1.1-1.1v-.6H7.3v.6a1.1 1.1 0 0 1-1.1 1.1H4.7a1.1 1.1 0 0 1-1.1-1.1v-3.5Z" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="admin-side__name"><strong>AutoSelect</strong><span>Dealer portal</span></span>
+      </a>
+
+      <nav class="admin-side__nav" aria-label="Workspace">
+        <p class="admin-side__label">Workspace</p>
+        <button class="admin-nav-item is-active" type="button" data-view="overview" aria-current="page">
+          <span class="material-symbols-outlined" aria-hidden="true">space_dashboard</span>Overview
+        </button>
+        <button class="admin-nav-item" type="button" data-view="inventory">
+          <span class="material-symbols-outlined" aria-hidden="true">directions_car</span>Inventory
+          <span class="admin-nav-item__count" data-count-inventory>—</span>
+        </button>
+        <button class="admin-nav-item" type="button" data-view="leads">
+          <span class="material-symbols-outlined" aria-hidden="true">forum</span>Leads
+          <span class="admin-nav-item__count" data-count-leads>—</span>
+        </button>
+        <div class="admin-side__divider"></div>
+        <a class="admin-nav-item" href="../index.html">
+          <span class="material-symbols-outlined" aria-hidden="true">storefront</span>View showroom
+        </a>
+      </nav>
+
+      <div class="admin-side__foot">
+        <div class="admin-user">
+          <span class="admin-user__avatar" data-admin-avatar>AM</span>
+          <span class="admin-user__text">
+            <strong data-admin-name>Dealer admin</strong>
+            <span data-admin-email>admin@autoselect.demo</span>
+          </span>
+        </div>
+        <button class="admin-signout" type="button" data-admin-signout>
+          <span class="material-symbols-outlined" aria-hidden="true">logout</span>Sign out
+        </button>
+      </div>
+    </aside>
+
+    <div class="admin-scrim" data-side-close hidden></div>
+
+    <div class="admin-main">
+      <header class="admin-topbar">
+        <button class="admin-menu-btn" type="button" data-side-open aria-label="Open portal menu" aria-controls="adminSide" aria-expanded="false">
+          <span class="material-symbols-outlined" aria-hidden="true">menu</span>
+        </button>
+        <div class="admin-topbar__titles">
+          <h1 data-admin-title>Overview</h1>
+          <p data-admin-subtitle>Showroom performance at a glance.</p>
+        </div>
+        <div class="admin-topbar__actions">
+          <a class="btn btn--ghost btn--sm btn--view-site" href="../index.html">
+            <span class="material-symbols-outlined" aria-hidden="true">storefront</span><span>View site</span>
+          </a>
+          <button class="btn btn--primary btn--sm" type="button" data-add-vehicle>
+            <span class="material-symbols-outlined" aria-hidden="true">add</span><span>Add vehicle</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="admin-content" id="adminContent">
+        <section class="adm-view" data-view-panel="overview" aria-labelledby="overviewTitle">
+          <h2 class="sr-only" id="overviewTitle">Overview</h2>
+
+          <div class="adm-stats">
+            <article class="adm-stat">
+              <div class="adm-stat__top">
+                <span class="adm-stat__icon adm-stat__icon--green"><span class="material-symbols-outlined" aria-hidden="true">directions_car</span></span>
+                <span class="adm-stat__delta" data-stat-featured>— featured</span>
+              </div>
+              <div>
+                <div class="adm-stat__value" data-stat-available>—</div>
+                <div class="adm-stat__label">Available vehicles</div>
+              </div>
+            </article>
+            <article class="adm-stat">
+              <div class="adm-stat__top">
+                <span class="adm-stat__icon adm-stat__icon--navy"><span class="material-symbols-outlined" aria-hidden="true">garage</span></span>
+                <span class="adm-stat__delta" data-stat-sold>— sold</span>
+              </div>
+              <div>
+                <div class="adm-stat__value" data-stat-total>—</div>
+                <div class="adm-stat__label">Total stock records</div>
+              </div>
+            </article>
+            <article class="adm-stat">
+              <div class="adm-stat__top">
+                <span class="adm-stat__icon"><span class="material-symbols-outlined" aria-hidden="true">mark_unread_chat_alt</span></span>
+                <span class="adm-stat__delta" data-stat-week>— this week</span>
+              </div>
+              <div>
+                <div class="adm-stat__value" data-stat-new-leads>—</div>
+                <div class="adm-stat__label">New leads</div>
+              </div>
+            </article>
+            <article class="adm-stat">
+              <div class="adm-stat__top">
+                <span class="adm-stat__icon adm-stat__icon--orange"><span class="material-symbols-outlined" aria-hidden="true">forum</span></span>
+                <span class="adm-stat__delta" data-stat-winrate>—% won</span>
+              </div>
+              <div>
+                <div class="adm-stat__value" data-stat-total-leads>—</div>
+                <div class="adm-stat__label">All-time leads</div>
+              </div>
+            </article>
+          </div>
+
+          <div class="adm-split">
+            <section class="adm-panel" aria-labelledby="viewedTitle">
+              <div class="adm-panel__head">
+                <div>
+                  <h2 id="viewedTitle">Most viewed vehicles</h2>
+                  <p>Views recorded on the public detail pages.</p>
+                </div>
+                <button class="btn btn--ghost btn--sm" type="button" data-view-link="inventory">Manage stock</button>
+              </div>
+              <div class="adm-panel__body adm-panel__body--flush" data-most-viewed>
+                <div class="adm-skeleton" aria-hidden="true"><span style="width:70%"></span><span style="width:88%"></span><span style="width:62%"></span><span style="width:80%"></span></div>
+              </div>
+            </section>
+
+            <div style="display:grid;gap:18px;align-content:start;min-width:0">
+              <section class="adm-panel" aria-labelledby="recentTitle">
+                <div class="adm-panel__head">
+                  <div>
+                    <h2 id="recentTitle">Recent leads</h2>
+                    <p>Newest concierge and test-drive requests.</p>
+                  </div>
+                  <button class="btn btn--ghost btn--sm" type="button" data-view-link="leads">All leads</button>
+                </div>
+                <div class="adm-panel__body adm-panel__body--flush" data-recent-leads>
+                  <div class="adm-skeleton" aria-hidden="true"><span style="width:74%"></span><span style="width:58%"></span><span style="width:82%"></span></div>
+                </div>
+              </section>
+
+              <section class="adm-panel" aria-labelledby="actionsTitle">
+                <div class="adm-panel__head">
+                  <div>
+                    <h2 id="actionsTitle">Quick actions</h2>
+                    <p>Keep the demo showroom stocked.</p>
+                  </div>
+                </div>
+                <div class="adm-panel__body">
+                  <div class="adm-actions-list">
+                    <button class="adm-action" type="button" data-add-vehicle>
+                      <span class="adm-action__icon"><span class="material-symbols-outlined" aria-hidden="true">add_box</span></span>
+                      <span class="adm-action__text"><strong>Add a vehicle</strong><span>List a new car with photos and specs.</span></span>
+                      <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+                    </button>
+                    <button class="adm-action" type="button" data-seed-inventory>
+                      <span class="adm-action__icon adm-action__icon--navy"><span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span></span>
+                      <span class="adm-action__text"><strong>Seed 24 demo vehicles</strong><span>Restore the showcase catalogue.</span></span>
+                      <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+                    </button>
+                    <button class="adm-action" type="button" data-reset-inventory>
+                      <span class="adm-action__icon adm-action__icon--orange"><span class="material-symbols-outlined" aria-hidden="true">restart_alt</span></span>
+                      <span class="adm-action__text"><strong>Reset demo data</strong><span>Discard local edits and reseed inventory.</span></span>
+                      <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+                    </button>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <section class="adm-view" data-view-panel="inventory" aria-labelledby="inventoryTitle" hidden>
+          <div class="adm-panel">
+            <div class="adm-panel__head">
+              <div>
+                <h2 id="inventoryTitle">Vehicle inventory</h2>
+                <p><span data-inventory-count>—</span> records in stock</p>
+              </div>
+              <button class="btn btn--primary btn--sm" type="button" data-add-vehicle>
+                <span class="material-symbols-outlined" aria-hidden="true">add</span>Add vehicle
+              </button>
+            </div>
+            <div class="adm-toolbar">
+              <div class="adm-search">
+                <span class="material-symbols-outlined" aria-hidden="true">search</span>
+                <label class="sr-only" for="admInvSearch">Search inventory</label>
+                <input class="input" id="admInvSearch" type="search" placeholder="Search make, model, stock or VIN" autocomplete="off">
+              </div>
+              <label class="sr-only" for="admInvStatus">Filter by status</label>
+              <select class="select" id="admInvStatus">
+                <option value="all">All statuses</option>
+                <option value="available">Available</option>
+                <option value="reserved">Reserved</option>
+                <option value="sold">Sold</option>
+                <option value="featured">Featured</option>
+              </select>
+              <span class="adm-toolbar__count">Showing <strong data-inv-shown>0</strong></span>
+            </div>
+            <div data-inventory-body>
+              <div class="adm-skeleton" aria-hidden="true"><span style="width:84%"></span><span style="width:72%"></span><span style="width:90%"></span><span style="width:66%"></span><span style="width:80%"></span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="adm-view" data-view-panel="leads" aria-labelledby="leadsTitle" hidden>
+          <div class="adm-panel">
+            <div class="adm-panel__head">
+              <div>
+                <h2 id="leadsTitle">Leads</h2>
+                <p>Every concierge, trade-in and test-drive request.</p>
+              </div>
+              <button class="btn btn--ghost btn--sm" type="button" data-export-leads>
+                <span class="material-symbols-outlined" aria-hidden="true">download</span>Export CSV
+              </button>
+            </div>
+            <div class="adm-toolbar">
+              <div class="adm-search">
+                <span class="material-symbols-outlined" aria-hidden="true">search</span>
+                <label class="sr-only" for="admLeadSearch">Search leads</label>
+                <input class="input" id="admLeadSearch" type="search" placeholder="Search name, email, phone or vehicle" autocomplete="off">
+              </div>
+              <label class="sr-only" for="admLeadType">Filter by type</label>
+              <select class="select" id="admLeadType">
+                <option value="all">All types</option>
+                <option value="contact">Contact</option>
+                <option value="whatsapp">WhatsApp</option>
+                <option value="testDrive">Test drive</option>
+                <option value="valuation">Trade-in</option>
+              </select>
+              <label class="sr-only" for="admLeadStatus">Filter by status</label>
+              <select class="select" id="admLeadStatus">
+                <option value="all">All statuses</option>
+                <option value="new">New</option>
+                <option value="contacted">Contacted</option>
+                <option value="qualified">Qualified</option>
+                <option value="won">Won</option>
+                <option value="lost">Lost</option>
+              </select>
+              <span class="adm-toolbar__count">Showing <strong data-leads-shown>0</strong></span>
+            </div>
+            <div data-leads-body>
+              <div class="adm-skeleton" aria-hidden="true"><span style="width:88%"></span><span style="width:69%"></span><span style="width:92%"></span><span style="width:74%"></span></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <dialog class="adm-dialog" id="vehicleDialog" aria-labelledby="vehicleDialogTitle">
+    <div class="adm-dialog__head">
+      <div>
+        <h2 id="vehicleDialogTitle">Add vehicle</h2>
+        <p id="vehicleDialogSubtitle">Create a listing with photos, specs and pricing.</p>
+      </div>
+      <button class="adm-dialog__close" type="button" data-vehicle-cancel aria-label="Close dialog">
+        <span class="material-symbols-outlined" aria-hidden="true">close</span>
+      </button>
+    </div>
+    <form class="adm-dialog__form" id="vehicleForm" novalidate>
+      <div class="adm-dialog__body">
+        <div class="adm-dialog__error" data-vehicle-error hidden>
+          <span class="material-symbols-outlined" aria-hidden="true">error</span>
+          <p role="alert"></p>
+        </div>
+
+        <section class="af-section">
+          <div class="af-section__head">
+            <h3><span class="material-symbols-outlined" aria-hidden="true">badge</span>Identity</h3>
+            <p>The year, make and model shown on the listing card.</p>
+          </div>
+          <div class="af-grid af-grid--3">
+            <div class="af-field" data-af-field="year">
+              <label class="label" for="vfYear">Year *</label>
+              <input class="input" id="vfYear" name="year" type="number" min="1990" max="2030" inputmode="numeric" placeholder="2023">
+              <p class="af-field__error" data-af-error="year" hidden></p>
+            </div>
+            <div class="af-field" data-af-field="make">
+              <label class="label" for="vfMake">Make *</label>
+              <input class="input" id="vfMake" name="make" type="text" placeholder="BMW" autocomplete="off">
+              <p class="af-field__error" data-af-error="make" hidden></p>
+            </div>
+            <div class="af-field" data-af-field="model">
+              <label class="label" for="vfModel">Model *</label>
+              <input class="input" id="vfModel" name="model" type="text" placeholder="X5" autocomplete="off">
+              <p class="af-field__error" data-af-error="model" hidden></p>
+            </div>
+            <div class="af-field" data-af-field="trim">
+              <label class="label" for="vfTrim">Trim</label>
+              <input class="input" id="vfTrim" name="trim" type="text" placeholder="xDrive40i">
+            </div>
+            <div class="af-field" data-af-field="stockNumber">
+              <label class="label" for="vfStock">Stock number *</label>
+              <input class="input" id="vfStock" name="stockNumber" type="text" placeholder="AS-2271">
+              <p class="af-field__error" data-af-error="stockNumber" hidden></p>
+            </div>
+            <div class="af-field" data-af-field="vin">
+              <label class="label" for="vfVin">VIN</label>
+              <input class="input" id="vfVin" name="vin" type="text" maxlength="17" placeholder="17 characters" autocapitalize="characters">
+              <p class="af-field__error" data-af-error="vin" hidden></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="af-section">
+          <div class="af-section__head">
+            <h3><span class="material-symbols-outlined" aria-hidden="true">sell</span>Pricing</h3>
+            <p>Transparent fixed price. MSRP is used for savings calculations.</p>
+          </div>
+          <div class="af-grid af-grid--4">
+            <div class="af-field" data-af-field="price">
+              <label class="label" for="vfPrice">Price *</label>
+              <input class="input" id="vfPrice" name="price" type="number" min="500" step="100" inputmode="numeric" placeholder="48900">
+              <p class="af-field__error" data-af-error="price" hidden></p>
+            </div>
+            <div class="af-field" data-af-field="msrp">
+              <label class="label" for="vfMsrp">MSRP</label>
+              <input class="input" id="vfMsrp" name="msrp" type="number" min="0" step="100" inputmode="numeric" placeholder="53400">
+            </div>
+            <div class="af-field" data-af-field="belowMarketAmount">
+              <label class="label" for="vfBelowMarket">Below market</label>
+              <input class="input" id="vfBelowMarket" name="belowMarketAmount" type="number" min="0" step="50" inputmode="numeric" placeholder="1200">
+            </div>
+            <div class="af-field" data-af-field="dealRating">
+              <label class="label" for="vfDealRating">Deal rating</label>
+              <select class="select" id="vfDealRating" name="dealRating">
+                <option>Great Deal</option>
+                <option>Good Deal</option>
+                <option selected>Fair Market Price</option>
+                <option>Above Market</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="af-section">
+          <div class="af-section__head">
+            <h3><span class="material-symbols-outlined" aria-hidden="true">settings</span>Specifications</h3>
+            <p>Powers the filterable specs and comparison table.</p>
+          </div>
+          <div class="af-grid af-grid--3">
+            <div class="af-field" data-af-field="mileage">
+              <label class="label" for="vfMileage">Mileage *</label>
+              <input class="input" id="vfMileage" name="mileage" type="number" min="0" step="1" inputmode="numeric" placeholder="18200">
+              <p class="af-field__error" data-af-error="mileage" hidden></p>
+            </div>
+            <div class="af-field">
+              <label class="label" for="vfBodyStyle">Body style</label>
+              <select class="select" id="vfBodyStyle" name="bodyStyle">
+                <option>SUV</option>
+                <option>Sedan</option>
+                <option>Truck</option>
+                <option>Coupe</option>
+                <option>Crossover</option>
+              </select>
+            </div>
+            <div class="af-field">
+              <label class="label" for="vfFuelType">Fuel type</label>
+              <select class="select" id="vfFuelType" name="fuelType">
+                <option>Gasoline</option>
+                <option>Hybrid</option>
+                <option>Electric</option>
+                <option>PlugInHybrid</option>
+                <option>Diesel</option>
+              </select>
+            </div>
+            <div class="af-field">
+              <label class="label" for="vfTransmission">Transmission</label>
+              <select class="select" id="vfTransmission" name="transmission">
+                <option>Automatic</option>
+                <option>Manual</option>
+              </select>
+            </div>
+            <div class="af-field">
+              <label class="label" for="vfDrivetrain">Drivetrain</label>
+              <select class="select" id="vfDrivetrain" name="drivetrain">
+                <option>FWD</option>
+                <option>RWD</option>
+                <option>AWD</option>
+                <option>4WD</option>
+              </select>
+            </div>
+            <div class="af-field">
+              <label class="label" for="vfEngine">Engine</label>
+              <input class="input" id="vfEngine" name="engine" type="text" placeholder="3.0L Turbo I6">
+            </div>
+            <div class="af-field">
+              <label class="label" for="vfSeats">Seats</label>
+              <input class="input" id="vfSeats" name="seats" type="number" min="2" max="9" step="1" inputmode="numeric" placeholder="5">
+            </div>
+            <div class="af-field">
+              <label class="label" for="vfMpgCity">MPG city</label>
+              <input class="input" id="vfMpgCity" name="mpgCity" type="number" min="0" step="1" inputmode="numeric" placeholder="21">
+            </div>
+            <div class="af-field">
+              <label class="label" for="vfMpgHwy">MPG highway</label>
+              <input class="input" id="vfMpgHwy" name="mpgHwy" type="number" min="0" step="1" inputmode="numeric" placeholder="26">
+            </div>
+            <div class="af-field">
+              <label class="label" for="vfExterior">Exterior color</label>
+              <input class="input" id="vfExterior" name="exteriorColor" type="text" placeholder="Alpine White">
+            </div>
+            <div class="af-field">
+              <label class="label" for="vfInterior">Interior color</label>
+              <input class="input" id="vfInterior" name="interiorColor" type="text" placeholder="Black Vernasca">
+            </div>
+            <div class="af-field">
+              <label class="label" for="vfLocation">Hub location</label>
+              <select class="select" id="vfLocation" name="location">
+                <option>Dallas, TX</option>
+                <option>Plano, TX</option>
+                <option>Fort Worth, TX</option>
+                <option>Arlington, TX</option>
+                <option>Irving, TX</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="af-section">
+          <div class="af-section__head">
+            <h3><span class="material-symbols-outlined" aria-hidden="true">photo_library</span>Photos</h3>
+            <p>Drag to reorder. The first image is the cover on cards and social previews.</p>
+          </div>
+          <div class="af-drop" id="afDrop" role="button" tabindex="0" aria-label="Upload vehicle photos">
+            <span class="material-symbols-outlined" aria-hidden="true">add_photo_alternate</span>
+            <strong>Drop photos here or browse</strong>
+            <span>JPG, PNG or WebP · up to 8 MB each</span>
+            <input id="afImages" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden>
+          </div>
+          <div class="af-url">
+            <input class="input" id="afImageUrl" type="url" inputmode="url" autocomplete="off"
+              placeholder="https://example.com/photo.jpg" aria-label="Photo URL">
+            <button class="btn btn--ghost btn--sm" type="button" id="afImageUrlAdd">Add by URL</button>
+          </div>
+          <div class="af-image-grid" id="afImageGrid"></div>
+          <div class="af-image-empty" id="afImageEmpty">No photos yet. Add at least one for a complete listing.</div>
+          <p class="af-image-note" id="afImageNote" aria-live="polite">First image is the cover. Drag to reorder or use the arrow buttons.</p>
+        </section>
+
+        <section class="af-section">
+          <div class="af-section__head">
+            <h3><span class="material-symbols-outlined" aria-hidden="true">verified</span>Flags &amp; status</h3>
+            <p>Control merchandising, availability and inspection badges.</p>
+          </div>
+          <div class="af-grid af-grid--2">
+            <div class="af-field">
+              <label class="label" for="vfStatus">Listing status</label>
+              <select class="select" id="vfStatus" name="status">
+                <option value="available">Available</option>
+                <option value="reserved">Reserved</option>
+                <option value="sold">Sold</option>
+              </select>
+            </div>
+            <div class="af-field">
+              <label class="label" for="vfViewCount">View count</label>
+              <input class="input" id="vfViewCount" name="viewCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+            </div>
+          </div>
+          <div class="af-switches">
+            <label class="af-switch"><input type="checkbox" id="vfFeatured" name="featured"><span>Featured on home</span></label>
+            <label class="af-switch"><input type="checkbox" id="vfCertified" name="certified" checked><span>Certified pre-owned</span></label>
+            <label class="af-switch"><input type="checkbox" id="vfInspected" name="inspected150" checked><span>150-point inspected</span></label>
+            <label class="af-switch"><input type="checkbox" id="vfCarfax" name="carfaxClean" checked><span>Clean CARFAX</span></label>
+            <label class="af-switch"><input type="checkbox" id="vfOneOwner" name="oneOwner"><span>One owner</span></label>
+          </div>
+        </section>
+
+        <section class="af-section">
+          <div class="af-section__head">
+            <h3><span class="material-symbols-outlined" aria-hidden="true">checklist</span>Features &amp; inspection</h3>
+            <p>One feature per line. Inspection values appear on the detail page report.</p>
+          </div>
+          <div class="af-grid">
+            <div class="af-field af-span-2">
+              <label class="label" for="vfFeatures">Features</label>
+              <textarea class="textarea" id="vfFeatures" name="features" rows="4" placeholder="Heated front seats&#10;Adaptive cruise control&#10;Wireless CarPlay"></textarea>
+            </div>
+          </div>
+          <div class="af-grid af-grid--4">
+            <div class="af-field">
+              <label class="label" for="vfBrakeLife">Brake life %</label>
+              <input class="input" id="vfBrakeLife" name="brakeLife" type="number" min="0" max="100" step="1" inputmode="numeric" placeholder="85">
+            </div>
+            <div class="af-field">
+              <label class="label" for="vfTireTread">Tire tread /32"</label>
+              <input class="input" id="vfTireTread" name="tireTread" type="number" min="0" max="15" step="0.5" inputmode="decimal" placeholder="8">
+            </div>
+            <div class="af-field">
+              <label class="label" for="vfBattery">Battery</label>
+              <input class="input" id="vfBattery" name="battery" type="text" placeholder="100% Pass">
+            </div>
+            <div class="af-field">
+              <label class="label" for="vfFluids">Fluids</label>
+              <input class="input" id="vfFluids" name="fluids" type="text" placeholder="Fresh Service A">
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="adm-dialog__foot">
+        <button class="btn btn--ghost" type="button" data-vehicle-cancel>Cancel</button>
+        <button class="btn btn--primary" type="submit" id="vfSave">
+          <span class="material-symbols-outlined" aria-hidden="true">save</span>
+          <span>Save vehicle</span>
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="adm-dialog adm-dialog--sm" id="confirmDialog" aria-labelledby="confirmTitle">
+    <div class="adm-confirm__body">
+      <div class="adm-confirm__icon" id="confirmIcon"><span class="material-symbols-outlined" aria-hidden="true">warning</span></div>
+      <h2 id="confirmTitle">Are you sure?</h2>
+      <p id="confirmMessage">This action cannot be undone.</p>
+    </div>
+    <div class="adm-dialog__foot">
+      <button class="btn btn--ghost" type="button" data-confirm-cancel>Cancel</button>
+      <button class="btn btn--danger" type="button" id="confirmAccept" data-confirm-accept>Delete</button>
+    </div>
+  </dialog>
+
+  <noscript>
+    <p style="padding:24px;text-align:center;font-family:system-ui">The dealer portal needs JavaScript enabled.</p>
+  </noscript>
+  <script type="module" src="../js/admin/admin.js?v=20261101a"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 232 48" role="img" aria-label="AutoSelect">
+  <rect x="0" y="0" width="48" height="48" rx="13" fill="#0b132b"/>
+  <g transform="translate(6 7) scale(1.5)">
+    <path d="M3.2 15.1 4.9 9.9A2.7 2.7 0 0 1 7.5 8h9a2.7 2.7 0 0 1 2.6 1.9l1.7 5.2" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M3.6 14.6h16.8v3.5a1.1 1.1 0 0 1-1.1 1.1h-1.5a1.1 1.1 0 0 1-1.1-1.1v-.6H7.3v.6a1.1 1.1 0 0 1-1.1 1.1H4.7a1.1 1.1 0 0 1-1.1-1.1v-3.5Z" fill="#ffffff"/>
+    <circle cx="7.2" cy="12.1" r=".8" fill="#2563eb"/>
+    <circle cx="16.8" cy="12.1" r=".8" fill="#2563eb"/>
+  </g>
+  <text x="62" y="31" font-family="'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif" font-size="25" font-weight="800" letter-spacing="-0.8" fill="#0b132b">AutoSelect</text>
+</svg>

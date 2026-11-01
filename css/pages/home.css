@@ -1,0 +1,407 @@
+/* ==========================================================================
+   Home marketplace
+   ========================================================================== */
+
+.home-page .container { max-width: var(--container); }
+
+.section-head__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--slate);
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Hero ------------------------------------------------------------------ */
+.hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r-xl);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(37, 99, 235, 0.38) 0%, transparent 55%),
+    linear-gradient(125deg, #0b132b 0%, #1c2541 58%, #101a38 100%);
+  color: #fff;
+  padding: 28px 22px 34px;
+  box-shadow: var(--shadow-3);
+  isolation: isolate;
+}
+.hero__media {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 62%;
+  background: url("../../assets/cars/suv-black-luxury.jpg") right 58% / cover no-repeat;
+  opacity: 0.26;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 72%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 72%);
+  z-index: -1;
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 45%;
+  background: linear-gradient(to top, rgba(11, 19, 43, 0.55), transparent);
+  pointer-events: none;
+  z-index: -1;
+}
+.hero__content { position: relative; max-width: 680px; }
+.hero__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: var(--r-full);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.09);
+  color: #dbeafe;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.hero__badge .material-symbols-outlined { font-size: 14px; color: var(--green); }
+.hero h1 {
+  color: #fff;
+  font-size: var(--text-hero);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  margin: 14px 0 12px;
+  text-wrap: balance;
+  max-width: 16ch;
+}
+.hero p {
+  color: #cbd5e1;
+  font-size: 13.5px;
+  line-height: 1.65;
+  max-width: 54ch;
+}
+.hero__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 22px;
+  max-width: 500px;
+}
+.hero__stats > div {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.hero__stats strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+.hero__stats span {
+  display: block;
+  margin-top: 2px;
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #cbd5e1;
+}
+
+/* Search card ----------------------------------------------------------- */
+.search-card {
+  position: relative;
+  z-index: 3;
+  margin-top: -18px;
+  margin-inline: 8px;
+  padding: 16px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-2);
+}
+.search-card__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.search-card__title { font-size: 15px; letter-spacing: -0.01em; }
+.search-card__live {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--green-ink);
+  white-space: nowrap;
+}
+.search-card__live .pulse-dot { width: 6px; height: 6px; }
+.search-tabs .tabs__btn { padding: 8px 6px; font-size: 11.5px; }
+.search-grid { display: grid; gap: 12px; margin-top: 14px; }
+.field--budget .range { margin-top: 8px; }
+.search-submit { width: 100%; height: 46px; font-size: 13px; gap: 6px; }
+.search-submit .material-symbols-outlined { font-size: 19px; }
+
+/* Trust strip ----------------------------------------------------------- */
+.trust-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 20px;
+}
+.trust-strip__item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+.trust-strip__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--blue-soft);
+  color: var(--blue);
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.trust-strip__item strong { display: block; font-size: 11px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+.trust-strip__item span:last-child { display: block; font-size: 9.5px; color: var(--slate); line-height: 1.35; }
+
+/* Body style tiles ------------------------------------------------------ */
+.body-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.body-tile {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 14px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-1);
+  transition: border-color var(--speed), box-shadow var(--speed), transform var(--speed);
+}
+.body-tile:hover { border-color: var(--border-hover); box-shadow: var(--shadow-2); transform: translateY(-1px); }
+.body-tile__icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  background: var(--subtle);
+  color: var(--navy-tint);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.body-tile__icon .material-symbols-outlined { font-size: 23px; }
+.body-tile__text { min-width: 0; }
+.body-tile__text strong { display: block; font-family: var(--font-display); font-size: 13.5px; font-weight: 700; color: var(--ink); }
+.body-tile__text span { display: block; font-size: 10px; color: var(--slate); margin-top: 1px; }
+.body-tile__arrow { margin-left: auto; font-size: 17px; color: var(--border-strong); transition: transform var(--speed), color var(--speed); }
+.body-tile:hover .body-tile__arrow { color: var(--blue); transform: translateX(2px); }
+
+/* Featured grid --------------------------------------------------------- */
+.featured-grid { grid-template-columns: 1fr; }
+.featured-grid .veh-card { height: 100%; }
+
+/* Quiz CTA -------------------------------------------------------------- */
+.quiz-cta {
+  position: relative;
+  overflow: hidden;
+  margin-top: 34px;
+  padding: 24px 20px;
+  border-radius: var(--r-lg);
+  background:
+    radial-gradient(90% 130% at 100% 0%, rgba(255, 255, 255, 0.22) 0%, transparent 55%),
+    linear-gradient(135deg, #2563eb 0%, #1d4ed8 55%, #1e40af 100%);
+  color: #fff;
+  box-shadow: var(--shadow-2);
+  display: grid;
+  gap: 16px;
+}
+.quiz-cta::after {
+  content: "";
+  position: absolute;
+  right: -60px;
+  top: -70px;
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  border: 26px solid rgba(255, 255, 255, 0.09);
+  pointer-events: none;
+}
+.quiz-cta__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.16);
+  display: grid;
+  place-items: center;
+}
+.quiz-cta__icon .material-symbols-outlined { font-size: 26px; color: #fff; font-variation-settings: "FILL" 1; }
+.quiz-cta__eyebrow {
+  display: block;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #bfdbfe;
+  margin-bottom: 4px;
+}
+.quiz-cta h2 { color: #fff; font-size: clamp(21px, 2vw, 27px); max-width: 20ch; }
+.quiz-cta p { margin-top: 7px; font-size: 12.5px; line-height: 1.6; color: #dbeafe; max-width: 54ch; }
+.quiz-cta__points { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; }
+.quiz-cta__points li { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: #eff6ff; }
+.quiz-cta__points .material-symbols-outlined { font-size: 15px; color: #a7f3d0; }
+.quiz-cta__action { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; position: relative; z-index: 1; }
+.quiz-cta__action .btn { background: #fff; color: var(--blue); border-color: transparent; box-shadow: 0 8px 18px rgba(11, 19, 43, 0.18); }
+.quiz-cta__action .btn:hover { background: #eff6ff; }
+.quiz-cta__note { font-size: 10px; color: #bfdbfe; }
+
+/* Trade-in banner ------------------------------------------------------- */
+.tradein-banner {
+  position: relative;
+  overflow: hidden;
+  margin-top: 20px;
+  border-radius: var(--r-lg);
+  padding: 24px 20px;
+  background: linear-gradient(120deg, #0b132b 0%, #131a33 62%, #1c2541 100%);
+  color: #fff;
+  box-shadow: var(--shadow-2);
+  display: grid;
+  gap: 16px;
+  isolation: isolate;
+}
+.tradein-banner__media {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 70%;
+  background: url("../../assets/cars/truck-silver.jpg") right 60% / cover no-repeat;
+  opacity: 0.22;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 75%);
+  mask-image: linear-gradient(90deg, transparent, #000 75%);
+  z-index: -1;
+}
+.tradein-banner__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: var(--r-full);
+  background: var(--orange);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.tradein-banner h2 { color: #fff; font-size: clamp(19px, 2vw, 24px); max-width: 24ch; margin-top: 8px; }
+.tradein-banner p { margin-top: 6px; color: #cbd5e1; font-size: 12px; max-width: 48ch; }
+.tradein-banner .btn { justify-self: start; }
+
+/* Reviews --------------------------------------------------------------- */
+.reviews-layout { display: grid; gap: 14px; }
+.review-summary {
+  padding: 20px;
+  border-radius: var(--r-lg);
+  background: linear-gradient(145deg, var(--white), var(--surface-soft));
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-1);
+}
+.review-summary__score {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--ink);
+}
+.review-summary__stars { margin-top: 6px; }
+.review-summary__stars .material-symbols-outlined { font-size: 19px; }
+.review-summary__caption { margin-top: 8px; font-size: 11.5px; color: var(--slate); }
+.review-summary__caption strong { color: var(--ink); }
+.review-summary__badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.review-cards { display: grid; gap: 10px; }
+.review-card {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 15px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-1);
+}
+.review-card__head { display: flex; align-items: center; gap: 9px; }
+.review-card__avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--navy-tint);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.review-card__name { font-size: 12px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+.review-card__meta { font-size: 10px; color: var(--slate); }
+.review-card__head .rating-stars { margin-left: auto; }
+.review-card__text { font-size: 11.5px; line-height: 1.6; color: var(--slate-strong); }
+.review-card__foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.review-card__vehicle { font-size: 10px; font-weight: 600; color: var(--blue); }
+
+/* Responsive ------------------------------------------------------------ */
+@media (min-width: 560px) {
+  .search-grid { grid-template-columns: 1fr 1fr; }
+  .field--budget { grid-column: span 2; }
+  .search-submit { grid-column: span 2; }
+  .trust-strip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .body-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .body-tile { flex-direction: column; text-align: center; gap: 8px; padding: 16px 10px; }
+  .body-tile__icon { width: 46px; height: 46px; }
+  .body-tile__text span { margin-top: 2px; }
+  .body-tile__arrow { display: none; }
+  .review-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .quiz-cta { padding: 28px; }
+}
+
+@media (min-width: 768px) {
+  .hero { padding: 40px 36px 48px; }
+  .hero__media { width: 56%; }
+  .search-card { margin-inline: 16px; padding: 20px 22px; }
+  .search-grid { grid-template-columns: 1.1fr 1.1fr 1fr; }
+  .field--budget { grid-column: auto; }
+  .search-submit { grid-column: auto; }
+  .quiz-cta { grid-template-columns: auto 1fr; align-items: start; }
+  .quiz-cta__action { grid-column: 2; align-items: flex-start; }
+  .tradein-banner { grid-template-columns: 1fr auto; align-items: center; padding: 28px; }
+  .tradein-banner .btn { justify-self: end; }
+  .reviews-layout { grid-template-columns: 240px 1fr; align-items: start; }
+}
+
+@media (min-width: 1024px) {
+  .hero { padding: 52px 48px 62px; border-radius: 24px; }
+  .hero p { font-size: 15px; }
+  .hero__stats { max-width: 520px; margin-top: 28px; }
+  .hero__stats > div { padding: 13px 15px; }
+  .hero__stats strong { font-size: 21px; }
+  .search-card { margin-top: -26px; margin-inline: 24px; padding: 22px 24px; }
+  .search-grid {
+    grid-template-columns: 1fr 1fr 1.35fr 0.85fr 0.95fr 1.2fr;
+    gap: 14px;
+    align-items: end;
+  }
+  .search-tabs { max-width: 480px; }
+  .trust-strip { margin-top: 26px; }
+  .body-tile { flex-direction: row; text-align: left; gap: 12px; padding: 15px 16px; }
+  .body-tile__arrow { display: block; }
+  .featured-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .quiz-cta { grid-template-columns: auto 1fr auto; align-items: center; padding: 30px 34px; gap: 22px; }
+  .quiz-cta__action { grid-column: auto; align-items: flex-end; }
+  .reviews-layout { grid-template-columns: 280px 1fr; gap: 18px; }
+}
+
+@media (min-width: 1240px) {
+  .featured-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .featured-grid .veh-head { gap: 8px; }
+  .featured-grid .veh-price strong { font-size: 19px; }
+  .featured-grid .veh-body { padding: 13px 14px 15px; }
+}

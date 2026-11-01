@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Page not found — AutoSelect</title>
+  <meta name="description" content="The page you were looking for has moved or no longer exists. Search AutoSelect inventory or head back to the showroom.">
+  <meta name="theme-color" content="#0B132B">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/variables.css?v=20261101a">
+  <link rel="stylesheet" href="/css/base.css?v=20261101a">
+  <link rel="stylesheet" href="/css/components.css?v=20261101a">
+  <link rel="stylesheet" href="/css/pages/content.css?v=20261101a">
+</head>
+<body data-page="notfound">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="page content-page">
+    <div class="container">
+      <div class="nf-wrap">
+        <div class="nf-card">
+          <div class="nf-code" aria-hidden="true"><span>4</span>0<span>4</span></div>
+          <p class="eyebrow eyebrow--orange" style="justify-content:center">Wrong turn</p>
+          <h1>This page took an exit.</h1>
+          <p>The link may be outdated, or the vehicle you were looking for has been sold. Search the current inventory or start from a fresh route.</p>
+          <form class="nf-search" action="/inventory.html" method="get" role="search">
+            <label class="sr-only" for="nfQuery">Search inventory</label>
+            <input class="input" id="nfQuery" type="search" name="q" placeholder="Search make, model or keyword">
+            <button class="btn btn--primary" type="submit" aria-label="Search inventory">
+              <span class="material-symbols-outlined" aria-hidden="true">search</span>
+            </button>
+          </form>
+          <div class="nf-actions">
+            <a class="btn btn--accent" href="/inventory.html">
+              <span class="material-symbols-outlined" aria-hidden="true">directions_car</span>Browse inventory
+            </a>
+            <a class="btn btn--ghost" href="/index.html">
+              <span class="material-symbols-outlined" aria-hidden="true">home</span>Back to home
+            </a>
+          </div>
+          <nav class="nf-links" aria-label="Helpful links">
+            <span>Popular:</span>
+            <a href="/quiz.html">Match quiz</a>
+            <a href="/saved.html">Saved vehicles</a>
+            <a href="/sell.html">Sell or trade</a>
+            <a href="/contact.html">Concierge</a>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script type="module" src="/js/pages/content.js?v=20261101a"></script>
+</body>
+</html>

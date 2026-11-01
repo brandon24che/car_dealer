@@ -1,0 +1,41 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.token.get('admin', false) == true ||
+        firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function validImage() {
+      return request.resource.size < 8 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    /* Vehicle photos: public read, dealer uploads only. */
+    match /vehicles/{vehicleId}/{fileName} {
+      allow read: if true;
+      allow create, update: if isAdmin() && validImage();
+      allow delete: if isAdmin();
+    }
+
+    /*
+     * Trade-in photos are submitted by visitors. Firebase Storage gates
+     * getDownloadURL() on read access, so the uploader needs read for the
+     * returned token URL. Object paths are timestamped and only the admin
+     * valuation record links to them.
+     */
+    match /valuations/{fileName} {
+      allow create: if validImage();
+      allow read: if true;
+      allow update, delete: if isAdmin();
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

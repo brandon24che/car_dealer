@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Certified Pre-Owned Inventory — AutoSelect Dallas</title>
+  <meta name="description" content="Browse 1,450+ 150-point inspected, CARFAX-verified used SUVs, sedans, trucks and EVs in Dallas, TX. Filter by price, body style, make, mileage and financing.">
+  <meta name="theme-color" content="#0B132B">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Certified Inventory — AutoSelect">
+  <meta property="og:description" content="Filter 150-point inspected inventory by price, body style, make and certification.">
+  <meta property="og:image" content="assets/cars/suv-silver.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css?v=20261101a">
+  <link rel="stylesheet" href="css/base.css?v=20261101a">
+  <link rel="stylesheet" href="css/components.css?v=20261101a">
+  <link rel="stylesheet" href="css/pages/inventory.css?v=20261101a">
+</head>
+<body data-page="inventory">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="page inventory-page">
+    <div class="container">
+      <section class="inv-banner" aria-labelledby="invTitle">
+        <div class="inv-banner__top">
+          <span class="inv-banner__live"><span class="pulse-dot"></span>Live Verified Stock</span>
+          <span class="inv-banner__hub"><span class="material-symbols-outlined">location_on</span>Dallas Hub</span>
+        </div>
+        <h1 id="invTitle">Certified Pre-Owned</h1>
+        <p><strong data-banner-count>1,452 Vehicles</strong> inspected &amp; ready for immediate delivery in Dallas, TX.</p>
+        <div class="inv-banner__badges">
+          <span class="badge badge--verified"><span class="material-symbols-outlined">verified_user</span>150-point inspection</span>
+          <span class="badge badge--neutral"><span class="material-symbols-outlined">history</span>7-day returns</span>
+          <span class="badge badge--neutral"><span class="material-symbols-outlined">chat</span>WhatsApp checkout</span>
+        </div>
+      </section>
+
+      <div class="inv-toolbar">
+        <div class="inv-search">
+          <span class="material-symbols-outlined inv-search__icon" aria-hidden="true">search</span>
+          <input class="input input--search" id="invSearch" type="search" placeholder="Search make, model, or VIN…" autocomplete="off" aria-label="Search inventory">
+          <button type="button" class="inv-search__clear" data-search-clear hidden aria-label="Clear search">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <button type="button" class="btn btn--primary inv-filter-trigger" data-filter-open>
+          <span class="material-symbols-outlined">tune</span>
+          <span>Filters</span>
+          <span class="filter-count" data-filter-badge>0</span>
+        </button>
+        <button type="button" class="btn btn--ghost btn--icon inv-share" data-share aria-label="Copy link to these filters">
+          <span class="material-symbols-outlined">share</span>
+        </button>
+      </div>
+
+      <div class="inv-layout">
+        <aside class="filter-panel" id="filterPanel" aria-label="Inventory filters">
+          <div class="filter-panel__head">
+            <div>
+              <h2>Filters</h2>
+              <p>Refine certified inventory</p>
+            </div>
+            <button type="button" class="modal__close" data-filter-close aria-label="Close filters">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+
+          <div class="filter-panel__body">
+            <section class="filter-group">
+              <div class="row-between">
+                <h3>Max price</h3>
+                <span class="range-value" id="invPriceLabel">Any price</span>
+              </div>
+              <input class="range" id="invPrice" type="range" min="10000" max="80000" step="1000" value="80000" aria-label="Maximum price">
+              <div class="range-meta"><span>$10,000</span><span id="invPriceCap">$80,000</span></div>
+            </section>
+
+            <section class="filter-group">
+              <h3>Body style</h3>
+              <div class="filter-options" id="bodyFilters"></div>
+            </section>
+
+            <section class="filter-group">
+              <h3>Make &amp; model</h3>
+              <div class="filter-stack">
+                <div class="select-wrap"><select class="select" id="invMake" aria-label="Make"><option value="">Any make</option></select></div>
+                <div class="select-wrap"><select class="select" id="invModel" aria-label="Model" disabled><option value="">Any model</option></select></div>
+              </div>
+            </section>
+
+            <section class="filter-group">
+              <h3>Year</h3>
+              <div class="select-wrap"><select class="select" id="invYear" aria-label="Minimum year"></select></div>
+            </section>
+
+            <section class="filter-group">
+              <h3>Transmission</h3>
+              <div class="segmented filter-segmented" role="group" aria-label="Transmission">
+                <button type="button" class="segmented__btn is-active" data-transmission="">Any</button>
+                <button type="button" class="segmented__btn" data-transmission="Automatic">Automatic</button>
+                <button type="button" class="segmented__btn" data-transmission="Manual">Manual</button>
+              </div>
+            </section>
+
+            <section class="filter-group">
+              <h3>Fuel type</h3>
+              <div class="filter-options" id="fuelFilters"></div>
+            </section>
+
+            <section class="filter-group">
+              <h3>Certification</h3>
+              <div class="filter-options filter-options--stack">
+                <label class="filter-check"><input type="checkbox" id="invInspected"><span>150-point inspected</span><span class="material-symbols-outlined filter-check__icon">verified_user</span></label>
+                <label class="filter-check"><input type="checkbox" id="invCarfax"><span>Clean CARFAX</span><span class="material-symbols-outlined filter-check__icon">verified</span></label>
+                <label class="filter-check"><input type="checkbox" id="invOwner"><span>1-owner vehicle</span><span class="material-symbols-outlined filter-check__icon">person</span></label>
+              </div>
+            </section>
+
+            <button type="button" class="filter-reset" data-filter-reset>
+              <span class="material-symbols-outlined">restart_alt</span>Reset all filters
+            </button>
+          </div>
+
+          <div class="filter-panel__foot">
+            <button type="button" class="btn btn--ghost" data-filter-reset>Clear</button>
+            <button type="button" class="btn btn--primary" data-filter-apply>Show <span data-filter-foot-count>—</span> vehicles</button>
+          </div>
+        </aside>
+
+        <div class="filter-backdrop" data-filter-close hidden></div>
+
+        <section class="inv-main" aria-label="Inventory results">
+          <div class="inv-topbar">
+            <div class="inv-topbar__title">
+              <p class="eyebrow">Verified inventory</p>
+              <h2><span data-result-count>—</span> vehicles</h2>
+            </div>
+            <div class="inv-controls">
+              <label class="sort-control" for="invSort">
+                <span>Sort:</span>
+                <div class="select-wrap"><select class="select" id="invSort"></select></div>
+              </label>
+              <div class="view-toggle" role="group" aria-label="Layout">
+                <button type="button" class="view-toggle__btn is-active" data-view="grid" aria-label="Grid view" aria-pressed="true"><span class="material-symbols-outlined">grid_view</span></button>
+                <button type="button" class="view-toggle__btn" data-view="list" aria-label="List view" aria-pressed="false"><span class="material-symbols-outlined">view_agenda</span></button>
+              </div>
+            </div>
+          </div>
+
+          <div id="chipRibbon" class="inv-chips"></div>
+
+          <div class="results-meta">
+            <span data-showing>Loading certified inventory…</span>
+            <span class="results-meta__live"><span class="pulse-dot"></span>Live count</span>
+          </div>
+
+          <div id="inventoryFeed" class="cards-grid" aria-live="polite" aria-busy="true">
+            <div class="skeleton-card" aria-hidden="true"><div class="skeleton skeleton-card__media"></div><div class="skeleton-card__body"><div class="skeleton skeleton-line skeleton-line--sm"></div><div class="skeleton skeleton-line skeleton-line--lg"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line" style="height:44px"></div></div></div>
+            <div class="skeleton-card" aria-hidden="true"><div class="skeleton skeleton-card__media"></div><div class="skeleton-card__body"><div class="skeleton skeleton-line skeleton-line--sm"></div><div class="skeleton skeleton-line skeleton-line--lg"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line" style="height:44px"></div></div></div>
+            <div class="skeleton-card" aria-hidden="true"><div class="skeleton skeleton-card__media"></div><div class="skeleton-card__body"><div class="skeleton skeleton-line skeleton-line--sm"></div><div class="skeleton skeleton-line skeleton-line--lg"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line" style="height:44px"></div></div></div>
+            <div class="skeleton-card" aria-hidden="true"><div class="skeleton skeleton-card__media"></div><div class="skeleton-card__body"><div class="skeleton skeleton-line skeleton-line--sm"></div><div class="skeleton skeleton-line skeleton-line--lg"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line" style="height:44px"></div></div></div>
+          </div>
+
+          <div class="inv-loadmore" id="loadMoreWrap" hidden>
+            <button type="button" class="btn btn--ghost btn--lg" id="loadMoreBtn">
+              <span class="material-symbols-outlined">expand_more</span>
+              <span>Load Next 10 Vehicles</span>
+            </button>
+            <p data-load-note></p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script type="module" src="js/pages/inventory.js?v=20261101a"></script>
+</body>
+</html>

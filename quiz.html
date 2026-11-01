@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Car Match Quiz — Find Your Perfect Vehicle | AutoSelect</title>
+  <meta name="description" content="Answer six quick questions about your budget, passengers, lifestyle and must-haves. AutoSelect scores live Dallas inventory to find your top six certified matches in 60 seconds.">
+  <meta name="theme-color" content="#0B132B">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="canonical" href="quiz.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Find Your Perfect Car Match in 60 Seconds — AutoSelect">
+  <meta property="og:description" content="Six lifestyle questions, live Dallas inventory, and your top six certified matches with a % fit score.">
+  <meta property="og:image" content="assets/cars/suv-gray.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css?v=20261101a">
+  <link rel="stylesheet" href="css/base.css?v=20261101a">
+  <link rel="stylesheet" href="css/components.css?v=20261101a">
+  <link rel="stylesheet" href="css/pages/quiz.css?v=20261101a">
+</head>
+<body data-page="quiz" class="quiz-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="page quiz-page__main">
+    <div class="container">
+      <nav class="crumbs quiz-crumbs" aria-label="Breadcrumb">
+        <a href="index.html">Home</a>
+        <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+        <span aria-current="page">Match Quiz</span>
+      </nav>
+
+      <div class="quiz-layout" id="quizWizard">
+        <div class="quiz-main">
+          <section class="quiz-progress" aria-label="Quiz progress">
+            <div class="quiz-progress__top">
+              <span class="quiz-progress__step">
+                <span class="pulse-dot" aria-hidden="true"></span>
+                <span data-step-label>Step 1 of 6</span>
+              </span>
+              <button type="button" class="quiz-progress__skip" id="quizSkip">
+                Skip to Results <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+              </button>
+            </div>
+            <div class="quiz-progress__track" id="quizProgress" role="progressbar" aria-label="Quiz completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="17">
+              <span class="quiz-progress__fill" data-progress-fill style="width:17%"></span>
+            </div>
+            <div class="quiz-progress__meta">
+              <span class="quiz-progress__complete"><span class="material-symbols-outlined" aria-hidden="true">check_circle</span><span data-progress-complete>Budget &amp; Make in progress</span></span>
+              <strong data-progress-pct>17% Done</strong>
+            </div>
+          </section>
+
+          <header class="quiz-intro">
+            <span class="quiz-eyebrow"><span class="material-symbols-outlined" aria-hidden="true">tune</span>Find the Car That Fits Your Life</span>
+            <h1 id="quizTitle" tabindex="-1">Let’s start with your budget and favorite makes</h1>
+            <p id="quizDescription">Tell us what you want to spend and which badges you like. Our precision engine keeps every recommendation inside your comfort zone.</p>
+          </header>
+
+          <div class="quiz-live quiz-live--inline" data-live-banner>
+            <div class="quiz-live__main">
+              <span class="quiz-live__icon material-symbols-outlined" aria-hidden="true">auto_awesome</span>
+              <div>
+                <div class="quiz-live__count"><strong data-match-count>—</strong><span>Matches Found</span></div>
+                <p>AutoSelect certified inventory</p>
+              </div>
+            </div>
+            <span class="quiz-live__status"><i aria-hidden="true"></i>Live</span>
+          </div>
+
+          <div class="quiz-step" id="quizStep">
+            <div class="quiz-panel">
+              <div class="skeleton skeleton-line skeleton-line--lg" style="height:26px"></div>
+              <div class="skeleton skeleton-line" style="height:14px;margin-top:12px"></div>
+              <div class="skeleton skeleton-line" style="height:14px;width:70%;margin-top:8px"></div>
+              <div class="skeleton" style="height:130px;margin-top:20px;border-radius:14px"></div>
+            </div>
+          </div>
+
+          <div class="quiz-actions">
+            <button type="button" class="btn btn--ghost quiz-actions__back" id="quizBack">
+              <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span><span>Back</span>
+            </button>
+            <button type="button" class="btn btn--primary btn--lg quiz-actions__next" id="quizNext">
+              <span data-next-label>Next: Passengers</span>
+              <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+            </button>
+          </div>
+
+          <p class="quiz-trust"><span class="material-symbols-outlined" aria-hidden="true">verified_user</span>Every recommended vehicle carries our 150-Point Comprehensive Inspection.</p>
+        </div>
+
+        <aside class="quiz-side" aria-label="Live recommendation preview">
+          <div class="quiz-live quiz-live--rail" data-live-banner>
+            <div class="quiz-live__main">
+              <span class="quiz-live__icon material-symbols-outlined" aria-hidden="true">auto_awesome</span>
+              <div>
+                <div class="quiz-live__count"><strong data-match-count>—</strong><span>Matches Found</span></div>
+                <p>AutoSelect certified inventory</p>
+              </div>
+            </div>
+            <span class="quiz-live__status"><i aria-hidden="true"></i>Live</span>
+          </div>
+
+          <section class="quiz-topmatch" id="topMatchPanel" aria-label="Current top match">
+            <div class="quiz-topmatch__head">
+              <span class="material-symbols-outlined" aria-hidden="true">insights</span>
+              <h2>Current Top Match</h2>
+              <span class="badge badge--blue-soft">—</span>
+            </div>
+            <div class="skeleton" style="height:152px;border-radius:12px"></div>
+            <div class="skeleton skeleton-line skeleton-line--lg" style="margin-top:14px"></div>
+            <div class="skeleton skeleton-line" style="margin-top:8px;width:75%"></div>
+          </section>
+
+          <section class="quiz-criteria" id="criteriaPanel" aria-label="Your quiz answers">
+            <div class="quiz-criteria__head">
+              <h2>What we’re weighing</h2>
+              <span>6 answers</span>
+            </div>
+            <div id="criteriaList">
+              <div class="skeleton skeleton-line" style="margin-top:10px"></div>
+              <div class="skeleton skeleton-line" style="margin-top:8px;width:80%"></div>
+              <div class="skeleton skeleton-line" style="margin-top:8px;width:64%"></div>
+            </div>
+            <div class="quiz-criteria__note">
+              <span class="material-symbols-outlined" aria-hidden="true">verified</span>
+              Scored against live Dallas stock, not a generic list.
+            </div>
+          </section>
+        </aside>
+      </div>
+
+      <section class="quiz-results" id="quizResults" aria-labelledby="resultsTitle" hidden>
+        <header class="quiz-results__head">
+          <span class="quiz-eyebrow"><span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span>Your precision matches</span>
+          <h1 id="resultsTitle">Your top matches are ready</h1>
+          <p id="resultsIntro">We scored every certified vehicle against your answers. Here are the six closest fits from live Dallas inventory.</p>
+          <div class="quiz-results__criteria" id="resultCriteria"></div>
+        </header>
+
+        <div class="quiz-results__toolbar">
+          <div class="quiz-results__count">
+            <span class="pulse-dot" aria-hidden="true"></span>
+            <span data-result-count>Scoring inventory…</span>
+          </div>
+          <div class="quiz-results__tools">
+            <button type="button" class="btn btn--ghost btn--sm" id="quizAdjust"><span class="material-symbols-outlined" aria-hidden="true">tune</span>Adjust answers</button>
+            <button type="button" class="btn btn--ghost btn--sm" id="quizRetake"><span class="material-symbols-outlined" aria-hidden="true">restart_alt</span>Start over</button>
+          </div>
+        </div>
+
+        <div id="topMatchWrap" class="quiz-topmatch-wrap"></div>
+
+        <div class="results-subhead">
+          <div>
+            <p class="eyebrow">Also in your top six</p>
+            <h2>Close runners-up</h2>
+          </div>
+          <a class="section-head__link" href="inventory.html">Browse all inventory <span class="material-symbols-outlined" style="font-size:16px" aria-hidden="true">arrow_forward</span></a>
+        </div>
+        <div class="cards-grid results-grid" id="resultsGrid"></div>
+
+        <div class="quiz-results__actions">
+          <a class="btn btn--primary" href="inventory.html"><span class="material-symbols-outlined" aria-hidden="true">directions_car</span>Browse the full inventory</a>
+          <a class="btn btn--wa" id="quizWhatsapp" href="https://wa.me/18005550199" target="_blank" rel="noopener noreferrer"><span class="material-symbols-outlined" aria-hidden="true">chat</span>Send my matches to a specialist</a>
+        </div>
+
+        <p class="quiz-results__note"><span class="material-symbols-outlined" aria-hidden="true">info</span>Match scores weigh budget, seating, lifestyle, fuel, body style and must-haves. Final pricing is always confirmed by your concierge.</p>
+      </section>
+
+      <noscript>
+        <div class="state">
+          <div class="state__icon"><span class="material-symbols-outlined">auto_awesome</span></div>
+          <h2>Enable JavaScript for the match quiz</h2>
+          <p>Our recommendation engine runs in your browser. You can still browse the full inventory.</p>
+          <div class="state__actions"><a class="btn btn--primary" href="inventory.html">Browse inventory</a></div>
+        </div>
+      </noscript>
+      <p class="sr-only" id="quizLiveStatus" role="status" aria-live="polite"></p>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script type="module" src="js/pages/quiz.js?v=20261101a"></script>
+</body>
+</html>
