@@ -2,19 +2,22 @@
  * Dealer portal — inventory table and the full vehicle editor.
  */
 import {
+  bulkDeleteVehicles,
+  bulkUpdateVehicles,
   deleteVehicle,
   saveVehicle,
   uploadVehicleImage,
-} from "../data-store.js?v=20261101a";
-import { setButtonLoading, showToast } from "../ui.js?v=20261101a";
-import { escapeHtml, formatCurrency, formatMileage, qs, qsa } from "../utils.js?v=20261101a";
+} from "../data-store.js?v=20261102a";
+import { setButtonLoading, showToast } from "../ui.js?v=20261102a";
+import { escapeHtml, formatCurrency, formatMileage, qs, qsa } from "../utils.js?v=20261102a";
 import {
   assetPath,
+  downloadCsv,
   leadDate,
   vehicleName,
   vehicleStatusBadge,
   vehicleThumb,
-} from "./helpers.js?v=20261101a";
+} from "./helpers.js?v=20261102a";
 
 const MAX_IMAGES = 24;
 const MAX_EMBEDDED = 4;
@@ -23,6 +26,8 @@ const CURRENT_YEAR = new Date().getFullYear();
 
 let vehicles = [];
 let filters = { query: "", status: "all" };
+let visibleIds = [];
+const selected = new Set();
 let editing = null;
 let images = [];
 let uploading = false;
@@ -74,6 +79,9 @@ function row(vehicle) {
     <tr>
       <td>
         <div class="adm-table__vehicle">
+          <label class="adm-select" title="Select ${name}">
+            <input type="checkbox" data-select-vehicle="${id}"${selected.has(vehicle.id) ? " checked" : ""} aria-label="Select ${name}">
+          </label>
           <img class="adm-table__thumb" src="${escapeHtml(assetPath(vehicleThumb(vehicle)))}" alt="" loading="lazy" width="58" height="42">
           <div class="adm-table__vtext">
             <strong>${name}</strong>
@@ -128,6 +136,11 @@ function emptyMarkup() {
 
 export function renderInventory(list = []) {
   vehicles = Array.isArray(list) ? list : [];
+  const known = new Set(vehicles.map((vehicle) => vehicle.id));
+  selected.forEach((id) => {
+    if (!known.has(id)) selected.delete(id);
+  });
+
   const counter = qs("[data-count-inventory]");
   if (counter) counter.textContent = String(vehicles.length);
   const total = qs("[data-inventory-count]");
@@ -137,13 +150,20 @@ export function renderInventory(list = []) {
   if (!body) return;
 
   const listToShow = visibleVehicles();
+  visibleIds = listToShow.map((vehicle) => vehicle.id);
+  selected.forEach((id) => {
+    if (!visibleIds.includes(id)) selected.delete(id);
+  });
   const shown = qs("[data-inv-shown]");
   if (shown) shown.textContent = String(listToShow.length);
 
   if (!listToShow.length) {
     body.innerHTML = emptyMarkup();
+    updateBulkBar();
     return;
   }
+
+  const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selected.has(id));
 
   body.innerHTML = `
     <div class="adm-table-wrap">
@@ -151,7 +171,14 @@ export function renderInventory(list = []) {
         <caption class="sr-only">Vehicle inventory</caption>
         <thead>
           <tr>
-            <th scope="col">Vehicle</th>
+            <th scope="col">
+              <span class="adm-th-vehicle">
+                <label class="adm-select" title="Select all visible vehicles">
+                  <input type="checkbox" data-select-all aria-label="Select all visible vehicles"${allSelected ? " checked" : ""}>
+                </label>
+                Vehicle
+              </span>
+            </th>
             <th scope="col" class="adm-table__num">Price</th>
             <th scope="col" class="adm-table__num">Mileage</th>
             <th scope="col">Status</th>
@@ -163,6 +190,115 @@ export function renderInventory(list = []) {
         <tbody>${listToShow.map(row).join("")}</tbody>
       </table>
     </div>`;
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  const bar = qs("[data-bulk-bar]");
+  if (bar) bar.hidden = selected.size === 0;
+  const count = qs("[data-bulk-count]");
+  if (count) count.textContent = String(selected.size);
+  const all = qs("[data-select-all]");
+  if (!all) return;
+  const visibleSelected = visibleIds.filter((id) => selected.has(id)).length;
+  all.checked = visibleIds.length > 0 && visibleSelected === visibleIds.length;
+  all.indeterminate = visibleSelected > 0 && visibleSelected < visibleIds.length;
+}
+
+function toggleSelectAll(checked) {
+  visibleIds.forEach((id) => {
+    if (checked) selected.add(id);
+    else selected.delete(id);
+  });
+  renderInventory(vehicles);
+}
+
+async function applyBulk(action) {
+  const chosen = vehicles.filter((vehicle) => selected.has(vehicle.id));
+  if (!chosen.length) return;
+
+  if (action === "delete") {
+    const confirmed = await context.confirmAction({
+      title: "Delete selected vehicles?",
+      message: `${chosen.length} vehicle${chosen.length === 1 ? "" : "s"} will be removed from inventory and the public site. This cannot be undone.`,
+      confirmLabel: `Delete ${chosen.length} vehicle${chosen.length === 1 ? "" : "s"}`,
+      danger: true,
+    });
+    if (!confirmed) return;
+    try {
+      await bulkDeleteVehicles(chosen.map((vehicle) => vehicle.id));
+      selected.clear();
+      showToast(`${chosen.length} vehicle${chosen.length === 1 ? "" : "s"} deleted.`, "success");
+      await context.reload();
+    } catch (error) {
+      console.error("[AutoSelect] bulk delete failed", error);
+      showToast(error.message || "Could not delete the selected vehicles.", "error");
+    }
+    return;
+  }
+
+  const patch =
+    action === "feature"
+      ? { featured: true }
+      : action === "unfeature"
+        ? { featured: false }
+        : action === "sold"
+          ? { status: "sold" }
+          : { status: "available" };
+  const verb =
+    action === "feature"
+      ? "featured"
+      : action === "unfeature"
+        ? "removed from featured"
+        : action === "sold"
+          ? "marked sold"
+          : "marked available";
+
+  try {
+    await bulkUpdateVehicles(chosen.map((vehicle) => ({ ...vehicle, ...patch })));
+    selected.clear();
+    showToast(`${chosen.length} vehicle${chosen.length === 1 ? "" : "s"} ${verb}.`, "success");
+    await context.reload();
+  } catch (error) {
+    console.error("[AutoSelect] bulk update failed", error);
+    showToast(error.message || "Could not update the selected vehicles.", "error");
+  }
+}
+
+function exportInventory() {
+  const list = visibleVehicles();
+  if (!list.length) {
+    showToast("No vehicles to export with the current filters.", "info");
+    return;
+  }
+  const rows = [
+    [
+      "Stock", "Year", "Make", "Model", "Trim", "VIN", "Price", "Mileage",
+      "Status", "Featured", "Body style", "Fuel type", "Transmission",
+      "Drivetrain", "Location", "Views", "Created",
+    ],
+    ...list.map((vehicle) => [
+      vehicle.stockNumber || "",
+      vehicle.year || "",
+      vehicle.make || "",
+      vehicle.model || "",
+      vehicle.trim || "",
+      vehicle.vin || "",
+      Number(vehicle.price) || 0,
+      Number(vehicle.mileage) || 0,
+      vehicle.status || "available",
+      vehicle.featured ? "yes" : "no",
+      vehicle.bodyStyle || "",
+      vehicle.fuelType || "",
+      vehicle.transmission || "",
+      vehicle.drivetrain || "",
+      vehicle.location || "",
+      Number(vehicle.viewCount) || 0,
+      vehicle.createdAt?.toDate ? vehicle.createdAt.toDate().toISOString() : vehicle.createdAt || "",
+    ]),
+  ];
+  downloadCsv(`autoselect-inventory-${new Date().toISOString().slice(0, 10)}.csv`, rows);
+  showToast(`Exported ${list.length} vehicles to CSV.`, "success");
 }
 
 /* ------------------------------------------------------------------ */
@@ -574,6 +710,21 @@ export function initInventory(options = {}) {
     const remove = event.target.closest("[data-delete-vehicle]");
     if (remove) removeVehicle(remove.dataset.deleteVehicle);
 
+    const bulk = event.target.closest("[data-bulk-action]");
+    if (bulk) {
+      applyBulk(bulk.dataset.bulkAction);
+      return;
+    }
+    if (event.target.closest("[data-bulk-clear]")) {
+      selected.clear();
+      renderInventory(vehicles);
+      return;
+    }
+    if (event.target.closest("[data-export-inventory]")) {
+      exportInventory();
+      return;
+    }
+
     const clear = event.target.closest("[data-clear-inventory-filters]");
     if (clear) {
       filters = { query: "", status: "all" };
@@ -603,6 +754,18 @@ export function initInventory(options = {}) {
       renderInventory(vehicles);
     });
   }
+
+  document.addEventListener("change", (event) => {
+    const single = event.target.closest("[data-select-vehicle]");
+    if (single) {
+      if (single.checked) selected.add(single.dataset.selectVehicle);
+      else selected.delete(single.dataset.selectVehicle);
+      updateBulkBar();
+      return;
+    }
+    const all = event.target.closest("[data-select-all]");
+    if (all) toggleSelectAll(all.checked);
+  });
 
   const form = qs("#vehicleForm");
   form?.addEventListener("submit", submitVehicle);

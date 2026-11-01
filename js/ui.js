@@ -2,9 +2,9 @@
  * Shared UI shell: promo bar, header, mobile nav, footer, location selector,
  * menu sheet, modal engine and toast notifications.
  */
-import { authReady, getCurrentUser, signOutUser, userInitials, watchUser } from "./auth.js?v=20261101a";
-import { initFavoritesSync } from "./favorites.js?v=20261101a";
-import { waLink } from "./whatsapp.js?v=20261101a";
+import { authReady, getCachedUser, getCurrentUser, signOutUser, userInitials, watchUser } from "./auth.js?v=20261102a";
+import { initFavoritesSync } from "./favorites.js?v=20261102a";
+import { waLink } from "./whatsapp.js?v=20261102a";
 import {
   escapeHtml,
   getBasePath,
@@ -13,7 +13,7 @@ import {
   storageGet,
   storageSet,
   trapFocus,
-} from "./utils.js?v=20261101a";
+} from "./utils.js?v=20261102a";
 
 const LOCATION_KEY = "as_location_v1";
 const LOCATIONS = ["Dallas, TX", "Plano, TX", "Fort Worth, TX", "Arlington, TX", "Irving, TX"];
@@ -211,7 +211,7 @@ function renderFooter() {
 
 function renderMenuSheet() {
   const basePath = base();
-  const user = getCurrentUser();
+  const user = getCurrentUser() || getCachedUser();
   const authLink = user
     ? `<button type="button" class="menu-sheet__link" data-signout><span class="material-symbols-outlined">logout</span><span>Sign Out<small>${escapeHtml(user.email || "")}</small></span></button>`
     : `<a class="menu-sheet__link" href="${basePath}login.html?redirect=${encodeURIComponent(currentPathForRedirect())}"><span class="material-symbols-outlined">account_circle</span><span>Sign In<small>Save cars &amp; sync favorites</small></span></a>`;
@@ -242,7 +242,7 @@ function renderMenuSheet() {
 function renderAuthSlot() {
   const slot = qs("#authSlot");
   if (!slot) return;
-  const user = getCurrentUser();
+  const user = getCurrentUser() || getCachedUser();
   if (user) {
     slot.innerHTML = `
       <details class="avatar-menu" id="avatarMenu">
@@ -432,8 +432,9 @@ export async function mountShell(options = {}) {
   if (shellMounted) return;
   shellMounted = true;
 
-  await authReady;
-
+  // Paint the shell immediately. Auth (Firebase SDK + admin lookup) resolves in
+  // the background and only swaps the account controls, so the header never
+  // blocks first paint.
   const headerHost = qs("#site-header");
   const footerHost = qs("#site-footer");
   if (headerHost) headerHost.innerHTML = renderHeader(active);
@@ -524,6 +525,14 @@ export async function mountShell(options = {}) {
     renderAuthSlot();
     refreshMenuSheet();
   });
+
+  // Auth resolved after the shell painted — reconcile the cached profile.
+  authReady
+    .then(() => {
+      renderAuthSlot();
+      refreshMenuSheet();
+    })
+    .catch(() => {});
 
   // Dismiss avatar dropdown when clicking away
   document.addEventListener("click", (event) => {

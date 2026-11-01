@@ -43,6 +43,7 @@ export const firebaseSdk = {
   auth: null,
   db: null,
   storage: null,
+  appModule: null,
   authModule: null,
   firestoreModule: null,
   storageModule: null,
@@ -73,6 +74,7 @@ async function bootstrap() {
     firebaseSdk.auth = auth;
     firebaseSdk.db = db;
     firebaseSdk.storage = storage;
+    firebaseSdk.appModule = appModule;
     firebaseSdk.authModule = authModule;
     firebaseSdk.firestoreModule = firestoreModule;
     firebaseSdk.storageModule = storageModule;

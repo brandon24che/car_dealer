@@ -19,6 +19,21 @@ service cloud.firestore {
       );
     }
 
+    function hasSuperRole(uid) {
+      return exists(/databases/$(database)/documents/admins/$(uid))
+        && get(/databases/$(database)/documents/admins/$(uid)).data.get('role', '') == 'super';
+    }
+
+    /** Only the root account, a super claim or an admins doc with role 'super'. */
+    function isSuperAdmin() {
+      return signedIn() && (
+        request.auth.uid == 'NL3B6fmiZVUAMxaaAtwRYavYYY92' ||
+        request.auth.token.get('role', '') == 'super' ||
+        request.auth.token.get('super', false) == true ||
+        hasSuperRole(request.auth.uid)
+      );
+    }
+
     function isSelf(uid) {
       return signedIn() && request.auth.uid == uid;
     }
@@ -269,12 +284,31 @@ service cloud.firestore {
     }
 
     /* ------------------------------------------------------------------ */
-    /* Admins — read your own record; grant/revoke via console or Admin SDK */
+    /* Admins — super admin manages the team, everyone reads their own doc */
     /* ------------------------------------------------------------------ */
 
     match /admins/{uid} {
       allow read: if isSelf(uid) || isAdmin();
-      allow write: if false;
+
+      // Only a super admin can grant portal access, and only as a plain admin.
+      // Clients can never mint another super admin or alter the root account.
+      allow create: if isSuperAdmin()
+        && request.resource.data.keys().hasAll(['name', 'email', 'role', 'createdBy', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['name', 'email', 'role', 'createdBy', 'createdAt'])
+        && request.resource.data.role == 'admin'
+        && request.resource.data.createdBy == request.auth.uid
+        && filledText(request.resource.data.name, 80)
+        && text(request.resource.data.email, 120)
+        && request.resource.data.createdAt == request.time;
+
+      // Revoking is super-admin only, never yourself and never a super record.
+      allow delete: if isSuperAdmin()
+        && request.auth.uid != uid
+        && uid != 'NL3B6fmiZVUAMxaaAtwRYavYYY92'
+        && exists(/databases/$(database)/documents/admins/$(uid))
+        && get(/databases/$(database)/documents/admins/$(uid)).data.get('role', '') != 'super';
+
+      allow update: if false;
     }
 
     /* Default deny for anything not matched above. */

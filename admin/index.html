@@ -8,14 +8,15 @@
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#0B132B">
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/variables.css?v=20261101a">
-  <link rel="stylesheet" href="../css/base.css?v=20261101a">
-  <link rel="stylesheet" href="../css/components.css?v=20261101a">
-  <link rel="stylesheet" href="../css/pages/admin.css?v=20261101a">
+  <link rel="stylesheet" href="../css/variables.css?v=20261102a">
+  <link rel="stylesheet" href="../css/base.css?v=20261102a">
+  <link rel="stylesheet" href="../css/components.css?v=20261102a">
+  <link rel="stylesheet" href="../css/pages/admin.css?v=20261102a">
 </head>
 <body class="admin-body is-loading">
   <a class="skip-link" href="#adminContent">Skip to content</a>
@@ -58,6 +59,10 @@
           <span class="material-symbols-outlined" aria-hidden="true">forum</span>Leads
           <span class="admin-nav-item__count" data-count-leads>—</span>
         </button>
+        <button class="admin-nav-item" type="button" data-view="team" data-super-only hidden>
+          <span class="material-symbols-outlined" aria-hidden="true">group</span>Team
+          <span class="admin-nav-item__count" data-count-admins>—</span>
+        </button>
         <div class="admin-side__divider"></div>
         <a class="admin-nav-item" href="../index.html">
           <span class="material-symbols-outlined" aria-hidden="true">storefront</span>View showroom
@@ -70,6 +75,7 @@
           <span class="admin-user__text">
             <strong data-admin-name>Dealer admin</strong>
             <span data-admin-email>admin@autoselect.demo</span>
+            <span class="admin-user__role" data-admin-role hidden>Admin</span>
           </span>
         </div>
         <button class="admin-signout" type="button" data-admin-signout>
@@ -90,6 +96,9 @@
           <p data-admin-subtitle>Showroom performance at a glance.</p>
         </div>
         <div class="admin-topbar__actions">
+          <button class="btn btn--ghost btn--sm adm-palette-btn" type="button" data-command-open aria-label="Search the portal (Ctrl or Command + K)">
+            <span class="material-symbols-outlined" aria-hidden="true">search</span><span>Search</span><kbd>⌘K</kbd>
+          </button>
           <a class="btn btn--ghost btn--sm btn--view-site" href="../index.html">
             <span class="material-symbols-outlined" aria-hidden="true">storefront</span><span>View site</span>
           </a>
@@ -145,6 +154,21 @@
               </div>
             </article>
           </div>
+
+          <section class="adm-panel" aria-labelledby="leadChartTitle">
+            <div class="adm-panel__head">
+              <div>
+                <h2 id="leadChartTitle">Lead activity</h2>
+                <p>Requests received over the last 7 days.</p>
+              </div>
+              <span class="adm-chart__total"><strong data-chart-total>—</strong> total</span>
+            </div>
+            <div class="adm-panel__body">
+              <div class="adm-chart" data-lead-chart role="img" aria-label="Leads received per day over the last week">
+                <div class="adm-skeleton" aria-hidden="true"><span style="width:100%"></span><span style="width:80%"></span></div>
+              </div>
+            </div>
+          </section>
 
           <div class="adm-split">
             <section class="adm-panel" aria-labelledby="viewedTitle">
@@ -217,9 +241,14 @@
                 <h2 id="inventoryTitle">Vehicle inventory</h2>
                 <p><span data-inventory-count>—</span> records in stock</p>
               </div>
-              <button class="btn btn--primary btn--sm" type="button" data-add-vehicle>
-                <span class="material-symbols-outlined" aria-hidden="true">add</span>Add vehicle
-              </button>
+              <div class="adm-panel__head-actions">
+                <button class="btn btn--ghost btn--sm" type="button" data-export-inventory>
+                  <span class="material-symbols-outlined" aria-hidden="true">download</span>Export CSV
+                </button>
+                <button class="btn btn--primary btn--sm" type="button" data-add-vehicle>
+                  <span class="material-symbols-outlined" aria-hidden="true">add</span>Add vehicle
+                </button>
+              </div>
             </div>
             <div class="adm-toolbar">
               <div class="adm-search">
@@ -236,6 +265,29 @@
                 <option value="featured">Featured</option>
               </select>
               <span class="adm-toolbar__count">Showing <strong data-inv-shown>0</strong></span>
+            </div>
+            <div class="adm-bulk" data-bulk-bar hidden>
+              <span class="adm-bulk__count"><strong data-bulk-count>0</strong> selected</span>
+              <div class="adm-bulk__actions">
+                <button class="btn btn--ghost btn--sm" type="button" data-bulk-action="feature">
+                  <span class="material-symbols-outlined" aria-hidden="true">star</span>Feature
+                </button>
+                <button class="btn btn--ghost btn--sm" type="button" data-bulk-action="unfeature">
+                  <span class="material-symbols-outlined" aria-hidden="true">star_border</span>Unfeature
+                </button>
+                <button class="btn btn--ghost btn--sm" type="button" data-bulk-action="available">
+                  <span class="material-symbols-outlined" aria-hidden="true">check_circle</span>Available
+                </button>
+                <button class="btn btn--ghost btn--sm" type="button" data-bulk-action="sold">
+                  <span class="material-symbols-outlined" aria-hidden="true">sell</span>Mark sold
+                </button>
+                <button class="btn btn--danger btn--sm" type="button" data-bulk-action="delete">
+                  <span class="material-symbols-outlined" aria-hidden="true">delete</span>Delete
+                </button>
+                <button class="btn btn--ghost btn--sm" type="button" data-bulk-clear>
+                  <span class="material-symbols-outlined" aria-hidden="true">close</span>Clear
+                </button>
+              </div>
             </div>
             <div data-inventory-body>
               <div class="adm-skeleton" aria-hidden="true"><span style="width:84%"></span><span style="width:72%"></span><span style="width:90%"></span><span style="width:66%"></span><span style="width:80%"></span></div>
@@ -282,6 +334,42 @@
             <div data-leads-body>
               <div class="adm-skeleton" aria-hidden="true"><span style="width:88%"></span><span style="width:69%"></span><span style="width:92%"></span><span style="width:74%"></span></div>
             </div>
+          </div>
+        </section>
+
+        <section class="adm-view" data-view-panel="team" aria-labelledby="teamTitle" hidden>
+          <div class="adm-panel">
+            <div class="adm-panel__head">
+              <div>
+                <h2 id="teamTitle">Dealer team</h2>
+                <p>Only the super admin can add or remove portal admins.</p>
+              </div>
+              <div class="adm-panel__head-actions">
+                <button class="btn btn--primary btn--sm" type="button" data-add-admin>
+                  <span class="material-symbols-outlined" aria-hidden="true">person_add</span>Add admin
+                </button>
+              </div>
+            </div>
+            <div class="adm-panel__body adm-panel__body--flush" data-team-body>
+              <div class="adm-skeleton" aria-hidden="true"><span style="width:72%"></span><span style="width:60%"></span><span style="width:66%"></span></div>
+            </div>
+          </div>
+
+          <div class="adm-roles">
+            <article class="adm-role-card adm-role-card--super">
+              <span class="material-symbols-outlined" aria-hidden="true">shield_person</span>
+              <div>
+                <strong>Super admin</strong>
+                <p>Everything a dealer admin can do, plus create and remove admins.</p>
+              </div>
+            </article>
+            <article class="adm-role-card">
+              <span class="material-symbols-outlined" aria-hidden="true">badge</span>
+              <div>
+                <strong>Admin</strong>
+                <p>Manage inventory, leads and dashboard data. Cannot add or remove admins.</p>
+              </div>
+            </article>
           </div>
         </section>
       </main>
@@ -560,9 +648,72 @@
     </div>
   </dialog>
 
+  <dialog class="adm-dialog adm-dialog--sm" id="adminDialog" aria-labelledby="adminDialogTitle">
+    <div class="adm-dialog__head">
+      <div>
+        <h2 id="adminDialogTitle">Add a dealer admin</h2>
+        <p>Super admin only. New admins can manage stock and leads.</p>
+      </div>
+      <button class="adm-dialog__close" type="button" data-admin-cancel aria-label="Close dialog">
+        <span class="material-symbols-outlined" aria-hidden="true">close</span>
+      </button>
+    </div>
+    <form class="adm-dialog__form" id="adminForm" novalidate>
+      <div class="adm-dialog__body">
+        <div class="adm-dialog__error" data-admin-error hidden>
+          <span class="material-symbols-outlined" aria-hidden="true">error</span>
+          <p role="alert"></p>
+        </div>
+        <div class="af-grid">
+          <div class="af-field">
+            <label class="label" for="admAdminName">Full name *</label>
+            <input class="input" id="admAdminName" name="name" type="text" autocomplete="name" placeholder="Jordan Rivera">
+          </div>
+          <div class="af-field">
+            <label class="label" for="admAdminEmail">Work email *</label>
+            <input class="input" id="admAdminEmail" name="email" type="email" autocomplete="email" placeholder="jordan@autoselect.com">
+          </div>
+          <div class="af-field">
+            <label class="label" for="admAdminPassword">Temporary password *</label>
+            <input class="input" id="admAdminPassword" name="password" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters">
+          </div>
+          <div class="af-field">
+            <label class="label" for="admAdminConfirm">Confirm password *</label>
+            <input class="input" id="admAdminConfirm" name="confirm" type="password" autocomplete="new-password" minlength="8" placeholder="Repeat the password">
+          </div>
+        </div>
+        <p class="adm-form-hint">
+          <span class="material-symbols-outlined" aria-hidden="true">shield_person</span>
+          Share these credentials securely. The new admin can sign in immediately and manage inventory, but only you can create or remove admins.
+        </p>
+      </div>
+      <div class="adm-dialog__foot">
+        <button class="btn btn--ghost" type="button" data-admin-cancel>Cancel</button>
+        <button class="btn btn--primary" type="submit" id="admAdminSave">
+          <span class="material-symbols-outlined" aria-hidden="true">person_add</span>
+          <span>Create admin</span>
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="adm-palette" id="commandDialog" aria-labelledby="commandTitle">
+    <div class="adm-palette__search">
+      <span class="material-symbols-outlined" aria-hidden="true">search</span>
+      <label class="sr-only" for="commandInput">Search the portal</label>
+      <input id="commandInput" type="text" placeholder="Search vehicles, views or actions…" autocomplete="off" spellcheck="false">
+      <kbd>esc</kbd>
+    </div>
+    <div class="adm-palette__body">
+      <h2 class="sr-only" id="commandTitle">Portal command palette</h2>
+      <div id="commandResults"></div>
+      <p class="adm-palette__hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>↵</kbd> to open · <kbd>esc</kbd> to close</p>
+    </div>
+  </dialog>
+
   <noscript>
     <p style="padding:24px;text-align:center;font-family:system-ui">The dealer portal needs JavaScript enabled.</p>
   </noscript>
-  <script type="module" src="../js/admin/admin.js?v=20261101a"></script>
+  <script type="module" src="../js/admin/admin.js?v=20261102a"></script>
 </body>
 </html>

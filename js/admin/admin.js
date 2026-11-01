@@ -1,16 +1,16 @@
 /**
  * Dealer portal controller: access guard, navigation, dashboard and actions.
  */
-import { requireAdmin, signOutUser, userInitials } from "../auth.js?v=20261101a";
-import { carsAndBidsVehicles } from "../demo-data.js?v=20261101a";
+import { requireAdmin, signOutUser, userInitials } from "../auth.js?v=20261102a";
+import { carsAndBidsVehicles } from "../demo-data.js?v=20261102a";
 import {
   getAllVehicles,
   importVehicles,
   listLeads,
   resetDemoInventory,
   seedDemoInventory,
-} from "../data-store.js?v=20261101a";
-import { showToast } from "../ui.js?v=20261101a";
+} from "../data-store.js?v=20261102a";
+import { showToast } from "../ui.js?v=20261102a";
 import {
   escapeHtml,
   formatCurrency,
@@ -18,7 +18,7 @@ import {
   qs,
   qsa,
   timeAgo,
-} from "../utils.js?v=20261101a";
+} from "../utils.js?v=20261102a";
 import {
   LEAD_STATUS_LABELS,
   assetPath,
@@ -28,14 +28,17 @@ import {
   timeValue,
   vehicleName,
   vehicleThumb,
-} from "./helpers.js?v=20261101a";
-import { initInventory, renderInventory } from "./inventory.js?v=20261101a";
-import { initLeads, renderLeads } from "./leads.js?v=20261101a";
+} from "./helpers.js?v=20261102a";
+import { initInventory, renderInventory } from "./inventory.js?v=20261102a";
+import { initLeads, renderLeads } from "./leads.js?v=20261102a";
+import { initCommandPalette } from "./palette.js?v=20261102a";
+import { initTeam, refreshTeam } from "./team.js?v=20261102a";
 
 const VIEW_META = {
   overview: { title: "Overview", subtitle: "Showroom performance at a glance." },
   inventory: { title: "Inventory", subtitle: "Manage listings, pricing and availability." },
   leads: { title: "Leads", subtitle: "Follow up on every concierge request." },
+  team: { title: "Team", subtitle: "Portal admins and access control." },
 };
 
 const state = { vehicles: [], leads: [], view: "overview", loaded: false };
@@ -139,6 +142,51 @@ function recentLeadsMarkup(list) {
     .join("");
 }
 
+function renderLeadChart(leads) {
+  const host = qs("[data-lead-chart]");
+  if (!host) return;
+
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  const days = [];
+  for (let offset = 6; offset >= 0; offset -= 1) {
+    const date = new Date(start);
+    date.setDate(date.getDate() - offset);
+    days.push({ date, count: 0 });
+  }
+  leads.forEach((lead) => {
+    const time = timeValue(lead.createdAt);
+    if (!time) return;
+    const day = new Date(time);
+    day.setHours(0, 0, 0, 0);
+    const entry = days.find((item) => item.date.getTime() === day.getTime());
+    if (entry) entry.count += 1;
+  });
+
+  const total = days.reduce((sum, day) => sum + day.count, 0);
+  const max = Math.max(1, ...days.map((day) => day.count));
+  host.innerHTML = days
+    .map(({ date, count }) => {
+      const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
+      const full = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      const height = count ? Math.max(12, Math.round((count / max) * 100)) : 3;
+      return `<div class="adm-chart__col" title="${full}: ${count} lead${count === 1 ? "" : "s"}">
+        <span class="adm-chart__value">${count}</span>
+        <span class="adm-chart__bar" style="height:${height}%"></span>
+        <span class="adm-chart__label">${weekday}</span>
+      </div>`;
+    })
+    .join("");
+  host.setAttribute(
+    "aria-label",
+    `Leads in the last 7 days: ${days
+      .map(({ date, count }) => `${date.toLocaleDateString("en-US", { month: "short", day: "numeric" })}: ${count}`)
+      .join(", ")}`
+  );
+  const totalNode = qs("[data-chart-total]");
+  if (totalNode) totalNode.textContent = compactNumber(total);
+}
+
 function renderDashboard() {
   const vehicles = state.vehicles;
   const leads = state.leads;
@@ -163,6 +211,7 @@ function renderDashboard() {
   setText("[data-stat-week]", `${weekLeads.length} this week`);
   setText("[data-stat-total-leads]", compactNumber(leads.length));
   setText("[data-stat-winrate]", `${winRate}% won`);
+  renderLeadChart(leads);
 
   const publicCars = vehicles.filter((v) => ["available", "reserved"].includes(v.status || "available"));
   const mostViewed = [...publicCars]
@@ -244,7 +293,8 @@ function openSidebar() {
 }
 
 function showView(name, { updateHash = true } = {}) {
-  const view = VIEW_META[name] ? name : "overview";
+  const requested = VIEW_META[name] ? name : "overview";
+  const view = requested === "team" && !currentUser?.isSuperAdmin ? "overview" : requested;
   state.view = view;
   qsa("[data-view-panel]").forEach((panel) => {
     panel.hidden = panel.dataset.viewPanel !== view;
@@ -343,6 +393,19 @@ async function signOut() {
 /* Boot                                                                */
 /* ------------------------------------------------------------------ */
 
+function applyRole(user) {
+  const superAdmin = Boolean(user?.isSuperAdmin);
+  qsa("[data-super-only]").forEach((node) => {
+    node.hidden = !superAdmin;
+  });
+  const role = qs("[data-admin-role]");
+  if (role) {
+    role.hidden = false;
+    role.textContent = superAdmin ? "Super admin" : "Admin";
+    role.classList.toggle("is-super", superAdmin);
+  }
+}
+
 function fillUser(user) {
   const avatar = qs("[data-admin-avatar]");
   const name = qs("[data-admin-name]");
@@ -403,6 +466,7 @@ async function boot() {
   document.body.classList.remove("is-loading");
   qs("#adminBoot")?.remove();
   fillUser(user);
+  applyRole(user);
   bindShell();
 
   initInventory({
@@ -411,6 +475,16 @@ async function boot() {
     onSaved: () => showView("inventory"),
   });
   initLeads();
+  initCommandPalette({
+    getVehicles: () => state.vehicles,
+    showView,
+    isSuperAdmin: () => Boolean(currentUser?.isSuperAdmin),
+  });
+
+  if (user.isSuperAdmin) {
+    initTeam({ confirmAction });
+    refreshTeam();
+  }
 
   const initial = window.location.hash.replace("#", "");
   showView(VIEW_META[initial] ? initial : "overview", { updateHash: false });

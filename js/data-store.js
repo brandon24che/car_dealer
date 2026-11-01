@@ -9,8 +9,8 @@ import {
   firebaseReady,
   firebaseSdk,
   isFirebaseConfigured,
-} from "./firebase-config.js?v=20261101a";
-import { demoVehicles, demoReviews } from "./demo-data.js?v=20261101a";
+} from "./firebase-config.js?v=20261102a";
+import { demoVehicles, demoReviews } from "./demo-data.js?v=20261102a";
 import {
   debounce,
   escapeHtml,
@@ -21,7 +21,7 @@ import {
   storageSet,
   truncate,
   uid,
-} from "./utils.js?v=20261101a";
+} from "./utils.js?v=20261102a";
 
 const KEYS = {
   vehicles: "as_demo_vehicles_v1",
@@ -940,6 +940,76 @@ export async function deleteVehicle(id) {
   }
   writeLocalVehicles(localVehicles().filter((vehicle) => vehicle.id !== id));
   return true;
+}
+
+/**
+ * Apply a patch to many listings in one round trip. Records must be complete
+ * vehicle documents because Firestore validates the whole resource on update.
+ */
+export async function bulkUpdateVehicles(updates = []) {
+  const list = (Array.isArray(updates) ? updates : []).filter((vehicle) => vehicle?.id);
+  if (!list.length) return 0;
+
+  const f = await live();
+  if (f) {
+    try {
+      const m = f.firestoreModule;
+      const jobs = list.map((vehicle) => {
+        const { id, createdAt, ...data } = vehicle;
+        let created = m.serverTimestamp();
+        if (createdAt?.toDate) created = createdAt;
+        else if (createdAt) {
+          const date = new Date(createdAt);
+          if (!Number.isNaN(date.getTime())) created = m.Timestamp.fromDate(date);
+        }
+        return {
+          ref: m.doc(f.db, "vehicles", id),
+          payload: { ...data, createdAt: created, updatedAt: m.serverTimestamp() },
+        };
+      });
+      for (let index = 0; index < jobs.length; index += 400) {
+        const batch = m.writeBatch(f.db);
+        jobs.slice(index, index + 400).forEach(({ ref, payload }) => batch.set(ref, payload, { merge: true }));
+        await batch.commit();
+      }
+    } catch (error) {
+      throw firestoreWriteError(error, "update vehicles");
+    }
+    clearCache();
+    return list.length;
+  }
+
+  const current = localVehicles();
+  list.forEach((vehicle) => {
+    const index = current.findIndex((item) => item.id === vehicle.id);
+    if (index >= 0) current[index] = { ...vehicle, updatedAt: nowIso() };
+  });
+  writeLocalVehicles(current);
+  return list.length;
+}
+
+export async function bulkDeleteVehicles(ids = []) {
+  const list = [...new Set((Array.isArray(ids) ? ids : []).filter(Boolean))];
+  if (!list.length) return 0;
+
+  const f = await live();
+  if (f) {
+    try {
+      const m = f.firestoreModule;
+      for (let index = 0; index < list.length; index += 400) {
+        const batch = m.writeBatch(f.db);
+        list.slice(index, index + 400).forEach((id) => batch.delete(m.doc(f.db, "vehicles", id)));
+        await batch.commit();
+      }
+    } catch (error) {
+      throw firestoreWriteError(error, "delete vehicles");
+    }
+    clearCache();
+    return list.length;
+  }
+
+  writeLocalVehicles(localVehicles().filter((vehicle) => !list.includes(vehicle.id)));
+  return list.length;
 }
 
 export async function seedDemoInventory() {

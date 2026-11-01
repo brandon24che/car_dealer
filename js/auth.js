@@ -4,14 +4,20 @@
  * session so the whole flow (incl. admin) can be previewed without a project.
  */
 import {
+  firebaseConfig,
   firebaseReady,
   firebaseSdk,
   isFirebaseConfigured,
-} from "./firebase-config.js?v=20261101a";
-import { initials, storageGet, storageSet, storageRemove } from "./utils.js?v=20261101a";
+} from "./firebase-config.js?v=20261102a";
+import { initials, storageGet, storageSet, storageRemove } from "./utils.js?v=20261102a";
 
 const DEMO_ACCOUNTS = "as_demo_accounts_v1";
 const DEMO_SESSION = "as_demo_session_v1";
+const USER_HINT = "as_auth_hint_v1";
+const SDK_APP_URL = "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+
+/** Root dealer account. Always super admin, regardless of Firestore state. */
+const SUPER_ADMIN_UIDS = new Set(["NL3B6fmiZVUAMxaaAtwRYavYYY92"]);
 
 const listeners = new Set();
 let currentUser = null;
@@ -27,6 +33,7 @@ const DEFAULT_DEMO_ACCOUNT = {
   email: "admin@autoselect.demo",
   password: "autoselect",
   phone: "(214) 555-0148",
+  role: "super",
   createdAt: new Date().toISOString(),
 };
 
@@ -42,7 +49,31 @@ function notify() {
 
 function setCurrentUser(user) {
   currentUser = user;
+  rememberUser(user);
   notify();
+}
+
+/** Persist a minimal profile so the shell can paint the avatar before auth resolves. */
+function rememberUser(user) {
+  if (user?.uid) {
+    storageSet(USER_HINT, {
+      uid: user.uid,
+      name: user.name || "",
+      email: user.email || "",
+      role: user.role || (user.isAdmin ? "admin" : "member"),
+      isAdmin: Boolean(user.isAdmin),
+      isSuperAdmin: Boolean(user.isSuperAdmin),
+      isDemo: Boolean(user.isDemo),
+    });
+    return;
+  }
+  storageRemove(USER_HINT);
+}
+
+/** Last known profile from localStorage — safe for instant shell rendering only. */
+export function getCachedUser() {
+  const hint = storageGet(USER_HINT, null);
+  return hint?.uid ? hint : null;
 }
 
 function demoAccounts() {
@@ -58,45 +89,69 @@ function demoSessionUser() {
   const account = demoAccounts().find((item) => item.uid === session.uid);
   if (!account) return null;
   const { password, ...safe } = account;
+  const role = account.role === "super" ? "super" : "admin";
   return {
     ...safe,
-    role: "admin",
+    role,
     isAdmin: true,
+    isSuperAdmin: role === "super",
     isDemo: true,
   };
 }
 
-function toAppUser(firebaseUser, { isAdmin = false } = {}) {
+function toAppUser(firebaseUser, access = {}) {
+  const isAdmin = Boolean(access.isAdmin);
   return {
     uid: firebaseUser.uid,
     name: firebaseUser.displayName || firebaseUser.email?.split("@")[0] || "AutoSelect Member",
     email: firebaseUser.email || "",
     phone: firebaseUser.phoneNumber || "",
     photoURL: firebaseUser.photoURL || "",
-    role: isAdmin ? "admin" : "member",
+    role: access.role || (isAdmin ? "admin" : "member"),
     isAdmin,
+    isSuperAdmin: Boolean(access.isSuperAdmin),
     isDemo: false,
   };
 }
 
-const ADMIN_UIDS = new Set(["NL3B6fmiZVUAMxaaAtwRYavYYY92"]);
-
+/**
+ * Resolve portal access. The root UID short-circuits before any network call,
+ * so the primary super admin never pays for a token/doc round trip.
+ */
 async function resolveAdmin(firebaseUser) {
-  if (!firebaseSdk.db) return false;
+  const member = { isAdmin: false, isSuperAdmin: false, role: "member" };
+  if (!firebaseSdk.db) return member;
+  if (SUPER_ADMIN_UIDS.has(firebaseUser.uid)) {
+    return { isAdmin: true, isSuperAdmin: true, role: "super" };
+  }
   try {
-    if (ADMIN_UIDS.has(firebaseUser.uid)) return true;
     const m = firebaseSdk.firestoreModule;
     const token = await firebaseUser.getIdTokenResult();
-    if (token.claims?.admin === true) return true;
-    const snap = await m.getDoc(m.doc(firebaseSdk.db, "admins", firebaseUser.uid));
-    return snap.exists();
+    const claimRole = token.claims?.role;
+    if (token.claims?.super === true || claimRole === "super") {
+      return { isAdmin: true, isSuperAdmin: true, role: "super" };
+    }
+    const claimAdmin = token.claims?.admin === true || claimRole === "admin";
+
+    let docRole = null;
+    try {
+      const snap = await m.getDoc(m.doc(firebaseSdk.db, "admins", firebaseUser.uid));
+      if (snap.exists()) docRole = snap.data().role === "super" ? "super" : "admin";
+    } catch (error) {
+      console.warn("[AutoSelect] admin record read failed", error);
+    }
+    if (docRole === "super") return { isAdmin: true, isSuperAdmin: true, role: "super" };
+    if (claimAdmin || docRole === "admin") {
+      return { isAdmin: true, isSuperAdmin: false, role: "admin" };
+    }
+    return member;
   } catch (error) {
     console.warn("[AutoSelect] admin check failed", error);
-    return false;
+    return member;
   }
 }
 
-async function ensureUserDoc(firebaseUser, isAdmin) {
+async function ensureUserDoc(firebaseUser, role) {
   if (!firebaseSdk.db) return;
   try {
     const m = firebaseSdk.firestoreModule;
@@ -106,7 +161,7 @@ async function ensureUserDoc(firebaseUser, isAdmin) {
         name: firebaseUser.displayName || "",
         email: firebaseUser.email || "",
         phone: firebaseUser.phoneNumber || "",
-        role: isAdmin ? "admin" : "member",
+        role: role === "member" ? "member" : "admin",
         lastLoginAt: m.serverTimestamp(),
       },
       { merge: true }
@@ -128,9 +183,9 @@ async function init() {
       firebaseSdk.auth,
       async (firebaseUser) => {
         if (firebaseUser) {
-          const isAdmin = await resolveAdmin(firebaseUser);
-          setCurrentUser(toAppUser(firebaseUser, { isAdmin }));
-          ensureUserDoc(firebaseUser, isAdmin);
+          const access = await resolveAdmin(firebaseUser);
+          setCurrentUser(toAppUser(firebaseUser, access));
+          ensureUserDoc(firebaseUser, access.role);
         } else {
           setCurrentUser(null);
         }
@@ -225,8 +280,8 @@ export async function signUp({ name, email, password, phone = "" }) {
       const cred = await m.createUserWithEmailAndPassword(firebaseSdk.auth, cleanEmail, password);
       await m.updateProfile(cred.user, { displayName: cleanName });
       // Refresh local representation after profile update.
-      setCurrentUser(toAppUser({ ...cred.user, displayName: cleanName }, { isAdmin: false }));
-      await ensureUserDoc({ ...cred.user, displayName: cleanName }, false);
+      setCurrentUser(toAppUser({ ...cred.user, displayName: cleanName }, { role: "member" }));
+      await ensureUserDoc({ ...cred.user, displayName: cleanName }, "member");
       return currentUser;
     } catch (error) {
       throw new Error(friendlyError(error));
@@ -299,6 +354,138 @@ export async function resetPassword(email) {
   }
   const account = demoAccounts().find((item) => item.email.toLowerCase() === cleanEmail);
   if (!account) throw new Error("No demo account found with that email.");
+  return true;
+}
+
+/** Portal admins, newest first. Includes the super admin record. */
+export async function listAdminAccounts() {
+  await authReady;
+  if (isFirebaseConfigured && firebaseSdk.db) {
+    const m = firebaseSdk.firestoreModule;
+    const snap = await m.getDocs(
+      m.query(m.collection(firebaseSdk.db, "admins"), m.limit(100))
+    );
+    return snap.docs
+      .map((entry) => ({ uid: entry.id, ...entry.data(), isDemo: false }))
+      .sort((a, b) => {
+        const rank = (item) => (item.role === "super" ? 0 : 1);
+        return rank(a) - rank(b) || String(a.name || a.email || "").localeCompare(String(b.name || b.email || ""));
+      });
+  }
+  return demoAccounts()
+    .filter((account) => account.role === "super" || account.role === "admin")
+    .map(({ password, ...account }) => ({
+      ...account,
+      role: account.role === "super" ? "super" : "admin",
+      isDemo: true,
+    }));
+}
+
+/**
+ * Create a dealer admin. Super-admin only — enforced here, in the portal UI and
+ * again by firestore.rules so a regular admin cannot escalate privileges.
+ */
+export async function createAdminAccount({ name, email, password } = {}) {
+  await authReady;
+  const actor = getCurrentUser();
+  if (!actor?.isSuperAdmin) {
+    throw new Error("Only the super admin can add dealer admins.");
+  }
+  const cleanName = String(name || "").trim();
+  const cleanEmail = String(email || "").trim().toLowerCase();
+  if (cleanName.length < 2) throw new Error("Enter the admin's full name.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) throw new Error("Enter a valid email address.");
+  if (!password || password.length < 8) throw new Error("Use a password with at least 8 characters.");
+
+  if (isFirebaseConfigured && firebaseSdk.db && firebaseSdk.authModule) {
+    // Creating a user signs that user in, so use an isolated secondary app and
+    // keep the super admin's session untouched.
+    const appModule =
+      firebaseSdk.appModule || (await import(SDK_APP_URL));
+    const secondary = appModule.initializeApp(
+      firebaseSdk.app?.options || firebaseConfig,
+      `admin-provision-${Date.now().toString(36)}`
+    );
+    const secondaryAuth = firebaseSdk.authModule.getAuth(secondary);
+    let uid = "";
+    try {
+      const cred = await firebaseSdk.authModule.createUserWithEmailAndPassword(
+        secondaryAuth,
+        cleanEmail,
+        password
+      );
+      await firebaseSdk.authModule.updateProfile(cred.user, { displayName: cleanName });
+      uid = cred.user.uid;
+    } catch (error) {
+      throw new Error(friendlyError(error));
+    } finally {
+      await firebaseSdk.authModule.signOut(secondaryAuth).catch(() => {});
+      await appModule.deleteApp(secondary).catch(() => {});
+    }
+
+    const m = firebaseSdk.firestoreModule;
+    try {
+      await m.setDoc(m.doc(firebaseSdk.db, "admins", uid), {
+        name: cleanName,
+        email: cleanEmail,
+        role: "admin",
+        createdBy: actor.uid,
+        createdAt: m.serverTimestamp(),
+      });
+    } catch (error) {
+      console.error("[AutoSelect] admin record write failed", error);
+      throw new Error(
+        "The sign-in account was created but the admin record could not be saved. Deploy the latest firestore.rules and try again."
+      );
+    }
+    return { uid, name: cleanName, email: cleanEmail, role: "admin", createdBy: actor.uid };
+  }
+
+  const accounts = demoAccounts();
+  if (accounts.some((account) => account.email.toLowerCase() === cleanEmail)) {
+    throw new Error("An account already exists with that email.");
+  }
+  const account = {
+    uid: `demo-admin-${Date.now().toString(36)}`,
+    name: cleanName,
+    email: cleanEmail,
+    password,
+    role: "admin",
+    createdBy: actor.uid,
+    createdAt: new Date().toISOString(),
+  };
+  accounts.push(account);
+  storageSet(DEMO_ACCOUNTS, accounts);
+  const { password: _password, ...safe } = account;
+  return { ...safe, isDemo: true };
+}
+
+/** Remove a dealer admin. Super-admin only; the root and other super admins are protected. */
+export async function deleteAdminAccount(uid) {
+  await authReady;
+  const actor = getCurrentUser();
+  if (!actor?.isSuperAdmin) {
+    throw new Error("Only the super admin can remove dealer admins.");
+  }
+  if (!uid) throw new Error("Missing admin id.");
+  if (uid === actor.uid) throw new Error("You cannot remove your own super admin access.");
+  if (SUPER_ADMIN_UIDS.has(uid)) throw new Error("The primary super admin cannot be removed.");
+
+  if (isFirebaseConfigured && firebaseSdk.db) {
+    const m = firebaseSdk.firestoreModule;
+    const ref = m.doc(firebaseSdk.db, "admins", uid);
+    const snap = await m.getDoc(ref);
+    if (!snap.exists()) return true;
+    if (snap.data().role === "super") throw new Error("Super admins cannot be removed from the portal.");
+    await m.deleteDoc(ref);
+    return true;
+  }
+
+  const accounts = demoAccounts();
+  const target = accounts.find((account) => account.uid === uid);
+  if (!target) return true;
+  if (target.role === "super") throw new Error("Super admins cannot be removed from the portal.");
+  storageSet(DEMO_ACCOUNTS, accounts.filter((account) => account.uid !== uid));
   return true;
 }
 
