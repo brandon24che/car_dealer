@@ -9,8 +9,8 @@ import {
   firebaseReady,
   firebaseSdk,
   isFirebaseConfigured,
-} from "./firebase-config.js?v=20261102a";
-import { demoVehicles, demoReviews } from "./demo-data.js?v=20261102a";
+} from "./firebase-config.js?v=20261102b";
+import { demoVehicles, demoReviews } from "./demo-data.js?v=20261102b";
 import {
   debounce,
   escapeHtml,
@@ -21,7 +21,7 @@ import {
   storageSet,
   truncate,
   uid,
-} from "./utils.js?v=20261102a";
+} from "./utils.js?v=20261102b";
 
 const KEYS = {
   vehicles: "as_demo_vehicles_v1",

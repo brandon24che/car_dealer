@@ -2,8 +2,8 @@
  * Dealer portal command palette (Ctrl/Cmd + K): jump between views, run portal
  * actions and open a vehicle editor directly from the keyboard.
  */
-import { escapeHtml, qs } from "../utils.js?v=20261102a";
-import { vehicleName } from "./helpers.js?v=20261102a";
+import { escapeHtml, qs } from "../utils.js?v=20261102b";
+import { vehicleName } from "./helpers.js?v=20261102b";
 
 export function initCommandPalette({ getVehicles, showView, isSuperAdmin }) {
   const dialog = qs("#commandDialog");
@@ -20,8 +20,8 @@ export function initCommandPalette({ getVehicles, showView, isSuperAdmin }) {
       { group: "Go to", label: "Inventory", hint: "Manage stock, pricing and photos", icon: "directions_car", run: () => showView("inventory") },
       { group: "Go to", label: "Leads", hint: "Concierge, test drives and trade-ins", icon: "forum", run: () => showView("leads") },
       { group: "Actions", label: "Add a vehicle", hint: "Open the listing editor", icon: "add_box", run: () => qs("[data-add-vehicle]")?.click() },
-      { group: "Actions", label: "Import Cars & Bids listings", hint: "Publish the 15 bundled auctions", icon: "library_add", run: () => qs("[data-import-auction]")?.click() },
-      { group: "Actions", label: "Seed showcase vehicles", hint: "Restore the 39-vehicle catalogue", icon: "auto_awesome", run: () => qs("[data-seed-inventory]")?.click() },
+      { group: "Actions", label: "Import Cars & Bids listings", hint: "Publish the 25 bundled auctions", icon: "library_add", run: () => qs("[data-import-auction]")?.click() },
+      { group: "Actions", label: "Seed showcase vehicles", hint: "Restore the 49-vehicle catalogue", icon: "auto_awesome", run: () => qs("[data-seed-inventory]")?.click() },
       { group: "Actions", label: "Export leads CSV", hint: "Download the current lead list", icon: "download", run: () => { showView("leads"); qs("[data-export-leads]")?.click(); } },
       { group: "Actions", label: "Export inventory CSV", hint: "Download the current filtered stock", icon: "download", run: () => { showView("inventory"); qs("[data-export-inventory]")?.click(); } },
     ];

@@ -7,10 +7,10 @@ import {
   deleteAdminAccount,
   getCurrentUser,
   listAdminAccounts,
-} from "../auth.js?v=20261102a";
-import { setButtonLoading, showToast } from "../ui.js?v=20261102a";
-import { escapeHtml, initials, qs } from "../utils.js?v=20261102a";
-import { leadDate } from "./helpers.js?v=20261102a";
+} from "../auth.js?v=20261102b";
+import { setButtonLoading, showToast } from "../ui.js?v=20261102b";
+import { escapeHtml, initials, qs } from "../utils.js?v=20261102b";
+import { leadDate } from "./helpers.js?v=20261102b";
 
 let admins = [];
 let context = { confirmAction: async () => false };

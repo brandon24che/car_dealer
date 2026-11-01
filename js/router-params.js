@@ -2,7 +2,7 @@
  * Shareable URL state for the inventory page and home search handoff.
  * Every inventory filter is encoded in the query string.
  */
-import { normalizeFilters } from "./data-store.js?v=20261102a";
+import { normalizeFilters } from "./data-store.js?v=20261102b";
 
 export const INVENTORY_KEYS = [
   "q",

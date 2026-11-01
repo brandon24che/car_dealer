@@ -8,10 +8,10 @@ import {
   incrementViewCount,
   saveLead,
   saveTestDrive,
-} from "../data-store.js?v=20261102a";
-import { isFavorite, subscribeFavorites, toggleFavorite } from "../favorites.js?v=20261102a";
-import { FINANCE_DEFAULTS, monthlyPayment, roundPayment } from "../finance.js?v=20261102a";
-import { bindRange, mountShell, openModal, setButtonLoading, showToast } from "../ui.js?v=20261102a";
+} from "../data-store.js?v=20261102b";
+import { isFavorite, subscribeFavorites, toggleFavorite } from "../favorites.js?v=20261102b";
+import { FINANCE_DEFAULTS, monthlyPayment, roundPayment } from "../finance.js?v=20261102b";
+import { bindRange, mountShell, openModal, setButtonLoading, showToast } from "../ui.js?v=20261102b";
 import {
   escapeHtml,
   formatCurrency,
@@ -23,21 +23,21 @@ import {
   qs,
   qsa,
   resolveAsset,
-} from "../utils.js?v=20261102a";
+} from "../utils.js?v=20261102b";
 import {
   initVehicleCards,
   renderVehicleCards,
   shortEngine,
   shortTransmission,
   vehicleTitle,
-} from "../vehicles.js?v=20261102a";
+} from "../vehicles.js?v=20261102b";
 import {
   DEALER_NAME,
   DEALER_PHONE_DISPLAY,
   vehicleCheckoutMessage,
   waLink,
   WHATSAPP_SVG,
-} from "../whatsapp.js?v=20261102a";
+} from "../whatsapp.js?v=20261102b";
 
 const root = qs("#vehicleRoot");
 let currentVehicle = null;

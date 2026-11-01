@@ -2,9 +2,9 @@
  * Shared UI shell: promo bar, header, mobile nav, footer, location selector,
  * menu sheet, modal engine and toast notifications.
  */
-import { authReady, getCachedUser, getCurrentUser, signOutUser, userInitials, watchUser } from "./auth.js?v=20261102a";
-import { initFavoritesSync } from "./favorites.js?v=20261102a";
-import { waLink } from "./whatsapp.js?v=20261102a";
+import { authReady, getCachedUser, getCurrentUser, signOutUser, userInitials, watchUser } from "./auth.js?v=20261102b";
+import { initFavoritesSync } from "./favorites.js?v=20261102b";
+import { waLink } from "./whatsapp.js?v=20261102b";
 import {
   escapeHtml,
   getBasePath,
@@ -13,7 +13,7 @@ import {
   storageGet,
   storageSet,
   trapFocus,
-} from "./utils.js?v=20261102a";
+} from "./utils.js?v=20261102b";
 
 const LOCATION_KEY = "as_location_v1";
 const LOCATIONS = ["Dallas, TX", "Plano, TX", "Fort Worth, TX", "Arlington, TX", "Irving, TX"];

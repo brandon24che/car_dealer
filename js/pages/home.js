@@ -2,10 +2,10 @@
  * Home marketplace: live inventory counts, search handoff, featured stock and
  * verified reviews.
  */
-import { initCompare } from "../compare.js?v=20261102a";
-import { getBodyStyleCounts, getFacets, getFeaturedVehicles, getReviews, queryVehicles } from "../data-store.js?v=20261102a";
-import { homeSearchUrl } from "../router-params.js?v=20261102a";
-import { bindRange, mountShell, renderStars } from "../ui.js?v=20261102a";
+import { initCompare } from "../compare.js?v=20261102b";
+import { getBodyStyleCounts, getFacets, getFeaturedVehicles, getReviews, queryVehicles } from "../data-store.js?v=20261102b";
+import { homeSearchUrl } from "../router-params.js?v=20261102b";
+import { bindRange, mountShell, renderStars } from "../ui.js?v=20261102b";
 import {
   escapeHtml,
   formatCurrency,
@@ -15,8 +15,8 @@ import {
   optionsHtml,
   qs,
   qsa,
-} from "../utils.js?v=20261102a";
-import { initVehicleCards, renderVehicleCards } from "../vehicles.js?v=20261102a";
+} from "../utils.js?v=20261102b";
+import { initVehicleCards, renderVehicleCards } from "../vehicles.js?v=20261102b";
 
 const state = { body: "" };
 

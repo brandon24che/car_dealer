@@ -7,9 +7,9 @@ import {
   deleteVehicle,
   saveVehicle,
   uploadVehicleImage,
-} from "../data-store.js?v=20261102a";
-import { setButtonLoading, showToast } from "../ui.js?v=20261102a";
-import { escapeHtml, formatCurrency, formatMileage, qs, qsa } from "../utils.js?v=20261102a";
+} from "../data-store.js?v=20261102b";
+import { setButtonLoading, showToast } from "../ui.js?v=20261102b";
+import { escapeHtml, formatCurrency, formatMileage, qs, qsa } from "../utils.js?v=20261102b";
 import {
   assetPath,
   downloadCsv,
@@ -17,7 +17,7 @@ import {
   vehicleName,
   vehicleStatusBadge,
   vehicleThumb,
-} from "./helpers.js?v=20261102a";
+} from "./helpers.js?v=20261102b";
 
 const MAX_IMAGES = 24;
 const MAX_EMBEDDED = 4;

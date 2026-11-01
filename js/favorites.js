@@ -2,9 +2,9 @@
  * Favorites: works instantly for guests via localStorage and syncs to
  * Firestore (users/{uid}/favorites) once a member signs in.
  */
-import { watchUser } from "./auth.js?v=20261102a";
-import { firebaseReady, firebaseSdk } from "./firebase-config.js?v=20261102a";
-import { storageGet, storageSet } from "./utils.js?v=20261102a";
+import { watchUser } from "./auth.js?v=20261102b";
+import { firebaseReady, firebaseSdk } from "./firebase-config.js?v=20261102b";
+import { storageGet, storageSet } from "./utils.js?v=20261102b";
 
 const KEY = "as_favorites_v1";
 const listeners = new Set();

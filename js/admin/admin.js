@@ -1,16 +1,16 @@
 /**
  * Dealer portal controller: access guard, navigation, dashboard and actions.
  */
-import { requireAdmin, signOutUser, userInitials } from "../auth.js?v=20261102a";
-import { carsAndBidsVehicles } from "../demo-data.js?v=20261102a";
+import { requireAdmin, signOutUser, userInitials } from "../auth.js?v=20261102b";
+import { carsAndBidsVehicles } from "../demo-data.js?v=20261102b";
 import {
   getAllVehicles,
   importVehicles,
   listLeads,
   resetDemoInventory,
   seedDemoInventory,
-} from "../data-store.js?v=20261102a";
-import { showToast } from "../ui.js?v=20261102a";
+} from "../data-store.js?v=20261102b";
+import { showToast } from "../ui.js?v=20261102b";
 import {
   escapeHtml,
   formatCurrency,
@@ -18,7 +18,7 @@ import {
   qs,
   qsa,
   timeAgo,
-} from "../utils.js?v=20261102a";
+} from "../utils.js?v=20261102b";
 import {
   LEAD_STATUS_LABELS,
   assetPath,
@@ -28,11 +28,11 @@ import {
   timeValue,
   vehicleName,
   vehicleThumb,
-} from "./helpers.js?v=20261102a";
-import { initInventory, renderInventory } from "./inventory.js?v=20261102a";
-import { initLeads, renderLeads } from "./leads.js?v=20261102a";
-import { initCommandPalette } from "./palette.js?v=20261102a";
-import { initTeam, refreshTeam } from "./team.js?v=20261102a";
+} from "./helpers.js?v=20261102b";
+import { initInventory, renderInventory } from "./inventory.js?v=20261102b";
+import { initLeads, renderLeads } from "./leads.js?v=20261102b";
+import { initCommandPalette } from "./palette.js?v=20261102b";
+import { initTeam, refreshTeam } from "./team.js?v=20261102b";
 
 const VIEW_META = {
   overview: { title: "Overview", subtitle: "Showroom performance at a glance." },
@@ -324,7 +324,7 @@ async function seedInventory() {
   const confirmed = await confirmAction({
     title: "Seed the demo catalogue?",
     message:
-      "This loads the 39 showcase vehicles. In demo mode it replaces the locally edited inventory; when connected to Firestore it writes the demo records to your vehicles collection.",
+      "This loads the full 49-vehicle catalogue. In demo mode it replaces the locally edited inventory; when connected to Firestore it writes the demo records to your vehicles collection.",
     confirmLabel: "Seed vehicles",
     danger: false,
   });
@@ -342,9 +342,9 @@ async function seedInventory() {
 
 async function importAuctionInventory() {
   const confirmed = await confirmAction({
-    title: "Add the 15 Cars & Bids listings?",
+    title: "Add the 25 Cars & Bids listings?",
     message:
-      "The 15 newest Cars & Bids auctions bundled in the code will be added to inventory. Existing vehicles are untouched, and each imported car can be edited or deleted here afterwards.",
+      "The 25 Cars & Bids auctions bundled in the code (recent cars plus trucks and SUVs) will be added to inventory. Existing vehicles are untouched, and each imported vehicle can be edited or deleted here afterwards.",
     confirmLabel: "Add listings",
     danger: false,
   });

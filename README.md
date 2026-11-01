@@ -24,8 +24,8 @@ The site ships with a complete demo mode, so every page — including the dealer
 - Leads table with search, type/status filters, persistent status changes and CSV export.
 - Command palette (`Ctrl/Cmd + K`) for jumping between views, running portal actions and searching vehicles by make, model, stock number or VIN.
 - Super-admin team management: the root admin can add and remove dealer admins from **Team**; admins created there can use the whole portal but cannot add or remove other admins.
-- One-click import of the 15 Cars & Bids auction listings bundled in `js/demo-data.js`; imported cars use the normal CRUD editor, so any of them can be edited or deleted.
-- One-click seed of the 39-vehicle showcase catalogue and a demo-data reset.
+- One-click import of the 25 Cars & Bids auction listings bundled in `js/demo-data.js` (15 recent cars plus 10 trucks and SUVs); imported vehicles use the normal CRUD editor, so any of them can be edited or deleted.
+- One-click seed of the 49-vehicle showcase catalogue and a demo-data reset.
 
 ---
 
@@ -164,7 +164,7 @@ The user must refresh their ID token (sign out/in) after the claim is set. Rules
 
 ### 6. Seed inventory
 
-Open `/admin/`, go to **Overview → Add 15 Cars & Bids listings** to publish the auction cars, or **Seed showcase vehicles** to batch-write the full 39-vehicle catalogue and 4 reviews. Existing documents with the same IDs are overwritten by the seed; the auction import only touches its own 15 records.
+Open `/admin/`, go to **Overview → Add 25 Cars & Bids listings** to publish the auction vehicles, or **Seed showcase vehicles** to batch-write the full 49-vehicle catalogue and 4 reviews. Existing documents with the same IDs are overwritten by the seed; the auction import only touches its own 25 records.
 
 ### 7. Set the dealer WhatsApp number
 
@@ -246,7 +246,7 @@ css/
 js/
   firebase-config.js    Firebase bootstrap (public web config)
   data-store.js         Unified async data facade + demo fallback
-  demo-data.js          39 showcase vehicles (24 demo + 15 Cars & Bids), reviews
+  demo-data.js          49 showcase vehicles (24 demo + 25 Cars & Bids), reviews
   auth.js               Auth + demo session + admin guard
   ui.js                 Shared shell, toasts, modal, skeletons
   quiz-engine.js        Pure scoring logic

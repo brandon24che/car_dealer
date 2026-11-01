@@ -2,10 +2,10 @@
  * Vehicle presentation helpers: card markup, labels and card interactions.
  * Used by the home, inventory, saved, quiz and vehicle pages.
  */
-import { getCompareIds } from "./compare.js?v=20261102a";
-import { isFavorite, toggleFavorite } from "./favorites.js?v=20261102a";
-import { estimateMonthly, roundPayment } from "./finance.js?v=20261102a";
-import { showToast } from "./ui.js?v=20261102a";
+import { getCompareIds } from "./compare.js?v=20261102b";
+import { isFavorite, toggleFavorite } from "./favorites.js?v=20261102b";
+import { estimateMonthly, roundPayment } from "./finance.js?v=20261102b";
+import { showToast } from "./ui.js?v=20261102b";
 import {
   bodyStyleIcon,
   escapeHtml,
@@ -13,8 +13,8 @@ import {
   formatMileage,
   resolveAsset,
   truncate,
-} from "./utils.js?v=20261102a";
-import { vehicleInquiryMessage, waLink, WHATSAPP_SVG } from "./whatsapp.js?v=20261102a";
+} from "./utils.js?v=20261102b";
+import { vehicleInquiryMessage, waLink, WHATSAPP_SVG } from "./whatsapp.js?v=20261102b";
 
 let bound = false;
 
