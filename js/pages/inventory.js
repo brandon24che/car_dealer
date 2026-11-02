@@ -2,8 +2,8 @@
  * Inventory browser: URL-synced filters, sort, grid/list layouts, cursor
  * pagination and the compare tray.
  */
-import { initCompare } from "../compare.js?v=20261102c";
-import { getFacets, normalizeFilters, queryVehicles, watchVehicleCount } from "../data-store.js?v=20261102c";
+import { initCompare } from "../compare.js?v=20261102d";
+import { getFacets, normalizeFilters, queryVehicles, watchVehicleCount } from "../data-store.js?v=20261102d";
 import {
   activeFilterChips,
   BODY_FILTERS,
@@ -12,9 +12,9 @@ import {
   removeFilterChip,
   renderFilterChips,
   SORT_OPTIONS,
-} from "../filters.js?v=20261102c";
-import { readInventoryState, writeInventoryState } from "../router-params.js?v=20261102c";
-import { bindRange, mountShell, showToast } from "../ui.js?v=20261102c";
+} from "../filters.js?v=20261102d";
+import { readInventoryState, writeInventoryState } from "../router-params.js?v=20261102d";
+import { bindRange, mountShell, showToast } from "../ui.js?v=20261102d";
 import {
   debounce,
   escapeHtml,
@@ -23,8 +23,8 @@ import {
   optionsHtml,
   qs,
   trapFocus,
-} from "../utils.js?v=20261102c";
-import { initVehicleCards, renderCardSkeletons, renderVehicleCard } from "../vehicles.js?v=20261102c";
+} from "../utils.js?v=20261102d";
+import { initVehicleCards, renderCardSkeletons, renderVehicleCard } from "../vehicles.js?v=20261102d";
 
 const PAGE_SIZE = 10;
 let state = readInventoryState();

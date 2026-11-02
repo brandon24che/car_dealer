@@ -8,12 +8,12 @@ import {
   incrementViewCount,
   saveLead,
   saveTestDrive,
-} from "../data-store.js?v=20261102c";
-import { requireAccount } from "../account-gate.js?v=20261102c";
-import { getCurrentUser } from "../auth.js?v=20261102c";
-import { isFavorite, subscribeFavorites, toggleFavorite } from "../favorites.js?v=20261102c";
-import { FINANCE_DEFAULTS, monthlyPayment, roundPayment } from "../finance.js?v=20261102c";
-import { bindRange, mountShell, openModal, setButtonLoading, showToast } from "../ui.js?v=20261102c";
+} from "../data-store.js?v=20261102d";
+import { requireAccount } from "../account-gate.js?v=20261102d";
+import { getCurrentUser } from "../auth.js?v=20261102d";
+import { isFavorite, subscribeFavorites, toggleFavorite } from "../favorites.js?v=20261102d";
+import { FINANCE_DEFAULTS, monthlyPayment, roundPayment } from "../finance.js?v=20261102d";
+import { bindRange, mountShell, openModal, setButtonLoading, showToast } from "../ui.js?v=20261102d";
 import {
   escapeHtml,
   formatCurrency,
@@ -25,21 +25,21 @@ import {
   qs,
   qsa,
   resolveAsset,
-} from "../utils.js?v=20261102c";
+} from "../utils.js?v=20261102d";
 import {
   initVehicleCards,
   renderVehicleCards,
   shortEngine,
   shortTransmission,
   vehicleTitle,
-} from "../vehicles.js?v=20261102c";
+} from "../vehicles.js?v=20261102d";
 import {
   DEALER_NAME,
   DEALER_PHONE_DISPLAY,
   vehicleCheckoutMessage,
   waLink,
   WHATSAPP_SVG,
-} from "../whatsapp.js?v=20261102c";
+} from "../whatsapp.js?v=20261102d";
 
 const root = qs("#vehicleRoot");
 let currentVehicle = null;

@@ -1,11 +1,11 @@
 /**
  * Customer dashboard: request history, confirmations and concierge replies.
  */
-import { authReady, getCurrentUser, watchUser } from "../auth.js?v=20261102c";
-import { listMyLeads } from "../data-store.js?v=20261102c";
-import { mountShell } from "../ui.js?v=20261102c";
-import { escapeHtml, formatDate, formatCurrency, qs, qsa, timeAgo } from "../utils.js?v=20261102c";
-import { DEALER_NAME, waLink } from "../whatsapp.js?v=20261102c";
+import { authReady, getCurrentUser, watchUser } from "../auth.js?v=20261102d";
+import { listMyLeads } from "../data-store.js?v=20261102d";
+import { mountShell } from "../ui.js?v=20261102d";
+import { escapeHtml, formatDate, formatCurrency, qs, qsa, timeAgo } from "../utils.js?v=20261102d";
+import { DEALER_NAME, waLink } from "../whatsapp.js?v=20261102d";
 
 const TYPE_META = {
   testDrive: { label: "Test drive", icon: "event_available" },
@@ -26,6 +26,7 @@ let requests = [];
 let filter = "all";
 let loadedFor = "";
 let loading = false;
+let highlightTimer = 0;
 
 function toDate(value) {
   if (!value) return null;
@@ -116,7 +117,7 @@ function cardMarkup(lead) {
     : "";
 
   return `
-    <article class="dashboard-card" data-request-type="${escapeHtml(lead.type || "contact")}">
+    <article class="dashboard-card" id="request-${escapeHtml(lead.id)}" data-request-type="${escapeHtml(lead.type || "contact")}">
       <div class="dashboard-card__top">
         <span class="dashboard-card__type"><span class="material-symbols-outlined" aria-hidden="true">${type.icon}</span>${type.label}</span>
         <span class="dashboard-status dashboard-status--${status.tone}"><span></span>${status.label}</span>
@@ -203,6 +204,27 @@ function setFilter(next) {
   render();
 }
 
+/** Scroll to and flash the request referenced by #request-<id>. */
+function focusFromHash() {
+  const hash = window.location.hash || "";
+  if (!hash.startsWith("#request-") || !requests.length) return;
+  let id = "";
+  try {
+    id = decodeURIComponent(hash.slice("#request-".length));
+  } catch {
+    id = hash.slice("#request-".length);
+  }
+  const lead = requests.find((item) => String(item.id) === id);
+  if (!lead) return;
+  if (filter !== "all" && filter !== (lead.type || "contact")) setFilter("all");
+  const card = document.getElementById(`request-${id}`);
+  if (!card) return;
+  card.scrollIntoView({ behavior: "smooth", block: "center" });
+  card.classList.add("is-highlighted");
+  window.clearTimeout(highlightTimer);
+  highlightTimer = window.setTimeout(() => card.classList.remove("is-highlighted"), 2600);
+}
+
 function fillWhatsApp(user) {
   const first = (user?.name || "").split(/\s+/)[0] || "";
   const intro = first ? ` This is ${first}${user?.email ? ` (${user.email})` : ""}.` : "";
@@ -232,6 +254,7 @@ async function loadFor(user) {
     requests = await listMyLeads(user);
     loadedFor = user.uid || user.email || "";
     render();
+    focusFromHash();
   } catch (err) {
     console.error("[AutoSelect] dashboard load failed", err);
     if (feed) feed.hidden = true;
@@ -259,6 +282,7 @@ async function showUser(user) {
   fillWhatsApp(user);
   const key = user.uid || user.email || "";
   if (key !== loadedFor) await loadFor(user);
+  else focusFromHash();
 }
 
 async function boot() {
@@ -284,6 +308,8 @@ async function boot() {
     const user = getCurrentUser();
     if (user) loadFor(user);
   });
+
+  window.addEventListener("hashchange", focusFromHash);
 }
 
 boot();

@@ -15,6 +15,7 @@ The site ships with a complete demo mode, so every page — including the dealer
 - Six-step Match Quiz with a pure-JS scoring engine (`js/quiz-engine.js`), live match count, top match and saved results.
 - Saved vehicles, trade-in valuation flow with photo uploads, contact page, login, sign-up, password reset.
 - Customer dashboard (`dashboard.html`) with live request statuses, confirmations and concierge replies for test drives, reservations, trade-ins and messages.
+- Live notification bell in the header: unread count, message previews, refresh, guest call-to-action, deep links that scroll to and highlight the matching dashboard request. Admin accounts see incoming dealer requests and link straight to the portal's Leads view.
 - Account-gated requests: test drives, reservations and trade-ins require a free account so the confirmation and dealer replies land in the customer dashboard. Buying or requesting through WhatsApp stays account-free.
 - Legal pages, custom 404, SEO metadata, Open Graph, JSON-LD, accessible markup, skeletons and empty states.
 

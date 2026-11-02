@@ -2,9 +2,9 @@
  * Shared UI shell: promo bar, header, mobile nav, footer, location selector,
  * menu sheet, modal engine and toast notifications.
  */
-import { authReady, getCachedUser, getCurrentUser, signOutUser, userInitials, watchUser } from "./auth.js?v=20261102c";
-import { initFavoritesSync } from "./favorites.js?v=20261102c";
-import { waLink } from "./whatsapp.js?v=20261102c";
+import { authReady, getCachedUser, getCurrentUser, signOutUser, userInitials, watchUser } from "./auth.js?v=20261102d";
+import { initFavoritesSync } from "./favorites.js?v=20261102d";
+import { waLink } from "./whatsapp.js?v=20261102d";
 import {
   escapeHtml,
   getBasePath,
@@ -12,8 +12,10 @@ import {
   qsa,
   storageGet,
   storageSet,
+  timeAgo,
   trapFocus,
-} from "./utils.js?v=20261102c";
+  truncate,
+} from "./utils.js?v=20261102d";
 
 const LOCATION_KEY = "as_location_v1";
 const LOCATIONS = ["Dallas, TX", "Plano, TX", "Fort Worth, TX", "Arlington, TX", "Irving, TX"];
@@ -116,10 +118,32 @@ function renderHeader(active) {
         </nav>
 
         <div class="header-actions">
-          <button type="button" class="icon-btn" aria-label="Notifications" data-notifications>
-            <span class="material-symbols-outlined">notifications</span>
-            <span class="icon-btn__dot" id="notificationDot"></span>
-          </button>
+          <div class="notify" id="notifyWrap">
+            <button type="button" class="icon-btn" aria-label="Notifications" aria-haspopup="dialog" aria-expanded="false" aria-controls="notifyPanel" data-notifications>
+              <span class="material-symbols-outlined" aria-hidden="true">notifications</span>
+              <span class="icon-btn__badge" id="notificationDot" hidden></span>
+            </button>
+            <div class="notify-panel" id="notifyPanel" role="dialog" aria-label="Notifications" tabindex="-1" hidden>
+              <div class="notify-panel__head">
+                <div class="notify-panel__titles">
+                  <strong>Notifications</strong>
+                  <span data-notify-summary>Checking for updates…</span>
+                </div>
+                <div class="notify-panel__tools">
+                  <button type="button" class="notify-tool" data-notify-refresh aria-label="Refresh notifications">
+                    <span class="material-symbols-outlined" aria-hidden="true">refresh</span>
+                  </button>
+                  <button type="button" class="notify-tool" data-notify-close aria-label="Close notifications">
+                    <span class="material-symbols-outlined" aria-hidden="true">close</span>
+                  </button>
+                </div>
+              </div>
+              <div class="notify-panel__body" data-notify-list>
+                <div class="notify-skeleton" aria-hidden="true"><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span></div>
+              </div>
+              <div class="notify-panel__foot" data-notify-foot></div>
+            </div>
+          </div>
           <div class="auth-slot" id="authSlot"></div>
         </div>
       </div>
@@ -231,7 +255,7 @@ function renderMenuSheet() {
           <a class="menu-sheet__link" href="${basePath}saved.html"><span class="material-symbols-outlined">favorite_border</span><span>Saved Vehicles<small>Your shortlist</small></span></a>
           <a class="menu-sheet__link" href="${basePath}sell.html"><span class="material-symbols-outlined">price_change</span><span>Sell or Trade<small>Instant 2-minute offer</small></span></a>
           <a class="menu-sheet__link" href="${basePath}contact.html"><span class="material-symbols-outlined">support_agent</span><span>Contact Concierge<small>Dallas, TX hub</small></span></a>
-          ${user ? `<a class="menu-sheet__link" href="${basePath}dashboard.html"><span class="material-symbols-outlined">dashboard</span><span>My Dashboard<small>Requests, confirmations &amp; replies</small></span></a>` : ""}
+          ${user && !user.isAdmin ? `<a class="menu-sheet__link" href="${basePath}dashboard.html"><span class="material-symbols-outlined">dashboard</span><span>My Dashboard<small>Requests, confirmations &amp; replies</small></span></a>` : ""}
           ${user?.isAdmin ? `<a class="menu-sheet__link" href="${basePath}admin/index.html"><span class="material-symbols-outlined">admin_panel_settings</span><span>Dealer Portal<small>Inventory, leads &amp; metrics</small></span></a>` : ""}
           ${authLink}
         </div>
@@ -255,7 +279,7 @@ function renderAuthSlot() {
             <strong>${escapeHtml(user.name)}</strong>
             <span>${escapeHtml(user.email)}</span>
           </div>
-          <a class="avatar-menu__item" href="${base()}dashboard.html"><span class="material-symbols-outlined">dashboard</span>My dashboard</a>
+          ${user.isAdmin ? "" : `<a class="avatar-menu__item" href="${base()}dashboard.html"><span class="material-symbols-outlined">dashboard</span>My dashboard</a>`}
           <a class="avatar-menu__item" href="${base()}saved.html"><span class="material-symbols-outlined">favorite</span>Saved vehicles</a>
           ${user.isAdmin ? `<a class="avatar-menu__item" href="${base()}admin/index.html"><span class="material-symbols-outlined">admin_panel_settings</span>Dealer portal</a>` : ""}
           <a class="avatar-menu__item" href="${base()}sell.html"><span class="material-symbols-outlined">price_change</span>Sell or trade</a>
@@ -280,6 +304,349 @@ function refreshMenuSheet() {
     const modal = qs("#menuModal");
     if (modal) openModal(modal);
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Notifications                                                      */
+/* ------------------------------------------------------------------ */
+
+const NOTIFY_SEEN_KEY = "as_notify_seen_v1";
+const NOTIFY_TYPES = {
+  testDrive: { label: "Test drive", icon: "event_available", tone: "blue" },
+  valuation: { label: "Trade-in", icon: "price_change", tone: "orange" },
+  whatsapp: { label: "WhatsApp", icon: "chat", tone: "green" },
+  contact: { label: "Message", icon: "mail", tone: "neutral" },
+};
+const NOTIFY_STATUS = {
+  new: "New request",
+  contacted: "Contacted",
+  qualified: "Qualified",
+  won: "Won",
+  lost: "Closed",
+};
+
+let notifyState = { uid: "", viewer: "guest", items: [], unread: 0, loadedAt: 0 };
+let notifyLoading = false;
+let notifyRefreshTimer = 0;
+
+function notifyTime(value) {
+  if (!value) return 0;
+  if (typeof value === "number") return value;
+  const date = value?.toDate ? value.toDate() : new Date(value);
+  const time = date?.getTime?.();
+  return Number.isNaN(time) ? 0 : time || 0;
+}
+
+function notifySeenAt(user) {
+  if (!user?.uid) return 0;
+  const seen = storageGet(NOTIFY_SEEN_KEY, {});
+  const time = Date.parse(String(seen?.[user.uid] || ""));
+  return Number.isNaN(time) ? 0 : time;
+}
+
+function markNotificationsSeen(user) {
+  if (!user?.uid) return;
+  const seen = storageGet(NOTIFY_SEEN_KEY, {}) || {};
+  seen[user.uid] = new Date().toISOString();
+  storageSet(NOTIFY_SEEN_KEY, seen);
+}
+
+function setNotificationBadge(count) {
+  const badge = qs("#notificationDot");
+  const button = qs("[data-notifications]");
+  const unread = Math.max(0, Number(count) || 0);
+  if (badge) {
+    badge.hidden = unread === 0;
+    badge.textContent = unread > 9 ? "9+" : String(unread);
+  }
+  button?.setAttribute("aria-label", unread ? `Notifications, ${unread} unread` : "Notifications");
+}
+
+function notifyType(type) {
+  return NOTIFY_TYPES[type] || NOTIFY_TYPES.contact;
+}
+
+function memberNotifyItems(leads, seenAt) {
+  return leads
+    .map((lead) => {
+      const replies = Array.isArray(lead.replies)
+        ? lead.replies
+        : lead.response
+          ? [lead.response]
+          : [];
+      const reply = replies[replies.length - 1];
+      if (!reply) return null;
+      const type = notifyType(lead.type);
+      const at = notifyTime(reply.at);
+      return {
+        id: lead.id,
+        href: `${base()}dashboard.html#request-${encodeURIComponent(lead.id)}`,
+        icon: "support_agent",
+        tone: "blue",
+        title: lead.vehicleName || type.label,
+        body: reply.message || "Your concierge sent an update.",
+        meta: `${type.label} • ${reply.channel === "whatsapp" ? "WhatsApp reply" : "Dashboard reply"}`,
+        at,
+        unread: at > seenAt,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.at - a.at);
+}
+
+function dealerNotifyItems(leads, seenAt) {
+  return leads
+    .map((lead) => {
+      const type = notifyType(lead.type);
+      const at = notifyTime(lead.createdAt);
+      return {
+        id: lead.id,
+        href: `${base()}admin/index.html#leads`,
+        icon: type.icon,
+        tone: type.tone,
+        title: `${lead.name || "New customer"} • ${type.label}`,
+        body: lead.vehicleName || lead.message || "New request from the website.",
+        meta: `${NOTIFY_STATUS[lead.status] || "New request"}${lead.phone ? ` • ${lead.phone}` : ""}`,
+        at,
+        unread: at > seenAt,
+      };
+    })
+    .sort((a, b) => b.at - a.at);
+}
+
+async function buildNotifications(user) {
+  const { listLeads, listMyLeads } = await import("./data-store.js?v=20261102d");
+  const seenAt = notifySeenAt(user);
+  const items = user.isAdmin
+    ? dealerNotifyItems(await listLeads({ limit: 30 }), seenAt)
+    : memberNotifyItems(await listMyLeads(user), seenAt);
+  return {
+    viewer: user.isAdmin ? "admin" : "member",
+    items: items.slice(0, 6),
+    unread: items.filter((item) => item.unread).length,
+    loadedAt: Date.now(),
+  };
+}
+
+function notifyItemMarkup(item) {
+  return `
+    <a class="notify-item${item.unread ? " is-unread" : ""}" href="${escapeHtml(item.href)}">
+      <span class="notify-item__icon notify-item__icon--${escapeHtml(item.tone || "blue")}">
+        <span class="material-symbols-outlined" aria-hidden="true">${escapeHtml(item.icon || "notifications")}</span>
+      </span>
+      <span class="notify-item__content">
+        <span class="notify-item__top">
+          <strong>${escapeHtml(item.title)}</strong>
+          ${item.at ? `<time>${escapeHtml(timeAgo(item.at))}</time>` : ""}
+        </span>
+        <span class="notify-item__body">${escapeHtml(truncate(item.body, 118))}</span>
+        <span class="notify-item__meta">${escapeHtml(item.meta)}</span>
+      </span>
+    </a>`;
+}
+
+function guestNotifyMarkup() {
+  const redirect = encodeURIComponent(currentPathForRedirect());
+  return `
+    <div class="notify-guest">
+      <span class="notify-guest__icon material-symbols-outlined" aria-hidden="true">notifications_active</span>
+      <strong>Your updates, in one place</strong>
+      <p>Sign in to get confirmations and concierge replies for test drives, reservations and trade-ins.</p>
+      <div class="notify-guest__actions">
+        <a class="btn btn--primary btn--sm" href="${base()}login.html?redirect=${redirect}">Sign in</a>
+        <a class="btn btn--ghost btn--sm" href="${base()}signup.html?redirect=${redirect}">Create account</a>
+      </div>
+      <a class="notify-guest__wa" href="${waLink("Hi AutoSelect! I'd like to check on my request via WhatsApp.")}" target="_blank" rel="noopener noreferrer">
+        Continue on WhatsApp <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+      </a>
+    </div>`;
+}
+
+function emptyNotifyMarkup(viewer) {
+  const admin = viewer === "admin";
+  return `
+    <div class="notify-state">
+      <span class="material-symbols-outlined" aria-hidden="true">${admin ? "inbox" : "notifications_none"}</span>
+      <strong>${admin ? "No new requests" : "No updates yet"}</strong>
+      <p>${admin ? "New test drives, trade-ins and messages will appear here." : "Concierge replies and confirmations will appear here as soon as they land."}</p>
+    </div>`;
+}
+
+function errorNotifyMarkup() {
+  return `
+    <div class="notify-state notify-state--error">
+      <span class="material-symbols-outlined" aria-hidden="true">cloud_off</span>
+      <strong>Couldn't load updates</strong>
+      <p>Check your connection and try again.</p>
+      <button type="button" class="btn btn--ghost btn--sm" data-notify-retry>Try again</button>
+    </div>`;
+}
+
+function renderNotifyPanel(user, state = notifyState, { status = "ready" } = {}) {
+  const list = qs("[data-notify-list]");
+  const summary = qs("[data-notify-summary]");
+  const foot = qs("[data-notify-foot]");
+  if (!list) return;
+
+  if (!user) {
+    if (summary) summary.textContent = "Concierge updates";
+    list.innerHTML = guestNotifyMarkup();
+    if (foot) foot.innerHTML = "";
+    return;
+  }
+
+  if (status === "loading" && !state.items.length) {
+    if (summary) summary.textContent = "Checking for updates…";
+    list.innerHTML = `<div class="notify-skeleton" aria-hidden="true"><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span></div>`;
+    if (foot) foot.innerHTML = "";
+    return;
+  }
+
+  if (status === "error") {
+    if (summary) summary.textContent = "Couldn't load updates";
+    list.innerHTML = errorNotifyMarkup();
+    if (foot) foot.innerHTML = "";
+    return;
+  }
+
+  if (!state.items.length) {
+    if (summary) summary.textContent = user.isAdmin ? "Dealer activity" : "Concierge updates";
+    list.innerHTML = emptyNotifyMarkup(user.isAdmin ? "admin" : "member");
+  } else {
+    if (summary) {
+      summary.textContent = state.unread
+        ? `${state.unread} unread update${state.unread === 1 ? "" : "s"}`
+        : "You're all caught up";
+    }
+    list.innerHTML = state.items.map(notifyItemMarkup).join("");
+  }
+
+  if (foot) {
+    foot.innerHTML = user.isAdmin
+      ? `<a class="notify-panel__cta" href="${base()}admin/index.html#leads"><span>Review requests in dealer portal</span><span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>`
+      : `<a class="notify-panel__cta" href="${base()}dashboard.html"><span>Open my dashboard</span><span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>`;
+  }
+}
+
+function setNotifyRefreshState(loading) {
+  const button = qs("[data-notify-refresh]");
+  button?.classList.toggle("is-loading", loading);
+  button?.setAttribute("aria-busy", String(loading));
+}
+
+async function refreshNotifications(user, { forPanel = false } = {}) {
+  if (!user || notifyLoading) return;
+  notifyLoading = true;
+  setNotifyRefreshState(true);
+  try {
+    const data = await buildNotifications(user);
+    if (getCurrentUser()?.uid !== user.uid) return;
+    notifyState = { ...data, uid: user.uid };
+    setNotificationBadge(data.unread);
+    if (forPanel && isNotifyOpen()) {
+      renderNotifyPanel(user, notifyState);
+      markNotificationsSeen(user);
+      setNotificationBadge(0);
+    }
+  } catch (error) {
+    console.warn("[AutoSelect] notifications unavailable", error);
+    if (forPanel && isNotifyOpen()) renderNotifyPanel(user, notifyState, { status: "error" });
+  } finally {
+    notifyLoading = false;
+    setNotifyRefreshState(false);
+  }
+}
+
+function scheduleNotificationRefresh(user) {
+  window.clearTimeout(notifyRefreshTimer);
+  if (!user) return;
+  notifyRefreshTimer = window.setTimeout(() => {
+    if (document.hidden) return;
+    refreshNotifications(getCurrentUser());
+  }, 1600);
+}
+
+function syncNotificationUser(user) {
+  const uid = user?.uid || "";
+  if (notifyState.uid !== uid) {
+    notifyState = {
+      uid,
+      viewer: user?.isAdmin ? "admin" : user ? "member" : "guest",
+      items: [],
+      unread: 0,
+      loadedAt: 0,
+    };
+    setNotificationBadge(0);
+  }
+  if (isNotifyOpen()) {
+    renderNotifyPanel(user, notifyState, { status: user ? "loading" : "ready" });
+  }
+  scheduleNotificationRefresh(user);
+}
+
+function isNotifyOpen() {
+  const panel = qs("#notifyPanel");
+  return Boolean(panel && !panel.hidden);
+}
+
+function closeNotifications({ focus = false } = {}) {
+  const panel = qs("#notifyPanel");
+  if (!panel || panel.hidden) return;
+  panel.hidden = true;
+  qs("[data-notifications]")?.setAttribute("aria-expanded", "false");
+  if (focus) qs("[data-notifications]")?.focus({ preventScroll: true });
+}
+
+function openNotifications() {
+  const panel = qs("#notifyPanel");
+  if (!panel) return;
+  qs("#avatarMenu")?.removeAttribute("open");
+  panel.hidden = false;
+  qs("[data-notifications]")?.setAttribute("aria-expanded", "true");
+  const user = getCurrentUser();
+  renderNotifyPanel(user, notifyState, {
+    status: user && !notifyState.items.length ? "loading" : "ready",
+  });
+  requestAnimationFrame(() => panel.focus({ preventScroll: true }));
+  if (!user) return;
+  refreshNotifications(user, { forPanel: true });
+}
+
+function bindNotifications() {
+  qs("[data-notifications]")?.addEventListener("click", (event) => {
+    event.preventDefault();
+    if (isNotifyOpen()) closeNotifications({ focus: true });
+    else openNotifications();
+  });
+
+  qs("#notifyPanel")?.addEventListener("click", (event) => {
+    if (event.target.closest("[data-notify-close]")) {
+      event.preventDefault();
+      closeNotifications({ focus: true });
+      return;
+    }
+    if (event.target.closest("[data-notify-refresh], [data-notify-retry]")) {
+      event.preventDefault();
+      const user = getCurrentUser();
+      if (user) refreshNotifications(user, { forPanel: true });
+      else renderNotifyPanel(null, notifyState);
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    const wrap = qs("#notifyWrap");
+    if (isNotifyOpen() && wrap && !wrap.contains(event.target)) closeNotifications();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && isNotifyOpen()) closeNotifications({ focus: true });
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && Date.now() - notifyState.loadedAt > 60000) {
+      scheduleNotificationRefresh(getCurrentUser());
+    }
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -492,11 +859,8 @@ export async function mountShell(options = {}) {
   });
 
   // Notifications
-  qs("[data-notifications]")?.addEventListener("click", () => {
-    const dot = qs("#notificationDot");
-    dot?.remove();
-    showToast("You're all caught up — 3 new certified arrivals in Dallas.", "info");
-  });
+  bindNotifications();
+  syncNotificationUser(getCurrentUser() || getCachedUser());
 
   // Menu sheet
   document.addEventListener("click", (event) => {
@@ -512,9 +876,11 @@ export async function mountShell(options = {}) {
     if (!button) return;
     event.preventDefault();
     await signOutUser();
+    closeNotifications();
     qs("#avatarMenu")?.removeAttribute("open");
     renderAuthSlot();
     refreshMenuSheet();
+    syncNotificationUser(null);
     showToast("Signed out. Your saved cars are still on this device.");
     if (window.location.pathname.includes("/admin/")) {
       window.setTimeout(() => {
@@ -523,9 +889,10 @@ export async function mountShell(options = {}) {
     }
   });
 
-  watchUser(() => {
+  watchUser((user) => {
     renderAuthSlot();
     refreshMenuSheet();
+    syncNotificationUser(user);
   });
 
   // Auth resolved after the shell painted — reconcile the cached profile.
@@ -533,6 +900,7 @@ export async function mountShell(options = {}) {
     .then(() => {
       renderAuthSlot();
       refreshMenuSheet();
+      syncNotificationUser(getCurrentUser());
     })
     .catch(() => {});
 
