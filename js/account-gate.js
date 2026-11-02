@@ -5,9 +5,9 @@
  * confirmation and concierge replies can be delivered to their dashboard.
  * WhatsApp handoff stays open to everyone.
  */
-import { authReady, getCurrentUser } from "./auth.js?v=20261102d";
-import { closeModal, openModal } from "./ui.js?v=20261102d";
-import { waLink } from "./whatsapp.js?v=20261102d";
+import { authReady, getCurrentUser } from "./auth.js?v=20261102e";
+import { closeModal, openModal } from "./ui.js?v=20261102e";
+import { waLink } from "./whatsapp.js?v=20261102e";
 
 let gate = null;
 

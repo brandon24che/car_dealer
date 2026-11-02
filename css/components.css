@@ -778,6 +778,16 @@ body.no-bottom-nav .site-footer { margin-bottom: 0; }
 .chip .material-symbols-outlined { font-size: 13px; color: var(--slate); }
 .chip--green { color: var(--green-ink); font-weight: 600; background: var(--green-soft); }
 .chip--outline { background: transparent; border: 1px solid var(--border); }
+.chip--action {
+  background: var(--blue-soft);
+  border: 1px solid rgba(37, 99, 235, 0.24);
+  color: var(--blue-dark);
+  font-weight: 700;
+  transition: background var(--speed), border-color var(--speed), color var(--speed);
+}
+.chip--action .material-symbols-outlined { color: var(--blue); }
+.chip--action:hover { background: var(--surface-tint); border-color: rgba(37, 99, 235, 0.45); color: var(--blue-dark); }
+.chip--action:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
 .filter-chip {
   display: inline-flex;

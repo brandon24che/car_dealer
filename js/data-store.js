@@ -9,9 +9,9 @@ import {
   firebaseReady,
   firebaseSdk,
   isFirebaseConfigured,
-} from "./firebase-config.js?v=20261102d";
-import { getCurrentUser } from "./auth.js?v=20261102d";
-import { demoVehicles, demoReviews } from "./demo-data.js?v=20261102d";
+} from "./firebase-config.js?v=20261102e";
+import { getCurrentUser } from "./auth.js?v=20261102e";
+import { demoVehicles, demoReviews } from "./demo-data.js?v=20261102e";
 import {
   debounce,
   escapeHtml,
@@ -22,7 +22,7 @@ import {
   storageSet,
   truncate,
   uid,
-} from "./utils.js?v=20261102d";
+} from "./utils.js?v=20261102e";
 
 const KEYS = {
   vehicles: "as_demo_vehicles_v1",

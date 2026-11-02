@@ -2,10 +2,10 @@
  * Vehicle presentation helpers: card markup, labels and card interactions.
  * Used by the home, inventory, saved, quiz and vehicle pages.
  */
-import { getCompareIds } from "./compare.js?v=20261102d";
-import { isFavorite, toggleFavorite } from "./favorites.js?v=20261102d";
-import { estimateMonthly, roundPayment } from "./finance.js?v=20261102d";
-import { showToast } from "./ui.js?v=20261102d";
+import { getCompareIds } from "./compare.js?v=20261102e";
+import { isFavorite, toggleFavorite } from "./favorites.js?v=20261102e";
+import { estimateMonthly, roundPayment } from "./finance.js?v=20261102e";
+import { showToast } from "./ui.js?v=20261102e";
 import {
   bodyStyleIcon,
   escapeHtml,
@@ -13,8 +13,8 @@ import {
   formatMileage,
   resolveAsset,
   truncate,
-} from "./utils.js?v=20261102d";
-import { vehicleInquiryMessage, waLink, WHATSAPP_SVG } from "./whatsapp.js?v=20261102d";
+} from "./utils.js?v=20261102e";
+import { vehicleInquiryMessage, waLink, WHATSAPP_SVG } from "./whatsapp.js?v=20261102e";
 
 let bound = false;
 
@@ -75,8 +75,13 @@ function dealChip(vehicle) {
       formatCurrency(save)
     )}</span>`;
   }
+  const rating = String(vehicle.dealRating || "");
+  if (/auction|no reserve/i.test(rating)) {
+    const bookHref = `${vehicleHref(vehicle.id)}&open=test-drive`;
+    return `<a class="chip chip--action" href="${escapeHtml(bookHref)}"><span class="material-symbols-outlined" aria-hidden="true">event_available</span>Book test drive</a>`;
+  }
   return `<span class="chip"><span class="material-symbols-outlined">sell</span>${escapeHtml(
-    vehicle.dealRating || "Fair Market Price"
+    rating || "Fair Market Price"
   )}</span>`;
 }
 

@@ -1,7 +1,7 @@
 /**
  * Shared formatting and CSV helpers for the dealer portal.
  */
-import { formatDate, formatNumber, truncate } from "../utils.js?v=20261102d";
+import { formatDate, formatNumber, truncate } from "../utils.js?v=20261102e";
 
 export const LEAD_TYPES = {
   whatsapp: { label: "WhatsApp", icon: "chat", tone: "wa" },

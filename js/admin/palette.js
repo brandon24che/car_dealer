@@ -2,8 +2,8 @@
  * Dealer portal command palette (Ctrl/Cmd + K): jump between views, run portal
  * actions and open a vehicle editor directly from the keyboard.
  */
-import { escapeHtml, qs } from "../utils.js?v=20261102d";
-import { vehicleName } from "./helpers.js?v=20261102d";
+import { escapeHtml, qs } from "../utils.js?v=20261102e";
+import { vehicleName } from "./helpers.js?v=20261102e";
 
 export function initCommandPalette({ getVehicles, showView, isSuperAdmin }) {
   const dialog = qs("#commandDialog");

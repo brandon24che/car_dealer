@@ -2,9 +2,9 @@
  * Car match quiz page: six-step wizard, live match preview and persisted
  * recommendations powered by the pure engine in ../quiz-engine.js.
  */
-import { initCompare } from "../compare.js?v=20261102d";
-import { getAllVehicles, saveQuizResult } from "../data-store.js?v=20261102d";
-import { estimateMonthly, roundPayment } from "../finance.js?v=20261102d";
+import { initCompare } from "../compare.js?v=20261102e";
+import { getAllVehicles, saveQuizResult } from "../data-store.js?v=20261102e";
+import { estimateMonthly, roundPayment } from "../finance.js?v=20261102e";
 import {
   analyzeMatches,
   BODY_OPTIONS,
@@ -19,8 +19,8 @@ import {
   normalizeAnswers,
   SEAT_OPTIONS,
   TRANSMISSION_OPTIONS,
-} from "../quiz-engine.js?v=20261102d";
-import { bindRange, mountShell, showToast } from "../ui.js?v=20261102d";
+} from "../quiz-engine.js?v=20261102e";
+import { bindRange, mountShell, showToast } from "../ui.js?v=20261102e";
 import {
   escapeHtml,
   formatCurrency,
@@ -31,7 +31,7 @@ import {
   resolveAsset,
   storageGet,
   storageSet,
-} from "../utils.js?v=20261102d";
+} from "../utils.js?v=20261102e";
 import {
   initVehicleCards,
   renderVehicleCard,
@@ -39,8 +39,8 @@ import {
   shortTransmission,
   vehicleHref,
   vehicleTitle,
-} from "../vehicles.js?v=20261102d";
-import { waLink } from "../whatsapp.js?v=20261102d";
+} from "../vehicles.js?v=20261102e";
+import { waLink } from "../whatsapp.js?v=20261102e";
 
 const ANSWERS_KEY = "as_quiz_answers_v1";
 const COMPLETED_KEY = "as_quiz_completed_v1";

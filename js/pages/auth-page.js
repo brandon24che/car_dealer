@@ -11,10 +11,10 @@ import {
   signUp,
   userInitials,
   watchUser,
-} from "../auth.js?v=20261102d";
-import { isFirebaseConfigured } from "../firebase-config.js?v=20261102d";
-import { closeModal, mountShell, openModal, setButtonLoading, showToast } from "../ui.js?v=20261102d";
-import { isValidEmail, qs, qsa } from "../utils.js?v=20261102d";
+} from "../auth.js?v=20261102e";
+import { isFirebaseConfigured } from "../firebase-config.js?v=20261102e";
+import { closeModal, mountShell, openModal, setButtonLoading, showToast } from "../ui.js?v=20261102e";
+import { isValidEmail, qs, qsa } from "../utils.js?v=20261102e";
 
 const page = document.body.dataset.auth;
 const redirectTarget = safeRedirect(
