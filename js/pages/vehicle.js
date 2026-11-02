@@ -8,12 +8,12 @@ import {
   incrementViewCount,
   saveLead,
   saveTestDrive,
-} from "../data-store.js?v=20261102e";
-import { requireAccount } from "../account-gate.js?v=20261102e";
-import { getCurrentUser } from "../auth.js?v=20261102e";
-import { isFavorite, subscribeFavorites, toggleFavorite } from "../favorites.js?v=20261102e";
-import { FINANCE_DEFAULTS, monthlyPayment, roundPayment } from "../finance.js?v=20261102e";
-import { bindRange, mountShell, openModal, setButtonLoading, showToast } from "../ui.js?v=20261102e";
+} from "../data-store.js?v=20261102f";
+import { requireAccount } from "../account-gate.js?v=20261102f";
+import { getCurrentUser } from "../auth.js?v=20261102f";
+import { isFavorite, subscribeFavorites, toggleFavorite } from "../favorites.js?v=20261102f";
+import { FINANCE_DEFAULTS, monthlyPayment, roundPayment } from "../finance.js?v=20261102f";
+import { bindRange, mountShell, openModal, setButtonLoading, showToast } from "../ui.js?v=20261102f";
 import {
   escapeHtml,
   formatCurrency,
@@ -25,21 +25,21 @@ import {
   qs,
   qsa,
   resolveAsset,
-} from "../utils.js?v=20261102e";
+} from "../utils.js?v=20261102f";
 import {
   initVehicleCards,
   renderVehicleCards,
   shortEngine,
   shortTransmission,
   vehicleTitle,
-} from "../vehicles.js?v=20261102e";
+} from "../vehicles.js?v=20261102f";
 import {
   DEALER_NAME,
   DEALER_PHONE_DISPLAY,
   vehicleCheckoutMessage,
   waLink,
   WHATSAPP_SVG,
-} from "../whatsapp.js?v=20261102e";
+} from "../whatsapp.js?v=20261102f";
 
 const root = qs("#vehicleRoot");
 let currentVehicle = null;
@@ -411,16 +411,17 @@ function renderFeatures(vehicle) {
 function renderAvailability(vehicle) {
   const location = vehicle.location || "Dallas, TX";
   const city = String(location).replace(/,\s*TX$/i, "");
-  const onLot = (vehicle.status || "available") === "available";
-  const statusLabel = onLot ? "On Showroom Lot" : vehicle.status === "reserved" ? "Reserved — join waitlist" : "Recently sold";
+  const status = vehicle.status || "available";
+  const onLot = status === "available";
+  const statusLabel = onLot ? "On Showroom Lot" : status === "reserved" ? "Reserved — join waitlist" : "Recently sold";
   const directions = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     `AutoSelect ${city} dealership`
   )}`;
 
-  return `<section class="panel veh-lower--full" aria-labelledby="availabilityTitle">
+  return `<section class="panel veh-lower--full" id="availability" aria-labelledby="availabilityTitle">
     <div class="veh-lower__head">
       <h2 id="availabilityTitle">Vehicle Availability</h2>
-      <span class="veh-availability__status">${escapeHtml(statusLabel)}</span>
+      <span class="veh-availability__status" data-status="${escapeHtml(status)}">${escapeHtml(statusLabel)}</span>
     </div>
     <div class="veh-lower__body">
       <div class="veh-availability__grid">
@@ -932,7 +933,7 @@ function prepareTestDriveModal(vehicle) {
 async function openTestDrive() {
   if (!currentVehicle) return;
   const account = await requireAccount({
-    title: "Sign in to reserve your test drive",
+    title: "Sign in to reserve this car",
     copy: `Reserve the ${vehicleTitle(currentVehicle)} and receive your confirmation and concierge replies in your dashboard.`,
     whatsappMessage: `Hi ${DEALER_NAME}! I'd like to reserve a test drive for the ${vehicleLabel(currentVehicle)} (Stock ${
       currentVehicle.stockNumber || currentVehicle.id

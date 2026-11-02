@@ -653,9 +653,6 @@
 .adm-status--qualified { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
 .adm-status--won { background: var(--green-soft); color: var(--green-ink); border-color: rgba(16, 185, 129, 0.28); }
 .adm-status--lost { background: #fef2f2; color: var(--error); border-color: #fecaca; }
-.adm-status--car-available { background: var(--green-soft); color: var(--green-ink); border-color: rgba(16, 185, 129, 0.28); }
-.adm-status--car-reserved { background: var(--orange-soft); color: var(--orange-ink); border-color: rgba(249, 115, 22, 0.24); }
-.adm-status--car-sold { background: var(--subtle); color: var(--slate-strong); }
 
 /* Empty / loading */
 .adm-empty {
@@ -812,6 +809,84 @@
 .af-switch:has(input:checked) { border-color: rgba(37, 99, 235, 0.4); background: var(--blue-soft); color: var(--ink); }
 .af-switch input { width: 15px; height: 15px; accent-color: var(--blue); flex-shrink: 0; margin: 0; }
 .af-switch span { min-width: 0; }
+
+/* Availability controls ------------------------------------------------- */
+.adm-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.adm-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+}
+.adm-switch__track {
+  position: relative;
+  width: 38px;
+  height: 22px;
+  border-radius: var(--r-full);
+  background: #cbd5e1;
+  box-shadow: inset 0 1px 2px rgba(11, 19, 43, 0.18);
+  transition: background var(--speed), box-shadow var(--speed);
+}
+.adm-switch__track::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(11, 19, 43, 0.35);
+  transition: transform var(--speed);
+}
+.adm-switch input:checked + .adm-switch__track { background: var(--green); }
+.adm-switch input:checked + .adm-switch__track::after { transform: translateX(16px); }
+.adm-switch input:focus-visible + .adm-switch__track { outline: 2px solid var(--blue); outline-offset: 2px; }
+.adm-switch input:disabled + .adm-switch__track { opacity: 0.6; }
+.adm-switch--lg .adm-switch__track { width: 44px; height: 25px; }
+.adm-switch--lg .adm-switch__track::after { width: 19px; height: 19px; }
+.adm-switch--lg input:checked + .adm-switch__track::after { transform: translateX(19px); }
+
+.adm-avail-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  padding: 4px 6px 4px 8px;
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: background var(--speed), opacity var(--speed);
+}
+.adm-avail-toggle:hover { background: var(--surface-soft); }
+.adm-avail-toggle__text { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+.adm-avail-toggle__text strong { font-size: 10.5px; font-weight: 700; color: var(--slate-strong); }
+.adm-avail-toggle__text small { font-size: 9px; color: var(--slate); }
+.adm-avail-toggle[data-status="available"] .adm-avail-toggle__text strong { color: var(--green-ink); }
+.adm-avail-toggle[data-status="reserved"] .adm-avail-toggle__text strong { color: var(--orange-ink); }
+.adm-avail-toggle.is-saving { opacity: 0.6; pointer-events: none; }
+
+.af-avail {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface-soft);
+  transition: border-color var(--speed), background var(--speed);
+}
+.af-avail.is-live { border-color: rgba(16, 185, 129, 0.4); background: var(--green-soft); }
+.af-avail__copy { min-width: 0; display: grid; gap: 2px; }
+.af-avail__copy strong { font-size: 12px; color: var(--ink); }
+.af-avail__copy span { font-size: 10.5px; line-height: 1.45; color: var(--slate-strong); }
 
 /* Image manager */
 .af-drop {
@@ -1320,8 +1395,6 @@
   .adm-table--inventory td:nth-child(4),
   .adm-table--inventory th:nth-child(5),
   .adm-table--inventory td:nth-child(5),
-  .adm-table--inventory th:nth-child(6),
-  .adm-table--inventory td:nth-child(6),
   .adm-table--leads th:nth-child(2),
   .adm-table--leads td:nth-child(2),
   .adm-table--leads th:nth-child(3),
@@ -1330,6 +1403,9 @@
   .adm-table--leads td:nth-child(4) { display: none; }
 
   .adm-table__vehicle { min-width: 0; }
+  .adm-table--inventory .adm-table__vehicle { flex-wrap: wrap; }
+  .adm-avail-toggle { margin-left: 24px; padding-left: 0; }
+  .adm-avail-toggle__text small { display: none; }
   .adm-table__vtext strong { white-space: normal; }
   .adm-table__vtext .adm-table__mobile {
     display: block;

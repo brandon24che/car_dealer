@@ -7,17 +7,16 @@ import {
   deleteVehicle,
   saveVehicle,
   uploadVehicleImage,
-} from "../data-store.js?v=20261102e";
-import { setButtonLoading, showToast } from "../ui.js?v=20261102e";
-import { escapeHtml, formatCurrency, formatMileage, qs, qsa } from "../utils.js?v=20261102e";
+} from "../data-store.js?v=20261102f";
+import { setButtonLoading, showToast } from "../ui.js?v=20261102f";
+import { escapeHtml, formatCurrency, formatMileage, qs, qsa } from "../utils.js?v=20261102f";
 import {
   assetPath,
   downloadCsv,
   leadDate,
   vehicleName,
-  vehicleStatusBadge,
   vehicleThumb,
-} from "./helpers.js?v=20261102e";
+} from "./helpers.js?v=20261102f";
 
 const MAX_IMAGES = 24;
 const MAX_EMBEDDED = 4;
@@ -75,6 +74,12 @@ function row(vehicle) {
   const stock = escapeHtml(vehicle.stockNumber || "No stock #");
   const vin = vehicle.vin ? ` · VIN ${escapeHtml(String(vehicle.vin).slice(-6))}` : "";
   const status = vehicle.status || "available";
+  const available = status === "available";
+  const statusLabel = available ? "Available" : status === "reserved" ? "Reserved" : "Sold";
+  const statusHint = available ? "Live on site" : status === "reserved" ? "Waitlist only" : "Hidden from site";
+  const toggleLabel = available
+    ? `Mark ${name} sold and hide it from the storefront`
+    : `Make ${name} available on the storefront`;
   return `
     <tr>
       <td>
@@ -86,13 +91,17 @@ function row(vehicle) {
           <div class="adm-table__vtext">
             <strong>${name}</strong>
             <span>${stock}${vin}</span>
-            <span class="adm-table__mobile">${formatCurrency(Number(vehicle.price) || 0)} · ${formatMileage(Number(vehicle.mileage) || 0)} mi · ${status.charAt(0).toUpperCase() + status.slice(1)}${vehicle.featured ? " · Featured" : ""}</span>
+            <span class="adm-table__mobile">${formatCurrency(Number(vehicle.price) || 0)} · ${formatMileage(Number(vehicle.mileage) || 0)} · ${statusLabel}${vehicle.featured ? " · Featured" : ""}</span>
           </div>
+          <label class="adm-switch adm-avail-toggle" data-status="${escapeHtml(status)}" title="${toggleLabel}">
+            <input type="checkbox" role="switch" data-toggle-availability="${id}" aria-label="${toggleLabel}"${available ? " checked" : ""}>
+            <span class="adm-switch__track" aria-hidden="true"></span>
+            <span class="adm-avail-toggle__text"><strong>${statusLabel}</strong><small>${statusHint}</small></span>
+          </label>
         </div>
       </td>
       <td class="adm-table__num">${formatCurrency(Number(vehicle.price) || 0)}</td>
       <td class="adm-table__num">${formatMileage(Number(vehicle.mileage) || 0)}</td>
-      <td>${vehicleStatusBadge(vehicle.status || "available")}</td>
       <td>${vehicle.featured ? `<span class="adm-table__featured" title="Featured"><span class="material-symbols-outlined" aria-hidden="true">star</span></span>` : `<span style="color:var(--slate)">—</span>`}</td>
       <td class="adm-table__date adm-hide-sm">${leadDate(vehicle.updatedAt || vehicle.createdAt)}</td>
       <td class="adm-table__actions">
@@ -181,7 +190,6 @@ export function renderInventory(list = []) {
             </th>
             <th scope="col" class="adm-table__num">Price</th>
             <th scope="col" class="adm-table__num">Mileage</th>
-            <th scope="col">Status</th>
             <th scope="col">Featured</th>
             <th scope="col" class="adm-hide-sm">Updated</th>
             <th scope="col" class="adm-table__actions">Actions</th>
@@ -262,6 +270,38 @@ async function applyBulk(action) {
   } catch (error) {
     console.error("[AutoSelect] bulk update failed", error);
     showToast(error.message || "Could not update the selected vehicles.", "error");
+  }
+}
+
+async function toggleAvailability(toggle) {
+  const id = toggle.dataset.toggleAvailability;
+  const vehicle = vehicles.find((item) => item.id === id);
+  if (!vehicle) return;
+  const makeAvailable = toggle.checked;
+  const inputs = qsa(`[data-toggle-availability="${CSS.escape(id)}"]`);
+  const control = toggle.closest(".adm-avail-toggle");
+  inputs.forEach((input) => {
+    input.disabled = true;
+  });
+  control?.classList.add("is-saving");
+
+  try {
+    await bulkUpdateVehicles([{ ...vehicle, status: makeAvailable ? "available" : "sold" }]);
+    showToast(
+      makeAvailable
+        ? `${vehicleName(vehicle)} is live and open for reservations.`
+        : `${vehicleName(vehicle)} marked sold and hidden from the storefront.`,
+      "success"
+    );
+    await context.reload();
+  } catch (error) {
+    console.error("[AutoSelect] availability update failed", error);
+    inputs.forEach((input) => {
+      input.disabled = false;
+      input.checked = !makeAvailable;
+    });
+    control?.classList.remove("is-saving");
+    showToast(error.message || "Could not update availability.", "error");
   }
 }
 
@@ -354,6 +394,15 @@ function showEditorError(message) {
   box.querySelector("p").textContent = message;
 }
 
+function syncEditorAvailability() {
+  const select = qs("#vfStatus");
+  const toggle = qs("#vfAvailable");
+  if (!select || !toggle) return;
+  const available = select.value === "available";
+  toggle.checked = available;
+  toggle.closest(".af-avail")?.classList.toggle("is-live", available);
+}
+
 function openEditor(vehicle = null) {
   const dialog = qs("#vehicleDialog");
   if (!dialog) return;
@@ -393,6 +442,7 @@ function openEditor(vehicle = null) {
   setValue("vfInterior", vehicle?.interiorColor || "");
   setValue("vfLocation", vehicle?.location || "Dallas, TX");
   setValue("vfStatus", vehicle?.status || "available");
+  syncEditorAvailability();
   setValue("vfViewCount", vehicle?.viewCount ?? 0);
   setValue("vfFeatured", Boolean(vehicle?.featured));
   setValue("vfCertified", vehicle ? Boolean(vehicle.certified) : true);
@@ -756,6 +806,11 @@ export function initInventory(options = {}) {
   }
 
   document.addEventListener("change", (event) => {
+    const availability = event.target.closest("[data-toggle-availability]");
+    if (availability) {
+      toggleAvailability(availability);
+      return;
+    }
     const single = event.target.closest("[data-select-vehicle]");
     if (single) {
       if (single.checked) selected.add(single.dataset.selectVehicle);
@@ -769,6 +824,13 @@ export function initInventory(options = {}) {
 
   const form = qs("#vehicleForm");
   form?.addEventListener("submit", submitVehicle);
+
+  qs("#vfStatus")?.addEventListener("change", syncEditorAvailability);
+  qs("#vfAvailable")?.addEventListener("change", (event) => {
+    const select = qs("#vfStatus");
+    if (select) select.value = event.target.checked ? "available" : "sold";
+    syncEditorAvailability();
+  });
 
   qsa("[data-vehicle-cancel]").forEach((button) => {
     button.addEventListener("click", closeEditor);

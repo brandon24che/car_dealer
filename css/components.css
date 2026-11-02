@@ -783,6 +783,9 @@ body.no-bottom-nav .site-footer { margin-bottom: 0; }
   border: 1px solid rgba(37, 99, 235, 0.24);
   color: var(--blue-dark);
   font-weight: 700;
+  font-family: inherit;
+  line-height: 1.2;
+  cursor: pointer;
   transition: background var(--speed), border-color var(--speed), color var(--speed);
 }
 .chip--action .material-symbols-outlined { color: var(--blue); }
@@ -1005,22 +1008,25 @@ a.veh-title:hover { color: var(--blue); }
 
 .veh-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 2px; }
 .veh-meta__left { min-width: 0; display: flex; flex-wrap: wrap; gap: 5px; }
-.veh-compare {
+.veh-reserve {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  font-size: 10.5px;
-  font-weight: 500;
-  color: var(--slate);
-  cursor: pointer;
+  gap: 4px;
+  padding: 5px 9px;
+  border-radius: var(--r-full);
+  background: var(--navy);
+  border: 1px solid var(--navy);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(11, 19, 43, 0.12);
+  transition: background var(--speed), border-color var(--speed), box-shadow var(--speed);
 }
-.veh-compare input {
-  width: 15px; height: 15px;
-  accent-color: var(--navy);
-  cursor: pointer;
-  margin: 0;
-}
+.veh-reserve .material-symbols-outlined { font-size: 13px; color: #9cc3ff; }
+.veh-reserve:hover { background: #16244a; border-color: #16244a; box-shadow: 0 3px 10px rgba(11, 19, 43, 0.18); color: #fff; }
+.veh-reserve:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
 .veh-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: auto; }
 .veh-actions .btn { height: 38px; padding: 0 10px; font-size: 11.5px; border-radius: var(--r-sm); }
@@ -1271,6 +1277,72 @@ a.veh-title:hover { color: var(--blue); }
 .modal--wide .modal__panel { max-width: 1040px; }
 .modal--md .modal__panel { max-width: 620px; }
 .modal--sm .modal__panel { max-width: 440px; }
+
+/* Availability check (live card action) */
+.avail-check { display: flex; gap: 14px; align-items: flex-start; }
+.avail-check__icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 24px;
+  background: var(--green-soft);
+  color: var(--green-ink);
+  box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.08);
+  animation: availPop 280ms var(--ease) both;
+}
+.avail-check--wait .avail-check__icon { background: var(--orange-soft); color: var(--orange-ink); box-shadow: 0 0 0 6px rgba(249, 115, 22, 0.08); }
+.avail-check--sold .avail-check__icon { background: var(--subtle); color: var(--slate-strong); box-shadow: 0 0 0 6px rgba(100, 116, 139, 0.08); }
+.avail-check__copy { min-width: 0; }
+.avail-check__copy h3 { font-size: 16px; letter-spacing: -0.01em; color: var(--ink); }
+.avail-check__copy p { margin-top: 4px; font-size: 12px; line-height: 1.55; color: var(--slate-strong); }
+.avail-check__facts {
+  display: grid;
+  gap: 6px;
+  margin: 14px 0 0;
+  padding: 12px;
+  border-radius: var(--r);
+  background: var(--canvas);
+  border: 1px solid var(--border);
+  list-style: none;
+}
+.avail-check__facts li { display: flex; gap: 7px; align-items: flex-start; font-size: 11px; color: var(--slate-strong); }
+.avail-check__facts .material-symbols-outlined { font-size: 15px; color: var(--blue); margin-top: 1px; }
+.avail-check__actions { display: grid; gap: 8px; margin-top: 16px; }
+.avail-check__actions .btn { width: 100%; }
+.avail-check__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  margin-top: 10px;
+  font-size: 11px;
+  font-weight: 650;
+  color: var(--blue-dark);
+}
+.avail-check__link:hover { text-decoration: underline; }
+.avail-check__link .material-symbols-outlined { font-size: 15px; }
+.avail-check__loading { display: flex; gap: 14px; align-items: center; padding: 10px 4px 18px; }
+.avail-check__loading strong { display: block; font-size: 13px; color: var(--ink); }
+.avail-check__loading p { margin-top: 3px; font-size: 11.5px; color: var(--slate); }
+.avail-check__spinner {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px solid var(--blue-soft);
+  border-top-color: var(--blue);
+  animation: availSpin 800ms linear infinite;
+  flex-shrink: 0;
+}
+@keyframes availSpin { to { transform: rotate(360deg); } }
+@keyframes availPop { from { transform: scale(0.82); opacity: 0.4; } to { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .avail-check__spinner,
+  .avail-check__icon { animation: none; }
+}
 
 @media (min-width: 640px) {
   .modal { align-items: center; padding: 24px; }

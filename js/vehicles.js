@@ -2,10 +2,9 @@
  * Vehicle presentation helpers: card markup, labels and card interactions.
  * Used by the home, inventory, saved, quiz and vehicle pages.
  */
-import { getCompareIds } from "./compare.js?v=20261102e";
-import { isFavorite, toggleFavorite } from "./favorites.js?v=20261102e";
-import { estimateMonthly, roundPayment } from "./finance.js?v=20261102e";
-import { showToast } from "./ui.js?v=20261102e";
+import { isFavorite, toggleFavorite } from "./favorites.js?v=20261102f";
+import { estimateMonthly, roundPayment } from "./finance.js?v=20261102f";
+import { openModal, showToast } from "./ui.js?v=20261102f";
 import {
   bodyStyleIcon,
   escapeHtml,
@@ -13,8 +12,8 @@ import {
   formatMileage,
   resolveAsset,
   truncate,
-} from "./utils.js?v=20261102e";
-import { vehicleInquiryMessage, waLink, WHATSAPP_SVG } from "./whatsapp.js?v=20261102e";
+} from "./utils.js?v=20261102f";
+import { vehicleInquiryMessage, waLink, WHATSAPP_SVG } from "./whatsapp.js?v=20261102f";
 
 let bound = false;
 
@@ -77,8 +76,9 @@ function dealChip(vehicle) {
   }
   const rating = String(vehicle.dealRating || "");
   if (/auction|no reserve/i.test(rating)) {
-    const bookHref = `${vehicleHref(vehicle.id)}&open=test-drive`;
-    return `<a class="chip chip--action" href="${escapeHtml(bookHref)}"><span class="material-symbols-outlined" aria-hidden="true">event_available</span>Book test drive</a>`;
+    return `<button type="button" class="chip chip--action" data-check-availability="${escapeHtml(vehicle.id)}" data-avail-name="${escapeHtml(
+      vehicleTitle(vehicle)
+    )}"><span class="material-symbols-outlined" aria-hidden="true">fact_check</span>Check Availability</button>`;
   }
   return `<span class="chip"><span class="material-symbols-outlined">sell</span>${escapeHtml(
     rating || "Fair Market Price"
@@ -108,18 +108,17 @@ function badgesFor(vehicle) {
  * @param {string} [options.reason] quiz match reason
  * @param {number} [options.match] quiz match percentage
  * @param {boolean} [options.actions]
- * @param {boolean} [options.compare]
+ * @param {boolean} [options.reserve]
  */
 export function renderVehicleCard(vehicle, options = {}) {
   const variant = options.variant || "default";
   const showActions = options.actions !== false;
-  const showCompare = options.compare !== false;
+  const showReserve = options.reserve !== false;
   const id = escapeHtml(vehicle.id);
   const href = escapeHtml(vehicleHref(vehicle.id));
   const images = Array.isArray(vehicle.images) && vehicle.images.length ? vehicle.images : [];
   const photoCount = images.length;
   const saved = isFavorite(vehicle.id);
-  const compared = getCompareIds().includes(vehicle.id);
   const title = vehicleTitle(vehicle);
   const subtitle = vehicleSubtitle(vehicle);
   const alt = `${title} — ${subtitle}`;
@@ -177,8 +176,10 @@ export function renderVehicleCard(vehicle, options = {}) {
       <div class="veh-meta">
         <div class="veh-meta__left">${dealChip(vehicle)}</div>
         ${
-          showCompare
-            ? `<label class="veh-compare"><input type="checkbox" data-compare="${id}"${compared ? " checked" : ""}><span>Compare</span></label>`
+          showReserve
+            ? `<a class="veh-reserve" href="${escapeHtml(
+                `${vehicleHref(vehicle.id)}&open=test-drive`
+              )}"><span class="material-symbols-outlined" aria-hidden="true">event_available</span><span>Reserve This Car</span></a>`
             : ""
         }
       </div>
@@ -215,6 +216,147 @@ export function renderCardSkeletons(count = 6) {
   ).join("");
 }
 
+function ensureAvailabilityModal() {
+  let modal = document.getElementById("availabilityModal");
+  if (modal) return modal;
+  modal = document.createElement("div");
+  modal.className = "modal modal--sm";
+  modal.id = "availabilityModal";
+  modal.dataset.modal = "";
+  modal.hidden = true;
+  modal.innerHTML = `
+    <div class="modal__backdrop" data-modal-close></div>
+    <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="availabilityModalTitle">
+      <div class="modal__head">
+        <div>
+          <h2 id="availabilityModalTitle">Availability check</h2>
+          <p data-avail-subtitle>Live status from dealer inventory.</p>
+        </div>
+        <button type="button" class="modal__close" data-modal-close aria-label="Close availability check">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal__body" data-avail-body aria-live="polite"></div>
+    </div>`;
+  document.body.appendChild(modal);
+  return modal;
+}
+
+function availabilityResult(vehicle) {
+  const status = vehicle.status || "available";
+  const title = escapeHtml(vehicleTitle(vehicle));
+  const location = escapeHtml(vehicle.location || "Dallas, TX");
+  const stock = escapeHtml(vehicle.stockNumber || vehicle.id);
+  const detailsHref = escapeHtml(`${vehicleHref(vehicle.id)}#availability`);
+  const reserveHref = escapeHtml(`${vehicleHref(vehicle.id)}&open=test-drive`);
+  const detailsLink = `<a class="avail-check__link" href="${detailsHref}">See full availability details<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>`;
+
+  const copy =
+    status === "available"
+      ? {
+          tone: "ok",
+          icon: "verified",
+          heading: "Available now",
+          description: `This ${title} is on the showroom lot in ${location} and ready for you to reserve.`,
+          action: `<a class="btn btn--primary" href="${reserveHref}"><span class="material-symbols-outlined" aria-hidden="true">event_available</span>Reserve this car</a>`,
+        }
+      : status === "reserved"
+        ? {
+            tone: "wait",
+            icon: "schedule",
+            heading: "Currently reserved",
+            description: `Another buyer is holding this ${title}. Join the waitlist and our concierge will call you first if it becomes available.`,
+            action: `<a class="btn btn--wa" href="${escapeHtml(
+              waLink(
+                `Hi AutoSelect! Please add me to the waitlist for the ${vehicleTitle(vehicle)} (Stock ${
+                  vehicle.stockNumber || vehicle.id
+                }).`
+              )
+            )}" target="_blank" rel="noopener noreferrer">${WHATSAPP_SVG}<span>Join the waitlist</span></a>`,
+          }
+        : {
+            tone: "sold",
+            icon: "sell",
+            heading: "Recently sold",
+            description: `This ${title} has found a new home. Our concierge can match you with similar certified stock available today.`,
+            action: `<a class="btn btn--primary" href="inventory.html"><span class="material-symbols-outlined" aria-hidden="true">directions_car</span>Browse available cars</a>`,
+          };
+
+  return `<div class="avail-check avail-check--${copy.tone}">
+      <span class="avail-check__icon material-symbols-outlined" aria-hidden="true">${copy.icon}</span>
+      <div class="avail-check__copy">
+        <h3>${copy.heading}</h3>
+        <p>${copy.description}</p>
+        <ul class="avail-check__facts">
+          <li><span class="material-symbols-outlined" aria-hidden="true">schedule</span>Checked against live inventory just now</li>
+          <li><span class="material-symbols-outlined" aria-hidden="true">pin_drop</span>${location} · Stock ${stock}</li>
+          <li><span class="material-symbols-outlined" aria-hidden="true">sell</span>${escapeHtml(formatCurrency(vehicle.price))} · ${escapeHtml(
+            vehicle.status === "reserved" ? "Waitlist open" : vehicle.status === "sold" ? "No longer listed" : "No dealer add-ons"
+          )}</li>
+        </ul>
+      </div>
+    </div>
+    <div class="avail-check__actions">
+      ${copy.action}
+      ${
+        status === "reserved"
+          ? ""
+          : `<a class="btn btn--ghost" href="${escapeHtml(waLink(vehicleInquiryMessage(vehicle)))}" target="_blank" rel="noopener noreferrer">${WHATSAPP_SVG}<span>WhatsApp concierge</span></a>`
+      }
+    </div>
+    ${detailsLink}`;
+}
+
+async function checkAvailability(id, title = "this vehicle") {
+  if (!id) return;
+  const modal = ensureAvailabilityModal();
+  const body = modal.querySelector("[data-avail-body]");
+  const subtitle = modal.querySelector("[data-avail-subtitle]");
+  if (subtitle) subtitle.textContent = `Live status for the ${title}`;
+  if (body) {
+    body.innerHTML = `<div class="avail-check__loading" role="status">
+      <span class="avail-check__spinner" aria-hidden="true"></span>
+      <div><strong>Confirming availability…</strong><p>Checking the dealership's live inventory.</p></div>
+    </div>`;
+  }
+  openModal(modal);
+
+  try {
+    const { getVehicle } = await import("./data-store.js?v=20261102f");
+    const vehicle = await getVehicle(id);
+    if (!vehicle) {
+      if (body) {
+        body.innerHTML = `<div class="avail-check avail-check--sold">
+          <span class="avail-check__icon material-symbols-outlined" aria-hidden="true">search_off</span>
+          <div class="avail-check__copy">
+            <h3>Listing not found</h3>
+            <p>This vehicle is no longer in our inventory. Browse the latest certified stock instead.</p>
+          </div>
+        </div>
+        <div class="avail-check__actions"><a class="btn btn--primary" href="inventory.html">Browse inventory</a></div>`;
+      }
+      return;
+    }
+    if (body) body.innerHTML = availabilityResult(vehicle);
+  } catch (error) {
+    console.error("[AutoSelect] availability check failed", error);
+    if (body) {
+      body.innerHTML = `<div class="avail-check avail-check--wait">
+        <span class="avail-check__icon material-symbols-outlined" aria-hidden="true">wifi_off</span>
+        <div class="avail-check__copy">
+          <h3>Couldn't confirm right now</h3>
+          <p>Live inventory is temporarily unreachable. Message the concierge and we'll confirm this vehicle within minutes.</p>
+        </div>
+      </div>
+      <div class="avail-check__actions">
+        <a class="btn btn--wa" href="${escapeHtml(
+          waLink(`Hi AutoSelect! Is the ${title} still available?`)
+        )}" target="_blank" rel="noopener noreferrer">${WHATSAPP_SVG}<span>Ask on WhatsApp</span></a>
+      </div>`;
+    }
+  }
+}
+
 function setFavoriteButtons(id, saved) {
   document.querySelectorAll(`[data-fav="${CSS.escape(String(id))}"]`).forEach((button) => {
     button.classList.toggle("is-saved", saved);
@@ -232,6 +374,12 @@ export function initVehicleCards() {
   if (bound) return;
   bound = true;
   document.addEventListener("click", async (event) => {
+    const check = event.target.closest("[data-check-availability]");
+    if (check) {
+      event.preventDefault();
+      checkAvailability(check.dataset.checkAvailability, check.dataset.availName);
+      return;
+    }
     const button = event.target.closest("[data-fav]");
     if (!button) return;
     event.preventDefault();

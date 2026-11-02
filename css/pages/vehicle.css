@@ -889,6 +889,21 @@
   background: var(--green);
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.14);
 }
+.veh-availability__status[data-status="available"]::before { animation: availStatusPulse 2.6s ease-out infinite; }
+.veh-availability__status[data-status="reserved"] { color: var(--orange-ink); }
+.veh-availability__status[data-status="reserved"]::before { background: var(--orange); box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.16); }
+.veh-availability__status[data-status="sold"] { color: var(--slate-strong); }
+.veh-availability__status[data-status="sold"]::before { background: var(--slate); box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.14); }
+@keyframes availStatusPulse {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.34); }
+  70% { box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+#availability { scroll-margin-top: calc(var(--header-offset, 96px) + 20px); }
+#availability:target { border-color: rgba(37, 99, 235, 0.35); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+@media (prefers-reduced-motion: reduce) {
+  .veh-availability__status[data-status="available"]::before { animation: none; }
+}
 .veh-policy {
   display: flex;
   gap: 8px;

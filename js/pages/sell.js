@@ -1,11 +1,11 @@
 /**
  * Sell / trade-in page: live valuation, photo uploads and offer submission.
  */
-import { isDemoConfigured, saveValuation, uploadValuationImage } from "../data-store.js?v=20261102e";
-import { requireAccount } from "../account-gate.js?v=20261102e";
-import { getCurrentUser, watchUser } from "../auth.js?v=20261102e";
-import { mountShell, setButtonLoading, showToast } from "../ui.js?v=20261102e";
-import { waLink } from "../whatsapp.js?v=20261102e";
+import { isDemoConfigured, saveValuation, uploadValuationImage } from "../data-store.js?v=20261102f";
+import { requireAccount } from "../account-gate.js?v=20261102f";
+import { getCurrentUser, watchUser } from "../auth.js?v=20261102f";
+import { mountShell, setButtonLoading, showToast } from "../ui.js?v=20261102f";
+import { waLink } from "../whatsapp.js?v=20261102f";
 import {
   clamp,
   formatCurrency,
@@ -13,7 +13,7 @@ import {
   isValidEmail,
   isValidPhone,
   qs,
-} from "../utils.js?v=20261102e";
+} from "../utils.js?v=20261102f";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const MAX_PHOTOS = 4;

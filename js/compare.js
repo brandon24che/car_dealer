@@ -2,9 +2,9 @@
  * Compare tray: keeps up to three vehicles in a shortlist, rendered as a
  * floating tray and a side-by-side comparison sheet.
  */
-import { getAllVehicles } from "./data-store.js?v=20261102e";
-import { estimateMonthly, roundPayment } from "./finance.js?v=20261102e";
-import { openModal, showToast } from "./ui.js?v=20261102e";
+import { getAllVehicles } from "./data-store.js?v=20261102f";
+import { estimateMonthly, roundPayment } from "./finance.js?v=20261102f";
+import { openModal, showToast } from "./ui.js?v=20261102f";
 import {
   escapeHtml,
   formatCurrency,
@@ -13,8 +13,8 @@ import {
   resolveAsset,
   storageGet,
   storageSet,
-} from "./utils.js?v=20261102e";
-import { shortEngine, shortTransmission, vehicleHref, vehicleTitle } from "./vehicles.js?v=20261102e";
+} from "./utils.js?v=20261102f";
+import { shortEngine, shortTransmission, vehicleHref, vehicleTitle } from "./vehicles.js?v=20261102f";
 
 const KEY = "as_compare_v1";
 export const MAX_COMPARE = 3;

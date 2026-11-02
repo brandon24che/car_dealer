@@ -1,7 +1,7 @@
 /**
  * Shared formatting and CSV helpers for the dealer portal.
  */
-import { formatDate, formatNumber, truncate } from "../utils.js?v=20261102e";
+import { formatDate, formatNumber, truncate } from "../utils.js?v=20261102f";
 
 export const LEAD_TYPES = {
   whatsapp: { label: "WhatsApp", icon: "chat", tone: "wa" },
@@ -27,12 +27,6 @@ export function leadType(type) {
 export function leadTypeBadge(type) {
   const meta = leadType(type);
   return `<span class="adm-type adm-type--${meta.tone}"><span class="material-symbols-outlined" aria-hidden="true">${meta.icon}</span>${meta.label}</span>`;
-}
-
-export function vehicleStatusBadge(status) {
-  const value = ["available", "reserved", "sold"].includes(status) ? status : "available";
-  const label = value.charAt(0).toUpperCase() + value.slice(1);
-  return `<span class="adm-status adm-status--car-${value}">${label}</span>`;
 }
 
 export function leadDate(value) {

@@ -1,16 +1,16 @@
 /**
  * Dealer portal controller: access guard, navigation, dashboard and actions.
  */
-import { requireAdmin, signOutUser, userInitials } from "../auth.js?v=20261102e";
-import { carsAndBidsVehicles } from "../demo-data.js?v=20261102e";
+import { requireAdmin, signOutUser, userInitials } from "../auth.js?v=20261102f";
+import { carsAndBidsVehicles } from "../demo-data.js?v=20261102f";
 import {
   getAllVehicles,
   importVehicles,
   listLeads,
   resetDemoInventory,
   seedDemoInventory,
-} from "../data-store.js?v=20261102e";
-import { showToast } from "../ui.js?v=20261102e";
+} from "../data-store.js?v=20261102f";
+import { showToast } from "../ui.js?v=20261102f";
 import {
   escapeHtml,
   formatCurrency,
@@ -18,7 +18,7 @@ import {
   qs,
   qsa,
   timeAgo,
-} from "../utils.js?v=20261102e";
+} from "../utils.js?v=20261102f";
 import {
   LEAD_STATUS_LABELS,
   assetPath,
@@ -28,11 +28,11 @@ import {
   timeValue,
   vehicleName,
   vehicleThumb,
-} from "./helpers.js?v=20261102e";
-import { initInventory, renderInventory } from "./inventory.js?v=20261102e";
-import { initLeads, renderLeads } from "./leads.js?v=20261102e";
-import { initCommandPalette } from "./palette.js?v=20261102e";
-import { initTeam, refreshTeam } from "./team.js?v=20261102e";
+} from "./helpers.js?v=20261102f";
+import { initInventory, renderInventory } from "./inventory.js?v=20261102f";
+import { initLeads, renderLeads } from "./leads.js?v=20261102f";
+import { initCommandPalette } from "./palette.js?v=20261102f";
+import { initTeam, refreshTeam } from "./team.js?v=20261102f";
 
 const VIEW_META = {
   overview: { title: "Overview", subtitle: "Showroom performance at a glance." },

@@ -2,7 +2,7 @@
  * Saved vehicles page: shortlist summary, cards, compare seeding and
  * account sync status.
  */
-import { getCurrentUser, watchUser } from "../auth.js?v=20261102e";
+import { getCurrentUser, watchUser } from "../auth.js?v=20261102f";
 import {
   MAX_COMPARE,
   clearCompare,
@@ -11,13 +11,13 @@ import {
   isCompared,
   openCompare,
   toggleCompare,
-} from "../compare.js?v=20261102e";
-import { getAllVehicles } from "../data-store.js?v=20261102e";
-import { clearFavorites, getFavoriteIds, subscribeFavorites } from "../favorites.js?v=20261102e";
-import { estimateMonthly, roundPayment } from "../finance.js?v=20261102e";
-import { closeModal, mountShell, openModal, showToast } from "../ui.js?v=20261102e";
-import { escapeHtml, formatCurrency, qs, qsa } from "../utils.js?v=20261102e";
-import { initVehicleCards, renderVehicleCard } from "../vehicles.js?v=20261102e";
+} from "../compare.js?v=20261102f";
+import { getAllVehicles } from "../data-store.js?v=20261102f";
+import { clearFavorites, getFavoriteIds, subscribeFavorites } from "../favorites.js?v=20261102f";
+import { estimateMonthly, roundPayment } from "../finance.js?v=20261102f";
+import { closeModal, mountShell, openModal, showToast } from "../ui.js?v=20261102f";
+import { escapeHtml, formatCurrency, qs, qsa } from "../utils.js?v=20261102f";
+import { initVehicleCards, renderVehicleCard } from "../vehicles.js?v=20261102f";
 
 const state = {
   vehicles: [],
