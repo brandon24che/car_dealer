@@ -16,10 +16,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/variables.css?v=20261102b">
-  <link rel="stylesheet" href="css/base.css?v=20261102b">
-  <link rel="stylesheet" href="css/components.css?v=20261102b">
-  <link rel="stylesheet" href="css/pages/sell.css?v=20261102b">
+  <link rel="stylesheet" href="css/variables.css?v=20261102c">
+  <link rel="stylesheet" href="css/base.css?v=20261102c">
+  <link rel="stylesheet" href="css/components.css?v=20261102c">
+  <link rel="stylesheet" href="css/pages/sell.css?v=20261102c">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -83,9 +83,23 @@
             <a class="btn btn--wa btn--lg" data-success-wa href="#" target="_blank" rel="noopener noreferrer">
               <span class="material-symbols-outlined" aria-hidden="true">chat</span>Continue on WhatsApp
             </a>
+            <a class="btn btn--ghost btn--lg" href="dashboard.html">View my dashboard</a>
             <a class="btn btn--ghost btn--lg" href="inventory.html">Browse inventory <span class="material-symbols-outlined">arrow_forward</span></a>
           </div>
           <p class="sell-success__ref">Reference <strong data-success-ref>—</strong> · A specialist replies in under 5 minutes, 9am–8pm CT.</p>
+        </div>
+      </div>
+
+      <div class="sell-account-note" data-sell-account-note>
+        <span class="material-symbols-outlined" aria-hidden="true">account_circle</span>
+        <div>
+          <strong>An account is required to submit your trade-in.</strong>
+          <p>Create a free account to receive your appraisal confirmation and specialist replies in your dashboard. Prefer WhatsApp? Continue there with no account.</p>
+        </div>
+        <div class="sell-account-note__actions">
+          <a class="btn btn--primary btn--sm" href="signup.html?redirect=sell.html">Create account</a>
+          <a class="btn btn--ghost btn--sm" href="login.html?redirect=sell.html">Sign in</a>
+          <a class="btn btn--wa btn--sm" data-sell-wa href="#" target="_blank" rel="noopener noreferrer"><span class="material-symbols-outlined" aria-hidden="true">chat</span>WhatsApp instead</a>
         </div>
       </div>
 
@@ -309,6 +323,6 @@
   </main>
 
   <div id="site-footer"></div>
-  <script type="module" src="js/pages/sell.js?v=20261102b"></script>
+  <script type="module" src="js/pages/sell.js?v=20261102c"></script>
 </body>
 </html>

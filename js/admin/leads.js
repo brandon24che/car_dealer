@@ -1,9 +1,11 @@
 /**
- * Dealer portal — leads table, filters, status updates and CSV export.
+ * Dealer portal — leads table, filters, status updates, concierge replies and CSV export.
  */
-import { updateLeadStatus } from "../data-store.js?v=20261102b";
-import { escapeHtml, qs } from "../utils.js?v=20261102b";
-import { showToast } from "../ui.js?v=20261102b";
+import { updateLeadStatus, replyToLead } from "../data-store.js?v=20261102c";
+import { getCurrentUser } from "../auth.js?v=20261102c";
+import { escapeHtml, qs, qsa, truncate } from "../utils.js?v=20261102c";
+import { showToast } from "../ui.js?v=20261102c";
+import { DEALER_NAME, waLink } from "../whatsapp.js?v=20261102c";
 import {
   LEAD_STATUSES,
   LEAD_STATUS_LABELS,
@@ -12,10 +14,11 @@ import {
   leadSummary,
   leadTypeBadge,
   timeValue,
-} from "./helpers.js?v=20261102b";
+} from "./helpers.js?v=20261102c";
 
 let leads = [];
 let filters = { query: "", type: "all", status: "all" };
+let replyingTo = null;
 
 function matches(lead) {
   if (filters.type !== "all" && (lead.type || "whatsapp") !== filters.type) return false;
@@ -49,8 +52,11 @@ function row(lead) {
   const summary = escapeHtml(leadSummary(lead));
   const vehicle = escapeHtml(lead.vehicleName || "");
   const id = escapeHtml(lead.id);
+  const replies = Array.isArray(lead.replies) ? lead.replies : [];
+  const latest = replies[replies.length - 1];
+  const replyPreview = latest ? escapeHtml(truncate(latest.message || "", 74)) : "";
   return `
-    <tr>
+    <tr class="${latest ? "adm-lead--replied" : ""}">
       <td>
         <div class="adm-customer">
           <strong>${name}</strong>
@@ -67,7 +73,10 @@ function row(lead) {
         ${leadTypeBadge(type)}
         ${vehicle ? `<div style="margin-top:4px;font-size:10.5px;color:var(--slate)">${vehicle}</div>` : ""}
       </td>
-      <td><div class="adm-lead-msg" title="${summary}">${summary}</div></td>
+      <td>
+        <div class="adm-lead-msg" title="${summary}">${summary}</div>
+        ${latest ? `<div class="adm-lead-reply-preview"><span class="material-symbols-outlined" aria-hidden="true">support_agent</span><span>${replyPreview}</span></div>` : ""}
+      </td>
       <td class="adm-table__date adm-hide-sm">${leadDate(lead.createdAt)}</td>
       <td>
         <label class="sr-only" for="leadStatus-${id}">Status for ${name}</label>
@@ -76,6 +85,11 @@ function row(lead) {
             (value) => `<option value="${value}"${value === status ? " selected" : ""}>${LEAD_STATUS_LABELS[value]}</option>`
           ).join("")}
         </select>
+      </td>
+      <td class="adm-lead-actions">
+        <button class="btn btn--ghost btn--sm adm-lead-reply" type="button" data-lead-reply="${id}" aria-label="Respond to ${name}">
+          <span class="material-symbols-outlined" aria-hidden="true">reply</span>${latest ? "Reply again" : "Respond"}
+        </button>
       </td>
     </tr>`;
 }
@@ -130,6 +144,7 @@ export function renderLeads(nextLeads = []) {
             <th scope="col">Message</th>
             <th scope="col" class="adm-hide-sm">Received</th>
             <th scope="col">Status</th>
+            <th scope="col"><span class="sr-only">Actions</span></th>
           </tr>
         </thead>
         <tbody>${list.map(row).join("")}</tbody>
@@ -177,6 +192,116 @@ function exportCsv() {
   showToast(`Exported ${list.length} leads to CSV.`, "success");
 }
 
+function replyTemplate(lead) {
+  const meta = lead.meta || {};
+  if (lead.type === "testDrive") {
+    const when = [meta.preferredDate, meta.locationPreference].filter(Boolean).join(" at ");
+    return `Your test drive${lead.vehicleName ? ` for the ${lead.vehicleName}` : ""} is confirmed${when ? ` for ${when}` : ""}. Bring a valid driver's license and we'll have the car ready. Reply here if you need a different time.`;
+  }
+  if (lead.type === "valuation") {
+    return `We've reviewed your trade-in details. A specialist will call to confirm the final offer and arrange the 15-minute inspection. Reply here with any questions.`;
+  }
+  return `Thanks for reaching out to ${DEALER_NAME}. We're checking availability now and will confirm the next steps within the hour. Reply here if anything changes.`;
+}
+
+function openReplyDialog(lead) {
+  const dialog = qs("#leadReplyDialog");
+  if (!dialog || !lead) return;
+  replyingTo = lead;
+  const context = qs("[data-reply-context]");
+  if (context) {
+    const phone = String(lead.phone || "").trim();
+    context.innerHTML = `
+      <div>
+        <strong>${escapeHtml(lead.name || "Website visitor")}</strong>
+        <span>${escapeHtml(lead.vehicleName || leadSummary(lead))}</span>
+      </div>
+      <div class="adm-reply-context__channels">
+        ${lead.email ? `<span><span class="material-symbols-outlined" aria-hidden="true">mail</span>${escapeHtml(lead.email)}</span>` : ""}
+        ${phone ? `<span><span class="material-symbols-outlined" aria-hidden="true">call</span>${escapeHtml(phone)}</span>` : ""}
+      </div>`;
+  }
+  const message = qs("#admReplyMessage");
+  const status = qs("#admReplyStatus");
+  const error = qs("[data-reply-error]");
+  if (message) message.value = "";
+  if (status) status.value = lead.status || "new";
+  if (error) error.hidden = true;
+  const waButton = qs('[data-reply-send="whatsapp"]');
+  if (waButton) {
+    waButton.disabled = !String(lead.phone || "").trim();
+    waButton.title = waButton.disabled ? "This customer did not leave a phone number." : "";
+  }
+  dialog.showModal();
+  requestAnimationFrame(() => message?.focus());
+}
+
+function closeReplyDialog() {
+  const dialog = qs("#leadReplyDialog");
+  if (dialog?.open) dialog.close();
+  replyingTo = null;
+}
+
+async function sendReply(channel) {
+  const lead = replyingTo;
+  const messageInput = qs("#admReplyMessage");
+  const statusInput = qs("#admReplyStatus");
+  const errorBox = qs("[data-reply-error]");
+  const message = String(messageInput?.value || "").trim();
+  if (!lead) return;
+  if (message.length < 2) {
+    if (errorBox) {
+      errorBox.hidden = false;
+      errorBox.querySelector("p").textContent = "Write a short reply before sending.";
+    }
+    messageInput?.focus();
+    return;
+  }
+  if (errorBox) errorBox.hidden = true;
+
+  const status = statusInput?.value || lead.status || "new";
+  const buttons = [...document.querySelectorAll("[data-reply-send]")];
+  buttons.forEach((button) => (button.disabled = true));
+
+  try {
+    const entry = await replyToLead(lead.id, {
+      message,
+      channel,
+      status,
+      actor: getCurrentUser(),
+    });
+    lead.replies = [...(Array.isArray(lead.replies) ? lead.replies : []), entry].slice(-20);
+    lead.response = entry;
+    lead.respondedAt = entry.at;
+    lead.respondedBy = entry.by;
+    if (status) lead.status = status;
+
+    const phone = String(lead.phone || "").trim();
+    const reference = String(lead.id || "").slice(0, 12).toUpperCase();
+    closeReplyDialog();
+    renderLeads(leads);
+
+    if (channel === "whatsapp" && phone) {
+      const text = `Hi ${lead.name || "there"}, this is ${DEALER_NAME} about request ${reference}.\n\n${message}`;
+      window.open(waLink(text), "_blank", "noopener,noreferrer");
+      showToast("Reply saved to the dashboard and WhatsApp opened.", "success");
+    } else {
+      showToast("Reply delivered to the customer dashboard.", "success");
+    }
+  } catch (error) {
+    console.error("[AutoSelect] lead reply failed", error);
+    if (errorBox) {
+      errorBox.hidden = false;
+      errorBox.querySelector("p").textContent = error.message || "Could not send that reply. Try again.";
+    }
+    showToast("Could not send the reply.", "error");
+  } finally {
+    const waButton = qs('[data-reply-send="whatsapp"]');
+    buttons.forEach((button) => (button.disabled = false));
+    if (waButton && replyingTo && !String(replyingTo.phone || "").trim()) waButton.disabled = true;
+  }
+}
+
 export function initLeads() {
   const search = qs("#admLeadSearch");
   const type = qs("#admLeadType");
@@ -214,5 +339,32 @@ export function initLeads() {
     if (type) type.value = "all";
     if (status) status.value = "all";
     renderLeads(leads);
+  });
+
+  document.addEventListener("click", (event) => {
+    const trigger = event.target.closest("[data-lead-reply]");
+    if (!trigger) return;
+    const lead = leads.find((item) => item.id === trigger.dataset.leadReply);
+    if (lead) openReplyDialog(lead);
+  });
+
+  qs("[data-reply-cancel]")?.addEventListener("click", closeReplyDialog);
+  qsa("[data-reply-send]").forEach((button) =>
+    button.addEventListener("click", () => sendReply(button.dataset.replySend))
+  );
+  qsa("[data-reply-template]").forEach((button) =>
+    button.addEventListener("click", () => {
+      const message = qs("#admReplyMessage");
+      if (!message || !replyingTo) return;
+      message.value = replyTemplate(replyingTo);
+      message.focus();
+    })
+  );
+  const replyDialog = qs("#leadReplyDialog");
+  replyDialog?.addEventListener("click", (event) => {
+    if (event.target === replyDialog) closeReplyDialog();
+  });
+  replyDialog?.addEventListener("close", () => {
+    replyingTo = null;
   });
 }

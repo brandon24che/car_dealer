@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>My Dashboard — AutoSelect</title>
+  <meta name="description" content="Track your AutoSelect test drives, reservations and trade-in appraisals, read concierge replies and continue the conversation on WhatsApp.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0B132B">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css?v=20261102c">
+  <link rel="stylesheet" href="css/base.css?v=20261102c">
+  <link rel="stylesheet" href="css/components.css?v=20261102c">
+  <link rel="stylesheet" href="css/pages/dashboard.css?v=20261102c">
+</head>
+<body data-page="dashboard">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="page dashboard-page">
+    <div class="container">
+      <nav class="breadcrumbs dashboard-breadcrumbs" aria-label="Breadcrumb">
+        <a href="index.html">Home</a>
+        <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+        <span aria-current="page">My dashboard</span>
+      </nav>
+
+      <div class="dashboard-guest" id="dashboardGuest" hidden>
+        <div class="dashboard-guest__card">
+          <span class="dashboard-guest__icon"><span class="material-symbols-outlined" aria-hidden="true">dashboard</span></span>
+          <p class="eyebrow">Your AutoSelect account</p>
+          <h1>One dashboard for every request.</h1>
+          <p>Sign in to see test-drive bookings, reservation confirmations, trade-in appraisals and direct replies from our concierge.</p>
+          <div class="dashboard-guest__actions">
+            <a class="btn btn--primary" href="login.html?redirect=dashboard.html"><span class="material-symbols-outlined" aria-hidden="true">login</span>Sign in</a>
+            <a class="btn btn--ghost" href="signup.html?redirect=dashboard.html"><span class="material-symbols-outlined" aria-hidden="true">person_add</span>Create free account</a>
+            <a class="btn btn--wa" data-guest-wa href="#" target="_blank" rel="noopener noreferrer"><span class="material-symbols-outlined" aria-hidden="true">chat</span>Continue on WhatsApp</a>
+          </div>
+          <p class="dashboard-guest__fine">Buying or booking through WhatsApp never requires an account.</p>
+        </div>
+      </div>
+
+      <div id="dashboardApp" hidden>
+        <section class="dashboard-hero" aria-labelledby="dashboardTitle">
+          <div class="dashboard-hero__main">
+            <p class="eyebrow"><span class="material-symbols-outlined" aria-hidden="true">verified_user</span>Private customer dashboard</p>
+            <h1 id="dashboardTitle">Welcome back, <span data-dashboard-name>there</span>.</h1>
+            <p class="dashboard-hero__lede">Every test drive, reservation and trade-in conversation in one place. Our concierge replies appear here as soon as they are sent.</p>
+            <div class="dashboard-hero__actions">
+              <a class="btn btn--primary btn--sm" href="inventory.html"><span class="material-symbols-outlined" aria-hidden="true">directions_car</span>Browse inventory</a>
+              <a class="btn btn--ghost btn--sm" href="sell.html"><span class="material-symbols-outlined" aria-hidden="true">price_change</span>New trade-in</a>
+            </div>
+          </div>
+          <div class="dashboard-summary" aria-label="Request summary">
+            <div class="dashboard-summary__item">
+              <span>Open requests</span>
+              <strong data-stat-open>—</strong>
+              <small>Awaiting or in progress</small>
+            </div>
+            <div class="dashboard-summary__item">
+              <span>Confirmed</span>
+              <strong data-stat-confirmed>—</strong>
+              <small>Booked or completed</small>
+            </div>
+            <div class="dashboard-summary__item">
+              <span>Concierge replies</span>
+              <strong data-stat-replies>—</strong>
+              <small>Across all requests</small>
+            </div>
+          </div>
+        </section>
+
+        <div class="dashboard-toolbar">
+          <div class="dashboard-filters" role="group" aria-label="Filter requests">
+            <button type="button" class="dashboard-filter is-active" data-dashboard-filter="all" aria-pressed="true">All</button>
+            <button type="button" class="dashboard-filter" data-dashboard-filter="testDrive" aria-pressed="false">Test drives</button>
+            <button type="button" class="dashboard-filter" data-dashboard-filter="valuation" aria-pressed="false">Trade-ins</button>
+            <button type="button" class="dashboard-filter" data-dashboard-filter="whatsapp" aria-pressed="false">WhatsApp</button>
+            <button type="button" class="dashboard-filter" data-dashboard-filter="contact" aria-pressed="false">Messages</button>
+          </div>
+          <span class="dashboard-toolbar__count">Showing <strong data-dashboard-shown>0</strong> of <strong data-dashboard-total>0</strong></span>
+        </div>
+
+        <div class="dashboard-grid">
+          <div id="dashboardFeed" class="dashboard-feed" aria-live="polite" aria-busy="true">
+            <div class="dashboard-skeleton" aria-hidden="true"><span></span><span></span><span></span></div>
+            <div class="dashboard-skeleton" aria-hidden="true"><span></span><span></span><span></span></div>
+          </div>
+
+          <aside class="dashboard-aside" aria-label="Help and next steps">
+            <section class="dashboard-panel">
+              <h2>Need an update?</h2>
+              <p>Message our concierge directly. Replies are usually within five minutes during Dallas business hours.</p>
+              <a class="btn btn--wa btn--block btn--sm" data-dashboard-wa href="#" target="_blank" rel="noopener noreferrer">
+                <span class="material-symbols-outlined" aria-hidden="true">chat</span>Message on WhatsApp
+              </a>
+              <p class="dashboard-panel__fine">Account not required for WhatsApp.</p>
+            </section>
+            <section class="dashboard-panel">
+              <h2>How confirmations work</h2>
+              <ol class="dashboard-steps">
+                <li><span>1</span><div><strong>You submit</strong><p>The request lands with our Dallas concierge instantly.</p></div></li>
+                <li><span>2</span><div><strong>We review</strong><p>Availability and timing are checked against the showroom.</p></div></li>
+                <li><span>3</span><div><strong>You get confirmation</strong><p>The reply and status update appear on this dashboard.</p></div></li>
+              </ol>
+            </section>
+            <section class="dashboard-panel dashboard-panel--soft">
+              <h2>Prefer WhatsApp?</h2>
+              <p>Skip the dashboard entirely — book a test drive, reserve a car or start a trade-in in chat.</p>
+              <a class="btn btn--ghost btn--block btn--sm" data-dashboard-wa-generic href="#" target="_blank" rel="noopener noreferrer">Open WhatsApp chat</a>
+            </section>
+          </aside>
+        </div>
+
+        <div class="state dashboard-empty" id="dashboardEmpty" hidden>
+          <div class="state__icon"><span class="material-symbols-outlined">inbox</span></div>
+          <h2 data-empty-title>No requests yet</h2>
+          <p data-empty-copy>Book a test drive on any vehicle or request a trade-in appraisal — your confirmation and concierge replies will appear here.</p>
+          <div class="state__actions">
+            <a class="btn btn--primary" href="inventory.html">Browse inventory <span class="material-symbols-outlined">arrow_forward</span></a>
+            <a class="btn btn--ghost" href="sell.html"><span class="material-symbols-outlined">price_change</span>Value my trade</a>
+          </div>
+        </div>
+
+        <div class="state dashboard-empty" id="dashboardError" hidden>
+          <div class="state__icon state__icon--error"><span class="material-symbols-outlined">cloud_off</span></div>
+          <h2>We couldn't load your requests</h2>
+          <p>Check your connection and try again. Your requests are safe with our concierge team.</p>
+          <div class="state__actions">
+            <button type="button" class="btn btn--primary" data-dashboard-retry>Try again</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script type="module" src="js/pages/dashboard.js?v=20261102c"></script>
+</body>
+</html>

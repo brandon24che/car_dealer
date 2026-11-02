@@ -8,10 +8,12 @@ import {
   incrementViewCount,
   saveLead,
   saveTestDrive,
-} from "../data-store.js?v=20261102b";
-import { isFavorite, subscribeFavorites, toggleFavorite } from "../favorites.js?v=20261102b";
-import { FINANCE_DEFAULTS, monthlyPayment, roundPayment } from "../finance.js?v=20261102b";
-import { bindRange, mountShell, openModal, setButtonLoading, showToast } from "../ui.js?v=20261102b";
+} from "../data-store.js?v=20261102c";
+import { requireAccount } from "../account-gate.js?v=20261102c";
+import { getCurrentUser } from "../auth.js?v=20261102c";
+import { isFavorite, subscribeFavorites, toggleFavorite } from "../favorites.js?v=20261102c";
+import { FINANCE_DEFAULTS, monthlyPayment, roundPayment } from "../finance.js?v=20261102c";
+import { bindRange, mountShell, openModal, setButtonLoading, showToast } from "../ui.js?v=20261102c";
 import {
   escapeHtml,
   formatCurrency,
@@ -23,21 +25,21 @@ import {
   qs,
   qsa,
   resolveAsset,
-} from "../utils.js?v=20261102b";
+} from "../utils.js?v=20261102c";
 import {
   initVehicleCards,
   renderVehicleCards,
   shortEngine,
   shortTransmission,
   vehicleTitle,
-} from "../vehicles.js?v=20261102b";
+} from "../vehicles.js?v=20261102c";
 import {
   DEALER_NAME,
   DEALER_PHONE_DISPLAY,
   vehicleCheckoutMessage,
   waLink,
   WHATSAPP_SVG,
-} from "../whatsapp.js?v=20261102b";
+} from "../whatsapp.js?v=20261102c";
 
 const root = qs("#vehicleRoot");
 let currentVehicle = null;
@@ -904,6 +906,18 @@ function prepareTestDriveModal(vehicle) {
     subtitle.textContent = `Drive the ${vehicleTitle(vehicle)} at our ${vehicle.location || "Dallas, TX"} hub — or we can bring it to you.`;
   }
 
+  const account = getCurrentUser();
+  if (account) {
+    [
+      ["#tdName", account.name],
+      ["#tdPhone", account.phone],
+      ["#tdEmail", account.email],
+    ].forEach(([selector, value]) => {
+      const input = qs(selector);
+      if (input && !input.value.trim() && value) input.value = value;
+    });
+  }
+
   const dateInput = qs("#tdDate");
   if (dateInput && !dateInput.value) {
     dateInput.value = isoDate(dateFromOption(selectedDateOption));
@@ -915,8 +929,17 @@ function prepareTestDriveModal(vehicle) {
   setActiveChoice("[data-loc]", qs(`[data-loc="${selectedLocation}"]`) || qs('[data-loc="Dealership Hub"]'));
 }
 
-function openTestDrive() {
+async function openTestDrive() {
   if (!currentVehicle) return;
+  const account = await requireAccount({
+    title: "Sign in to reserve your test drive",
+    copy: `Reserve the ${vehicleTitle(currentVehicle)} and receive your confirmation and concierge replies in your dashboard.`,
+    whatsappMessage: `Hi ${DEALER_NAME}! I'd like to reserve a test drive for the ${vehicleLabel(currentVehicle)} (Stock ${
+      currentVehicle.stockNumber || currentVehicle.id
+    }) via WhatsApp.`,
+    redirect: `vehicle.html?id=${encodeURIComponent(currentVehicle.id)}&open=test-drive`,
+  });
+  if (!account) return;
   prepareTestDriveModal(currentVehicle);
   openModal("testDriveModal");
 }
@@ -962,6 +985,10 @@ function bindTestDriveModal() {
   qs("#testDriveForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!currentVehicle) return;
+    if (!getCurrentUser()) {
+      openTestDrive();
+      return;
+    }
     const form = event.currentTarget;
     const name = qs("#tdName");
     const phone = qs("#tdPhone");
@@ -1269,6 +1296,9 @@ async function boot() {
     if (event.target.closest("[data-retry]")) window.location.reload();
   });
   await loadVehicle();
+  if (getParam("open") === "test-drive" && currentVehicle) {
+    await openTestDrive();
+  }
 }
 
 boot();

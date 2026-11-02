@@ -9,8 +9,9 @@ import {
   firebaseReady,
   firebaseSdk,
   isFirebaseConfigured,
-} from "./firebase-config.js?v=20261102b";
-import { demoVehicles, demoReviews } from "./demo-data.js?v=20261102b";
+} from "./firebase-config.js?v=20261102c";
+import { getCurrentUser } from "./auth.js?v=20261102c";
+import { demoVehicles, demoReviews } from "./demo-data.js?v=20261102c";
 import {
   debounce,
   escapeHtml,
@@ -21,7 +22,7 @@ import {
   storageSet,
   truncate,
   uid,
-} from "./utils.js?v=20261102b";
+} from "./utils.js?v=20261102c";
 
 const KEYS = {
   vehicles: "as_demo_vehicles_v1",
@@ -34,6 +35,7 @@ const KEYS = {
 };
 
 const PUBLIC_STATUSES = ["available", "reserved"];
+const LEAD_STATUS_VALUES = ["new", "contacted", "qualified", "won", "lost"];
 const SORT_FIELDS = {
   featured: [["featured", "desc"], ["createdAt", "desc"]],
   newest: [["createdAt", "desc"]],
@@ -635,15 +637,17 @@ export async function getReviews(limit = 6) {
 function sanitizeLead(payload = {}) {
   return {
     name: truncate(String(payload.name || "").trim(), 80),
-    email: truncate(String(payload.email || "").trim(), 120),
+    email: truncate(String(payload.email || "").trim().toLowerCase(), 120),
     phone: truncate(String(payload.phone || "").trim(), 30),
     message: truncate(String(payload.message || "").trim(), 1000),
   };
 }
 
 export async function saveLead(payload = {}) {
+  const account = getCurrentUser();
   const lead = {
     type: ["whatsapp", "testDrive", "valuation", "contact"].includes(payload.type) ? payload.type : "whatsapp",
+    uid: payload.uid || account?.uid || "",
     vehicleId: payload.vehicleId || "",
     vehicleName: payload.vehicleName || "",
     status: "new",
@@ -668,12 +672,14 @@ export async function saveLead(payload = {}) {
 }
 
 export async function saveTestDrive(payload = {}) {
+  const account = getCurrentUser();
   const record = {
+    uid: payload.uid || account?.uid || "",
     vehicleId: payload.vehicleId || "",
     vehicleName: payload.vehicleName || "",
     name: truncate(String(payload.name || "").trim(), 80),
     phone: truncate(String(payload.phone || "").trim(), 30),
-    email: truncate(String(payload.email || "").trim(), 120),
+    email: truncate(String(payload.email || "").trim().toLowerCase(), 120),
     preferredDate: payload.preferredDate || "",
     dateOption: payload.dateOption || "Today",
     locationPreference: payload.locationPreference || "Dealership Hub",
@@ -699,6 +705,7 @@ export async function saveTestDrive(payload = {}) {
   }
   await saveLead({
     type: "testDrive",
+    uid: record.uid,
     vehicleId: record.vehicleId,
     vehicleName: record.vehicleName,
     name: record.name,
@@ -711,7 +718,9 @@ export async function saveTestDrive(payload = {}) {
 }
 
 export async function saveValuation(payload = {}) {
+  const account = getCurrentUser();
   const record = {
+    uid: payload.uid || account?.uid || "",
     year: Number(payload.year) || null,
     make: truncate(String(payload.make || "").trim(), 40),
     model: truncate(String(payload.model || "").trim(), 60),
@@ -721,7 +730,7 @@ export async function saveValuation(payload = {}) {
     vin: truncate(String(payload.vin || "").trim(), 20),
     name: truncate(String(payload.name || "").trim(), 80),
     phone: truncate(String(payload.phone || "").trim(), 30),
-    email: truncate(String(payload.email || "").trim(), 120),
+    email: truncate(String(payload.email || "").trim().toLowerCase(), 120),
     estimateLow: Number(payload.estimateLow) || 0,
     estimateHigh: Number(payload.estimateHigh) || 0,
     photos: Array.isArray(payload.photos) ? payload.photos.slice(0, 8) : [],
@@ -747,6 +756,7 @@ export async function saveValuation(payload = {}) {
   }
   await saveLead({
     type: "valuation",
+    uid: record.uid,
     vehicleName: `${record.year || ""} ${record.make} ${record.model}`.trim(),
     name: record.name,
     phone: record.phone,
@@ -820,6 +830,100 @@ export async function updateLeadStatus(id, status) {
     lead.status = status;
     storageSet(KEYS.leads, leads);
   }
+}
+
+function requestTime(value) {
+  if (!value) return 0;
+  const date = value?.toDate ? value.toDate() : new Date(value);
+  return Number.isNaN(date.getTime()) ? 0 : date.getTime();
+}
+
+/**
+ * Requests that belong to the signed-in customer. UID is authoritative; the
+ * email fallback keeps requests submitted before sign-in visible.
+ */
+export async function listMyLeads(user) {
+  const uid = user?.uid || "";
+  const email = String(user?.email || "").trim().toLowerCase();
+  if (!uid && !email) return [];
+
+  const matches = (lead) =>
+    (uid && lead.uid === uid) ||
+    (email && String(lead.email || "").trim().toLowerCase() === email);
+
+  const f = await live();
+  if (f) {
+    const m = f.firestoreModule;
+    const requests = [];
+    if (uid) {
+      requests.push(
+        m.getDocs(m.query(m.collection(f.db, "leads"), m.where("uid", "==", uid), m.limit(100)))
+      );
+    }
+    if (email) {
+      requests.push(
+        m.getDocs(m.query(m.collection(f.db, "leads"), m.where("email", "==", email), m.limit(100)))
+      );
+    }
+    try {
+      const snaps = await Promise.all(requests);
+      const found = new Map();
+      snaps.forEach((snap) => snap.docs.forEach((doc) => found.set(doc.id, { id: doc.id, ...doc.data() })));
+      return [...found.values()].filter(matches).sort((a, b) => requestTime(b.createdAt) - requestTime(a.createdAt));
+    } catch (error) {
+      console.warn("[AutoSelect] customer request read failed", error);
+      return [];
+    }
+  }
+
+  return readLocal(KEYS.leads)
+    .filter(matches)
+    .sort((a, b) => requestTime(b.createdAt) - requestTime(a.createdAt));
+}
+
+/** Deliver a concierge reply to a customer dashboard, optionally moving the status. */
+export async function replyToLead(id, { message = "", channel = "dashboard", status = "", actor = null } = {}) {
+  const text = truncate(String(message || "").trim(), 1200);
+  if (!text) throw new Error("Write a reply before sending.");
+  if (!id) throw new Error("Missing request reference.");
+
+  const entry = {
+    message: text,
+    channel: channel === "whatsapp" ? "whatsapp" : "dashboard",
+    by: actor?.name || "AutoSelect concierge",
+    byUid: actor?.uid || "",
+    at: nowIso(),
+  };
+  const nextStatus = LEAD_STATUS_VALUES.includes(status) ? status : "";
+
+  const f = await live();
+  if (f) {
+    const m = f.firestoreModule;
+    const ref = m.doc(f.db, "leads", id);
+    const snap = await m.getDoc(ref);
+    if (!snap.exists()) throw new Error("That request no longer exists.");
+    const existing = Array.isArray(snap.data().replies) ? snap.data().replies : [];
+    const payload = {
+      replies: [...existing, entry].slice(-20),
+      response: entry,
+      respondedAt: entry.at,
+      respondedBy: entry.by,
+    };
+    if (nextStatus) payload.status = nextStatus;
+    await m.updateDoc(ref, payload);
+  } else {
+    const leads = readLocal(KEYS.leads);
+    const lead = leads.find((item) => item.id === id);
+    if (!lead) throw new Error("That request no longer exists.");
+    lead.replies = [...(Array.isArray(lead.replies) ? lead.replies : []), entry].slice(-20);
+    lead.response = entry;
+    lead.respondedAt = entry.at;
+    lead.respondedBy = entry.by;
+    if (nextStatus) lead.status = nextStatus;
+    storageSet(KEYS.leads, leads);
+  }
+
+  return { ...entry, status: nextStatus || undefined };
 }
 
 /* ------------------------------------------------------------------ */

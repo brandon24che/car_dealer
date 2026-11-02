@@ -1,9 +1,11 @@
 /**
  * Sell / trade-in page: live valuation, photo uploads and offer submission.
  */
-import { isDemoConfigured, saveValuation, uploadValuationImage } from "../data-store.js?v=20261102b";
-import { mountShell, setButtonLoading, showToast } from "../ui.js?v=20261102b";
-import { waLink } from "../whatsapp.js?v=20261102b";
+import { isDemoConfigured, saveValuation, uploadValuationImage } from "../data-store.js?v=20261102c";
+import { requireAccount } from "../account-gate.js?v=20261102c";
+import { getCurrentUser, watchUser } from "../auth.js?v=20261102c";
+import { mountShell, setButtonLoading, showToast } from "../ui.js?v=20261102c";
+import { waLink } from "../whatsapp.js?v=20261102c";
 import {
   clamp,
   formatCurrency,
@@ -11,7 +13,7 @@ import {
   isValidEmail,
   isValidPhone,
   qs,
-} from "../utils.js?v=20261102b";
+} from "../utils.js?v=20261102c";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const MAX_PHOTOS = 4;
@@ -322,6 +324,16 @@ async function handleSubmit(event) {
   const data = validateForm();
   if (!data) return;
 
+  const account = await requireAccount({
+    title: "Sign in to submit your trade-in",
+    copy: "Create a free account so your appraisal, offer confirmation and specialist replies stay together in your dashboard.",
+    whatsappMessage: `Hi AutoSelect! I'd like a trade-in valuation for my ${[data.year, data.make, data.model]
+      .filter(Boolean)
+      .join(" ")} with ${formatNumber(data.mileage)} miles.`,
+    redirect: "sell.html",
+  });
+  if (!account) return;
+
   const estimate = estimateTradeIn(data);
   const button = qs("#sellSubmit");
   submitting = true;
@@ -354,10 +366,31 @@ async function handleSubmit(event) {
   }
 }
 
+function syncAccount(user) {
+  const notice = qs("[data-sell-account-note]");
+  if (notice) notice.hidden = Boolean(user);
+  if (!user) return;
+  [
+    ["#sellName", user.name],
+    ["#sellPhone", user.phone],
+    ["#sellEmail", user.email],
+  ].forEach(([selector, value]) => {
+    const input = qs(selector);
+    if (input && !input.value.trim() && value) input.value = value;
+  });
+}
+
 async function boot() {
   await mountShell({ active: "sell" });
   populateYears();
   bindPhotos();
+
+  watchUser(syncAccount);
+  syncAccount(getCurrentUser());
+  qs("[data-sell-wa]")?.setAttribute(
+    "href",
+    waLink("Hi AutoSelect! I'd like to sell or trade my vehicle and continue on WhatsApp.")
+  );
 
   const form = qs("#sellForm");
   form?.addEventListener("input", updateEstimate);

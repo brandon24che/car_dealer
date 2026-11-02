@@ -2,9 +2,9 @@
  * Shared UI shell: promo bar, header, mobile nav, footer, location selector,
  * menu sheet, modal engine and toast notifications.
  */
-import { authReady, getCachedUser, getCurrentUser, signOutUser, userInitials, watchUser } from "./auth.js?v=20261102b";
-import { initFavoritesSync } from "./favorites.js?v=20261102b";
-import { waLink } from "./whatsapp.js?v=20261102b";
+import { authReady, getCachedUser, getCurrentUser, signOutUser, userInitials, watchUser } from "./auth.js?v=20261102c";
+import { initFavoritesSync } from "./favorites.js?v=20261102c";
+import { waLink } from "./whatsapp.js?v=20261102c";
 import {
   escapeHtml,
   getBasePath,
@@ -13,7 +13,7 @@ import {
   storageGet,
   storageSet,
   trapFocus,
-} from "./utils.js?v=20261102b";
+} from "./utils.js?v=20261102c";
 
 const LOCATION_KEY = "as_location_v1";
 const LOCATIONS = ["Dallas, TX", "Plano, TX", "Fort Worth, TX", "Arlington, TX", "Irving, TX"];
@@ -231,6 +231,7 @@ function renderMenuSheet() {
           <a class="menu-sheet__link" href="${basePath}saved.html"><span class="material-symbols-outlined">favorite_border</span><span>Saved Vehicles<small>Your shortlist</small></span></a>
           <a class="menu-sheet__link" href="${basePath}sell.html"><span class="material-symbols-outlined">price_change</span><span>Sell or Trade<small>Instant 2-minute offer</small></span></a>
           <a class="menu-sheet__link" href="${basePath}contact.html"><span class="material-symbols-outlined">support_agent</span><span>Contact Concierge<small>Dallas, TX hub</small></span></a>
+          ${user ? `<a class="menu-sheet__link" href="${basePath}dashboard.html"><span class="material-symbols-outlined">dashboard</span><span>My Dashboard<small>Requests, confirmations &amp; replies</small></span></a>` : ""}
           ${user?.isAdmin ? `<a class="menu-sheet__link" href="${basePath}admin/index.html"><span class="material-symbols-outlined">admin_panel_settings</span><span>Dealer Portal<small>Inventory, leads &amp; metrics</small></span></a>` : ""}
           ${authLink}
         </div>
@@ -254,6 +255,7 @@ function renderAuthSlot() {
             <strong>${escapeHtml(user.name)}</strong>
             <span>${escapeHtml(user.email)}</span>
           </div>
+          <a class="avatar-menu__item" href="${base()}dashboard.html"><span class="material-symbols-outlined">dashboard</span>My dashboard</a>
           <a class="avatar-menu__item" href="${base()}saved.html"><span class="material-symbols-outlined">favorite</span>Saved vehicles</a>
           ${user.isAdmin ? `<a class="avatar-menu__item" href="${base()}admin/index.html"><span class="material-symbols-outlined">admin_panel_settings</span>Dealer portal</a>` : ""}
           <a class="avatar-menu__item" href="${base()}sell.html"><span class="material-symbols-outlined">price_change</span>Sell or trade</a>

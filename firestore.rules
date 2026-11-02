@@ -165,7 +165,7 @@ service cloud.firestore {
         ])
         && request.resource.data.keys().hasOnly([
           'type', 'name', 'email', 'phone', 'message', 'status', 'createdAt',
-          'vehicleId', 'vehicleName', 'meta'
+          'vehicleId', 'vehicleName', 'meta', 'uid'
         ])
         && request.resource.data.type in ['whatsapp', 'testDrive', 'valuation', 'contact']
         && (
@@ -189,12 +189,29 @@ service cloud.firestore {
         && text(request.resource.data.message, 1000)
         && text(request.resource.data.get('vehicleId', ''), 120)
         && text(request.resource.data.get('vehicleName', ''), 160)
+        && text(request.resource.data.get('uid', ''), 128)
+        && (
+          request.resource.data.get('uid', '') == '' ||
+          (signedIn() && request.resource.data.get('uid', '') == request.auth.uid)
+        )
         && request.resource.data.get('meta', {}) is map
         && request.resource.data.get('meta', {}).keys().size() <= 40
         && request.resource.data.status == 'new'
         && request.resource.data.createdAt == request.time;
 
-      allow read, update, delete: if isAdmin();
+      // Customers can read their own requests (UID first, email for requests
+      // submitted before they created an account); the dealer sees everything.
+      allow read: if isAdmin() || (
+        signedIn() && (
+          resource.data.get('uid', '') == request.auth.uid ||
+          (
+            resource.data.get('email', '') != '' &&
+            resource.data.get('email', '') == request.auth.token.get('email', '')
+          )
+        )
+      );
+
+      allow update, delete: if isAdmin();
     }
 
     /* ------------------------------------------------------------------ */
@@ -208,7 +225,7 @@ service cloud.firestore {
         ])
         && request.resource.data.keys().hasOnly([
           'vehicleId', 'vehicleName', 'name', 'phone', 'email',
-          'preferredDate', 'dateOption', 'locationPreference', 'status', 'createdAt'
+          'preferredDate', 'dateOption', 'locationPreference', 'status', 'createdAt', 'uid'
         ])
         && filledText(request.resource.data.name, 80)
         && text(request.resource.data.phone, 30)
@@ -222,10 +239,19 @@ service cloud.firestore {
         && text(request.resource.data.locationPreference, 80)
         && text(request.resource.data.get('vehicleId', ''), 120)
         && text(request.resource.data.get('vehicleName', ''), 160)
+        && text(request.resource.data.get('uid', ''), 128)
+        && (
+          request.resource.data.get('uid', '') == '' ||
+          (signedIn() && request.resource.data.get('uid', '') == request.auth.uid)
+        )
         && request.resource.data.status == 'new'
         && request.resource.data.createdAt == request.time;
 
-      allow read, update, delete: if isAdmin();
+      allow read: if isAdmin() || (
+        signedIn() && resource.data.get('uid', '') == request.auth.uid
+      );
+
+      allow update, delete: if isAdmin();
     }
 
     /* ------------------------------------------------------------------ */
@@ -240,7 +266,7 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly([
           'year', 'make', 'model', 'trim', 'mileage', 'condition', 'vin',
           'name', 'phone', 'email', 'estimateLow', 'estimateHigh', 'photos',
-          'status', 'createdAt'
+          'status', 'createdAt', 'uid'
         ])
         && filledText(request.resource.data.make, 40)
         && filledText(request.resource.data.model, 60)
@@ -255,6 +281,11 @@ service cloud.firestore {
           request.resource.data.phone.size() > 0 ||
           request.resource.data.email.size() > 0
         )
+        && text(request.resource.data.get('uid', ''), 128)
+        && (
+          request.resource.data.get('uid', '') == '' ||
+          (signedIn() && request.resource.data.get('uid', '') == request.auth.uid)
+        )
         && request.resource.data.estimateLow is number
         && request.resource.data.estimateHigh is number
         && request.resource.data.photos is list
@@ -262,7 +293,11 @@ service cloud.firestore {
         && request.resource.data.status == 'new'
         && request.resource.data.createdAt == request.time;
 
-      allow read, update, delete: if isAdmin();
+      allow read: if isAdmin() || (
+        signedIn() && resource.data.get('uid', '') == request.auth.uid
+      );
+
+      allow update, delete: if isAdmin();
     }
 
     /* ------------------------------------------------------------------ */

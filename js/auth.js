@@ -8,8 +8,8 @@ import {
   firebaseReady,
   firebaseSdk,
   isFirebaseConfigured,
-} from "./firebase-config.js?v=20261102b";
-import { initials, storageGet, storageSet, storageRemove } from "./utils.js?v=20261102b";
+} from "./firebase-config.js?v=20261102c";
+import { initials, storageGet, storageSet, storageRemove } from "./utils.js?v=20261102c";
 
 const DEMO_ACCOUNTS = "as_demo_accounts_v1";
 const DEMO_SESSION = "as_demo_session_v1";
@@ -89,11 +89,11 @@ function demoSessionUser() {
   const account = demoAccounts().find((item) => item.uid === session.uid);
   if (!account) return null;
   const { password, ...safe } = account;
-  const role = account.role === "super" ? "super" : "admin";
+  const role = account.role === "super" ? "super" : account.role === "admin" ? "admin" : "member";
   return {
     ...safe,
     role,
-    isAdmin: true,
+    isAdmin: role !== "member",
     isSuperAdmin: role === "super",
     isDemo: true,
   };
@@ -260,7 +260,7 @@ export async function signIn(email, password) {
 
   const account = demoAccounts().find((item) => item.email.toLowerCase() === cleanEmail);
   if (!account) throw new Error("No demo account found. Create one on the sign-up page.");
-  if (account.password !== password) throw new Error("Incorrect password. The demo admin password is “autoselect”.");
+  if (account.password !== password) throw new Error("Incorrect password. Try again.");
   storageSet(DEMO_SESSION, { uid: account.uid });
   setCurrentUser(demoSessionUser());
   return currentUser;

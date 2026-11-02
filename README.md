@@ -14,6 +14,8 @@ The site ships with a complete demo mode, so every page — including the dealer
 - Vehicle detail page with carousel + lightbox, 360° view, specs, finance calculator, inspection report, availability, similar vehicles and a WhatsApp concierge that logs a lead.
 - Six-step Match Quiz with a pure-JS scoring engine (`js/quiz-engine.js`), live match count, top match and saved results.
 - Saved vehicles, trade-in valuation flow with photo uploads, contact page, login, sign-up, password reset.
+- Customer dashboard (`dashboard.html`) with live request statuses, confirmations and concierge replies for test drives, reservations, trade-ins and messages.
+- Account-gated requests: test drives, reservations and trade-ins require a free account so the confirmation and dealer replies land in the customer dashboard. Buying or requesting through WhatsApp stays account-free.
 - Legal pages, custom 404, SEO metadata, Open Graph, JSON-LD, accessible markup, skeletons and empty states.
 
 **Dealer portal** (`/admin/index.html`)
@@ -22,6 +24,7 @@ The site ships with a complete demo mode, so every page — including the dealer
 - Vehicle CRUD with every listing field, multi-image upload with drag-reorder/cover selection, featured/status flags, inline validation and delete confirmation.
 - Inventory bulk actions: select many vehicles to feature, unfeature, mark available/sold or delete, plus a CSV export of the filtered stock.
 - Leads table with search, type/status filters, persistent status changes and CSV export.
+- Reply to any customer request from the portal. Replies are saved to the customer's dashboard, optionally update the request status (contacted, confirmed, completed) and can be sent through WhatsApp in one click.
 - Command palette (`Ctrl/Cmd + K`) for jumping between views, running portal actions and searching vehicles by make, model, stock number or VIN.
 - Super-admin team management: the root admin can add and remove dealer admins from **Team**; admins created there can use the whole portal but cannot add or remove other admins.
 - One-click import of the 25 Cars & Bids auction listings bundled in `js/demo-data.js` (15 recent cars plus 10 trucks and SUVs); imported vehicles use the normal CRUD editor, so any of them can be edited or deleted.
@@ -67,7 +70,8 @@ While `js/firebase-config.js` contains placeholders, all data lives in `localSto
 - The login page has a “Fill demo credentials” shortcut.
 - The super admin can open **Team** in the portal and create or remove additional dealer admins. Admins created this way can manage inventory and leads but do not see the Team view.
 - Accounts created from the public sign-up page are customers, not dealer admins.
-- Seeded vehicles and reviews are stored under `as_demo_vehicles_v1` / `as_demo_reviews_v1`; leads under `as_leads_v1`.
+- Seeded vehicles and reviews are stored under `as_demo_vehicles_v1` / `as_demo_reviews_v1`; leads (including dashboard replies) under `as_leads_v1`.
+- The demo customer dashboard is prewired for any account created from `signup.html`; sign in with that account and open `dashboard.html` to see its requests.
 - Use **Dashboard → Reset demo data** in the portal to restore the original catalogue.
 - If Firestore is connected but the `vehicles` collection is empty, the storefront falls back to `data/vehicles.json` so the public site never looks broken.
 
@@ -210,13 +214,15 @@ Firestore, Auth and Storage need no Vercel-side configuration — the web config
 | `vehicles/{id}` | Public | Dealer | Listings. The public may only increment `viewCount` by exactly one. |
 | `reviews/{id}` | Public | Dealer | Home-page testimonials. |
 | `users/{uid}` | Owner + dealer | Owner (own doc) | Profile mirror written after sign-in. Role cannot be escalated without dealer access. |
-| `leads/{id}` | Dealer | Public create, dealer update | Every concierge, contact, test-drive and trade-in request. |
-| `testDrives/{id}` | Dealer | Public create, dealer update | Structured test-drive bookings. |
-| `valuations/{id}` | Dealer | Public create, dealer update | Trade-in submissions with photo URLs. |
+| `leads/{id}` | Dealer + request owner | Public create, dealer update | Every concierge, contact, test-drive and trade-in request. Owners may read requests matching their `uid` or account email; only dealers can reply. |
+| `testDrives/{id}` | Dealer + request owner | Public create, dealer update | Structured test-drive bookings. |
+| `valuations/{id}` | Dealer + request owner | Public create, dealer update | Trade-in submissions with photo URLs. |
 | `quizResults/{id}` | Dealer | Signed-in create | Optional quiz analytics (`uid` must match the caller). |
 | `admins/{uid}` | Owner + dealer | No client writes | Dealer authorization records; manage from the console or Admin SDK. |
 
-Lead creation is validated for allowed fields, types, lengths, a `new` status and a server timestamp. Public storage uploads are limited to images under 8 MB; vehicle photos are dealer-only, while trade-in photos use the separate `valuations/` path.
+Lead creation is validated for allowed fields, types, lengths, a `new` status, an optional `uid` that must match the signed-in caller and a server timestamp. Dealer replies append to `replies[]` (capped at 20) and mirror the latest message in `response` / `respondedAt` / `respondedBy`; the customer dashboard reads these fields. Public storage uploads are limited to images under 8 MB; vehicle photos are dealer-only, while trade-in photos use the separate `valuations/` path.
+
+> **Required deployment:** the customer dashboard needs the owner-read rules and the `uid` field allowance in this repository's `firestore.rules`. Run `firebase deploy --only firestore:rules` before relying on the dashboard in a live Firebase project; without it, Firestore rejects the new request fields and hides owner reads.
 
 ### Vehicle fields
 
@@ -234,6 +240,7 @@ quiz.html               Match quiz
 saved.html              Saved vehicles
 sell.html               Trade-in valuation
 contact.html            Contact
+dashboard.html          Customer dashboard (requests + concierge replies)
 login.html / signup.html
 privacy.html / terms.html / 404.html
 admin/index.html        Dealer portal
@@ -289,6 +296,7 @@ vercel.json             Vercel redirects, cache and security headers
 | Site still shows demo data | Replace all placeholders in `js/firebase-config.js`; hard-refresh. |
 | Admin redirects to login | Confirm the user is signed in and has either the `admin` claim or an `admins/{uid}` document. |
 | Admin redirects to home | The account is authenticated but not a dealer. |
+| Customer dashboard is empty in production | Deploy the latest `firestore.rules` (`firebase deploy --only firestore:rules`) so owners can read their requests and the new `uid` field is accepted. |
 | Team view is missing | Only the root super admin (or an account with a `super` role/claim) can manage admins. Deploy the latest `firestore.rules`, then sign out and back in. |
 | “Only the super admin can add dealer admins” | The signed-in account is a dealer admin created by the super admin; use the root account for team changes. |
 | “Missing index” in console | Open the link Firestore logs and create the composite index, then redeploy `firestore.indexes.json`. |

@@ -1369,6 +1369,25 @@ body.hide-fab .wa-fab { display: none; }
 .breadcrumbs a:hover { color: var(--blue); }
 .breadcrumbs .material-symbols-outlined { font-size: 14px; }
 
+/* Account gate (reservations, reservations & trade-ins) */
+.account-gate__badge {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 14px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  color: var(--blue);
+  background: var(--blue-soft);
+  border: 1px solid rgba(37, 99, 235, 0.18);
+}
+.account-gate__badge .material-symbols-outlined { font-size: 28px; }
+.account-gate__list { display: grid; gap: 10px; margin: 0 0 18px; padding: 0; list-style: none; }
+.account-gate__list li { display: flex; gap: 9px; font-size: 12.5px; line-height: 1.5; color: var(--slate-strong); }
+.account-gate__list .material-symbols-outlined { font-size: 17px; color: var(--green-ink); flex-shrink: 0; margin-top: 1px; }
+.account-gate__actions { display: grid; gap: 8px; }
+.account-gate__fine { margin-top: 4px; text-align: center; font-size: 10.5px; color: var(--slate); }
+
 /* Print */
 @media print {
   .site-header, .site-footer, .bottom-nav, .wa-fab, .compare-tray, .toast-host, .no-print { display: none !important; }
