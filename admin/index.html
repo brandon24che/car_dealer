@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../css/variables.css?v=20261103a">
   <link rel="stylesheet" href="../css/base.css?v=20261103a">
   <link rel="stylesheet" href="../css/components.css?v=20261103a">
-  <link rel="stylesheet" href="../css/pages/admin.css?v=20261103a">
+  <link rel="stylesheet" href="../css/pages/admin.css?v=20261103b">
 </head>
 <body class="admin-body is-loading">
   <a class="skip-link" href="#adminContent">Skip to content</a>
@@ -648,6 +648,13 @@
     </form>
   </dialog>
 
+  <div class="adm-drawer" id="leadDetailDrawer" hidden>
+    <div class="adm-drawer__scrim" data-lead-detail-close></div>
+    <aside class="adm-drawer__panel" role="dialog" aria-modal="true" aria-labelledby="leadDetailName" tabindex="-1">
+      <div class="adm-detail" data-lead-detail></div>
+    </aside>
+  </div>
+
   <dialog class="adm-dialog" id="leadReplyDialog" aria-labelledby="leadReplyTitle">
     <div class="adm-dialog__head">
       <div>
@@ -775,6 +782,6 @@
   <noscript>
     <p style="padding:24px;text-align:center;font-family:system-ui">The dealer portal needs JavaScript enabled.</p>
   </noscript>
-  <script type="module" src="../js/admin/admin.js?v=20261103a"></script>
+  <script type="module" src="../js/admin/admin.js?v=20261103b"></script>
 </body>
 </html>

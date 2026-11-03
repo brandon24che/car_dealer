@@ -30,7 +30,7 @@ import {
   vehicleThumb,
 } from "./helpers.js?v=20261103a";
 import { initInventory, renderInventory } from "./inventory.js?v=20261103a";
-import { initLeads, renderLeads } from "./leads.js?v=20261103a";
+import { initLeads, renderLeads } from "./leads.js?v=20261103b";
 import { initCommandPalette } from "./palette.js?v=20261103a";
 import { initTeam, refreshTeam } from "./team.js?v=20261103a";
 
