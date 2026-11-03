@@ -8,12 +8,12 @@ import {
   incrementViewCount,
   saveLead,
   saveTestDrive,
-} from "../data-store.js?v=20261102f";
-import { requireAccount } from "../account-gate.js?v=20261102f";
-import { getCurrentUser } from "../auth.js?v=20261102f";
-import { isFavorite, subscribeFavorites, toggleFavorite } from "../favorites.js?v=20261102f";
-import { FINANCE_DEFAULTS, monthlyPayment, roundPayment } from "../finance.js?v=20261102f";
-import { bindRange, mountShell, openModal, setButtonLoading, showToast } from "../ui.js?v=20261102f";
+} from "../data-store.js?v=20261103a";
+import { requireAccount } from "../account-gate.js?v=20261103a";
+import { getCurrentUser } from "../auth.js?v=20261103a";
+import { isFavorite, subscribeFavorites, toggleFavorite } from "../favorites.js?v=20261103a";
+import { FINANCE_DEFAULTS, monthlyPayment, roundPayment } from "../finance.js?v=20261103a";
+import { bindRange, mountShell, openModal, setButtonLoading, showToast } from "../ui.js?v=20261103a";
 import {
   escapeHtml,
   formatCurrency,
@@ -25,21 +25,21 @@ import {
   qs,
   qsa,
   resolveAsset,
-} from "../utils.js?v=20261102f";
+} from "../utils.js?v=20261103a";
 import {
   initVehicleCards,
   renderVehicleCards,
   shortEngine,
   shortTransmission,
   vehicleTitle,
-} from "../vehicles.js?v=20261102f";
+} from "../vehicles.js?v=20261103a";
 import {
   DEALER_NAME,
   DEALER_PHONE_DISPLAY,
   vehicleCheckoutMessage,
   waLink,
   WHATSAPP_SVG,
-} from "../whatsapp.js?v=20261102f";
+} from "../whatsapp.js?v=20261103a";
 
 const root = qs("#vehicleRoot");
 let currentVehicle = null;
@@ -116,7 +116,7 @@ function featureIcon(name = "") {
 /* ------------------------------------------------------------------ */
 
 function renderGallery(vehicle) {
-  const main = resolveAsset(images[0]);
+  const main = resolveAsset(images[0], 1600);
   const badges = [];
   if (vehicle.inspected150) {
     badges.push(
@@ -158,7 +158,7 @@ function renderGallery(vehicle) {
           (src, index) => `<button type="button" class="veh-thumb${index === 0 ? " is-active" : ""}" data-photo="${index}" aria-label="View photo ${index + 1}: ${escapeHtml(
             photoLabel(index)
           )}"${index === 0 ? ' aria-current="true"' : ""}>
-            <img src="${escapeHtml(resolveAsset(src))}" alt="" loading="lazy" decoding="async">
+            <img src="${escapeHtml(resolveAsset(src, 200))}" alt="" loading="lazy" decoding="async">
           </button>`
         )
         .join("")}
@@ -499,7 +499,7 @@ function setPhoto(index) {
   photoIndex = (index + images.length) % images.length;
   const main = qs("#vehMainImage");
   if (main) {
-    main.src = resolveAsset(images[photoIndex]);
+    main.src = resolveAsset(images[photoIndex], 1600);
     main.alt = photoAlt(currentVehicle, photoIndex);
   }
   qsa("[data-photo-count]").forEach((el) => {
@@ -521,7 +521,7 @@ function renderLightboxThumbs() {
       (src, index) => `<button type="button" data-lightbox-thumb="${index}" aria-label="View photo ${index + 1}"${
         index === photoIndex ? ' class="is-active" aria-current="true"' : ""
       }>
-        <img src="${escapeHtml(resolveAsset(src))}" alt="" loading="lazy">
+        <img src="${escapeHtml(resolveAsset(src, 200))}" alt="" loading="lazy">
       </button>`
     )
     .join("");
@@ -532,7 +532,7 @@ function setLightboxPhoto(index) {
   photoIndex = (index + images.length) % images.length;
   const image = qs("#lightboxImage");
   if (image) {
-    image.src = resolveAsset(images[photoIndex]);
+    image.src = resolveAsset(images[photoIndex], 2400);
     image.alt = photoAlt(currentVehicle, photoIndex);
   }
   qs("[data-lightbox-count]").textContent = `${photoIndex + 1} / ${images.length}`;
@@ -894,7 +894,7 @@ function prepareTestDriveModal(vehicle) {
   success.hidden = true;
   form.hidden = false;
 
-  const image = resolveAsset(images[0]);
+  const image = resolveAsset(images[0], 800);
   const summary = qs("[data-td-vehicle]");
   if (summary) {
     summary.innerHTML = `<img src="${escapeHtml(image)}" alt="">
@@ -1138,7 +1138,7 @@ function applySeo(vehicle) {
   const shareableImages = images.filter((src) => !/^(data|blob):/i.test(src));
   const ogImage = qs("#ogImage");
   if (ogImage) {
-    ogImage.setAttribute("content", absolute(resolveAsset(shareableImages[0] || images[0])));
+    ogImage.setAttribute("content", absolute(resolveAsset(shareableImages[0] || images[0], 1600)));
   }
   qs("[data-crumb]").textContent = vehicleTitle(vehicle);
 
@@ -1151,7 +1151,7 @@ function applySeo(vehicle) {
     name: vehicleLabel(vehicle),
     description,
     image: shareableImages.length
-      ? shareableImages.map((src) => absolute(resolveAsset(src)))
+      ? shareableImages.map((src) => absolute(resolveAsset(src, 1600)))
       : undefined,
     brand: { "@type": "Brand", name: vehicle.make },
     model: vehicle.model,

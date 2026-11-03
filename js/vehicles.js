@@ -2,9 +2,9 @@
  * Vehicle presentation helpers: card markup, labels and card interactions.
  * Used by the home, inventory, saved, quiz and vehicle pages.
  */
-import { isFavorite, toggleFavorite } from "./favorites.js?v=20261102f";
-import { estimateMonthly, roundPayment } from "./finance.js?v=20261102f";
-import { openModal, showToast } from "./ui.js?v=20261102f";
+import { isFavorite, toggleFavorite } from "./favorites.js?v=20261103a";
+import { estimateMonthly, roundPayment } from "./finance.js?v=20261103a";
+import { openModal, showToast } from "./ui.js?v=20261103a";
 import {
   bodyStyleIcon,
   escapeHtml,
@@ -12,8 +12,8 @@ import {
   formatMileage,
   resolveAsset,
   truncate,
-} from "./utils.js?v=20261102f";
-import { vehicleInquiryMessage, waLink, WHATSAPP_SVG } from "./whatsapp.js?v=20261102f";
+} from "./utils.js?v=20261103a";
+import { vehicleInquiryMessage, waLink, WHATSAPP_SVG } from "./whatsapp.js?v=20261103a";
 
 let bound = false;
 
@@ -131,7 +131,7 @@ export function renderVehicleCard(vehicle, options = {}) {
   return `<article class="veh-card${variant !== "default" ? ` veh-card--${variant}` : ""}" data-vehicle-card="${id}">
     <div class="veh-media">
       <a class="veh-media__link" href="${href}" tabindex="-1" aria-hidden="true">
-        <img src="${escapeHtml(resolveAsset(images[0]))}" alt="${escapeHtml(alt)}" loading="lazy" decoding="async">
+        <img src="${escapeHtml(resolveAsset(images[0], 800))}" alt="${escapeHtml(alt)}" loading="lazy" decoding="async">
       </a>
       <div class="veh-badges">${matchBadge}${badgesFor(vehicle)}</div>
       <button type="button" class="veh-fav${saved ? " is-saved" : ""}" data-fav="${id}"
@@ -322,7 +322,7 @@ async function checkAvailability(id, title = "this vehicle") {
   openModal(modal);
 
   try {
-    const { getVehicle } = await import("./data-store.js?v=20261102f");
+    const { getVehicle } = await import("./data-store.js?v=20261103a");
     const vehicle = await getVehicle(id);
     if (!vehicle) {
       if (body) {

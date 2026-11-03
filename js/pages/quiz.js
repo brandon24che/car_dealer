@@ -2,9 +2,9 @@
  * Car match quiz page: six-step wizard, live match preview and persisted
  * recommendations powered by the pure engine in ../quiz-engine.js.
  */
-import { initCompare } from "../compare.js?v=20261102f";
-import { getAllVehicles, saveQuizResult } from "../data-store.js?v=20261102f";
-import { estimateMonthly, roundPayment } from "../finance.js?v=20261102f";
+import { initCompare } from "../compare.js?v=20261103a";
+import { getAllVehicles, saveQuizResult } from "../data-store.js?v=20261103a";
+import { estimateMonthly, roundPayment } from "../finance.js?v=20261103a";
 import {
   analyzeMatches,
   BODY_OPTIONS,
@@ -19,8 +19,8 @@ import {
   normalizeAnswers,
   SEAT_OPTIONS,
   TRANSMISSION_OPTIONS,
-} from "../quiz-engine.js?v=20261102f";
-import { bindRange, mountShell, showToast } from "../ui.js?v=20261102f";
+} from "../quiz-engine.js?v=20261103a";
+import { bindRange, mountShell, showToast } from "../ui.js?v=20261103a";
 import {
   escapeHtml,
   formatCurrency,
@@ -31,7 +31,7 @@ import {
   resolveAsset,
   storageGet,
   storageSet,
-} from "../utils.js?v=20261102f";
+} from "../utils.js?v=20261103a";
 import {
   initVehicleCards,
   renderVehicleCard,
@@ -39,8 +39,8 @@ import {
   shortTransmission,
   vehicleHref,
   vehicleTitle,
-} from "../vehicles.js?v=20261102f";
-import { waLink } from "../whatsapp.js?v=20261102f";
+} from "../vehicles.js?v=20261103a";
+import { waLink } from "../whatsapp.js?v=20261103a";
 
 const ANSWERS_KEY = "as_quiz_answers_v1";
 const COMPLETED_KEY = "as_quiz_completed_v1";
@@ -660,7 +660,7 @@ function renderTopMatchPreview(best) {
     </div>
     <div class="quiz-topmatch__vehicle">
       <a href="${escapeHtml(href)}" tabindex="-1" aria-hidden="true"><img src="${escapeHtml(
-        resolveAsset(vehicle.images?.[0])
+        resolveAsset(vehicle.images?.[0], 800)
       )}" alt="${escapeHtml(vehicleTitle(vehicle))}" loading="lazy" decoding="async"></a>
       <div class="quiz-topmatch__copy">
         <span class="eyebrow">Recommended</span>
@@ -762,7 +762,7 @@ function renderTopMatchCard(match) {
   const showMsrp = msrp > Number(vehicle.price) + 500;
   return `<article class="top-match">
     <div class="top-match__media">
-      <img src="${escapeHtml(resolveAsset(vehicle.images?.[0]))}" alt="${escapeHtml(vehicleTitle(vehicle))}" loading="eager" decoding="async">
+      <img src="${escapeHtml(resolveAsset(vehicle.images?.[0], 800))}" alt="${escapeHtml(vehicleTitle(vehicle))}" loading="eager" decoding="async">
       <div class="top-match__flags">
         <span class="badge badge--accent"><span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span>Top pick</span>
         <span class="match-ring" style="--score:${match.score}" role="img" aria-label="${match.score} percent match">

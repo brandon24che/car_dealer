@@ -1,7 +1,8 @@
 /**
  * Shared formatting and CSV helpers for the dealer portal.
  */
-import { formatDate, formatNumber, truncate } from "../utils.js?v=20261102f";
+import { formatDate, formatNumber, truncate } from "../utils.js?v=20261103a";
+import { cloudinaryUrl } from "../cloudinary.js?v=20261103a";
 
 export const LEAD_TYPES = {
   whatsapp: { label: "WhatsApp", icon: "chat", tone: "wa" },
@@ -88,10 +89,11 @@ export function vehicleThumb(vehicle) {
 }
 
 /** Assets are stored root-relative; the portal lives one directory deeper. */
-export function assetPath(path) {
+export function assetPath(path, width = 0) {
   const value = String(path || "").trim();
   if (!value) return "../assets/cars/sedan-blue.jpg";
-  if (/^(https?:|data:|blob:)/i.test(value)) return value;
+  if (/^https?:/i.test(value)) return cloudinaryUrl(value, width);
+  if (/^(data:|blob:)/i.test(value)) return value;
   if (value.startsWith("../")) return value;
   return `../${value.replace(/^\.?\//, "")}`;
 }

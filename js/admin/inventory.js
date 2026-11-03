@@ -7,16 +7,16 @@ import {
   deleteVehicle,
   saveVehicle,
   uploadVehicleImage,
-} from "../data-store.js?v=20261102f";
-import { setButtonLoading, showToast } from "../ui.js?v=20261102f";
-import { escapeHtml, formatCurrency, formatMileage, qs, qsa } from "../utils.js?v=20261102f";
+} from "../data-store.js?v=20261103a";
+import { setButtonLoading, showToast } from "../ui.js?v=20261103a";
+import { escapeHtml, formatCurrency, formatMileage, qs, qsa } from "../utils.js?v=20261103a";
 import {
   assetPath,
   downloadCsv,
   leadDate,
   vehicleName,
   vehicleThumb,
-} from "./helpers.js?v=20261102f";
+} from "./helpers.js?v=20261103a";
 
 const MAX_IMAGES = 24;
 const MAX_EMBEDDED = 4;
@@ -87,7 +87,7 @@ function row(vehicle) {
           <label class="adm-select" title="Select ${name}">
             <input type="checkbox" data-select-vehicle="${id}"${selected.has(vehicle.id) ? " checked" : ""} aria-label="Select ${name}">
           </label>
-          <img class="adm-table__thumb" src="${escapeHtml(assetPath(vehicleThumb(vehicle)))}" alt="" loading="lazy" width="58" height="42">
+          <img class="adm-table__thumb" src="${escapeHtml(assetPath(vehicleThumb(vehicle), 160))}" alt="" loading="lazy" width="58" height="42">
           <div class="adm-table__vtext">
             <strong>${name}</strong>
             <span>${stock}${vin}</span>
@@ -488,7 +488,7 @@ function renderImages() {
     .map(
       (src, index) => `
       <div class="af-image" draggable="true" data-img-index="${index}">
-        <img src="${escapeHtml(assetPath(src))}" alt="Vehicle photo ${index + 1}" loading="lazy">
+        <img src="${escapeHtml(assetPath(src, 480))}" alt="Vehicle photo ${index + 1}" loading="lazy">
         ${index === 0 ? `<span class="af-image__cover">Cover</span>` : ""}
         <span class="af-image__drag" title="Drag to reorder"><span class="material-symbols-outlined" aria-hidden="true">drag_indicator</span></span>
         <div class="af-image__tools">
@@ -543,7 +543,7 @@ async function addImages(fileList) {
         const chars = embedded.reduce((sum, src) => sum + src.length, 0);
         if (embedded.length >= MAX_EMBEDDED || chars + url.length > EMBEDDED_BUDGET) {
           showToast(
-            "Firebase Storage is not enabled, so photos are embedded in the listing. This listing already holds the maximum embedded photos — use Add by URL or enable Storage for more.",
+            "Cloudinary was unreachable, so this demo keeps photos embedded in the listing. This listing already holds the maximum embedded photos — use Add by URL for more.",
             "info"
           );
           continue;
@@ -551,7 +551,7 @@ async function addImages(fileList) {
         if (!warnedEmbedded) {
           warnedEmbedded = true;
           showToast(
-            "Firebase Storage is not enabled — the photo was compressed and saved inside the listing.",
+            "Cloudinary was unreachable — the photo was compressed and kept locally for this demo.",
             "info"
           );
         }
@@ -570,7 +570,7 @@ async function addImages(fileList) {
     note.classList.remove("is-busy");
     const embeddedCount = images.filter((src) => src.startsWith("data:image/")).length;
     note.textContent = `${images.length} photo${images.length === 1 ? "" : "s"} attached. First image is the cover; drag to reorder.${
-      embeddedCount ? ` ${embeddedCount} embedded at reduced resolution because Storage is not enabled.` : ""
+      embeddedCount ? ` ${embeddedCount} embedded at reduced resolution because Cloudinary was unreachable.` : ""
     }`;
   }
   if (files.length > room) {

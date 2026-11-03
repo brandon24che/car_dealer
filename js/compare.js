@@ -2,9 +2,9 @@
  * Compare tray: keeps up to three vehicles in a shortlist, rendered as a
  * floating tray and a side-by-side comparison sheet.
  */
-import { getAllVehicles } from "./data-store.js?v=20261102f";
-import { estimateMonthly, roundPayment } from "./finance.js?v=20261102f";
-import { openModal, showToast } from "./ui.js?v=20261102f";
+import { getAllVehicles } from "./data-store.js?v=20261103a";
+import { estimateMonthly, roundPayment } from "./finance.js?v=20261103a";
+import { openModal, showToast } from "./ui.js?v=20261103a";
 import {
   escapeHtml,
   formatCurrency,
@@ -13,8 +13,8 @@ import {
   resolveAsset,
   storageGet,
   storageSet,
-} from "./utils.js?v=20261102f";
-import { shortEngine, shortTransmission, vehicleHref, vehicleTitle } from "./vehicles.js?v=20261102f";
+} from "./utils.js?v=20261103a";
+import { shortEngine, shortTransmission, vehicleHref, vehicleTitle } from "./vehicles.js?v=20261103a";
 
 const KEY = "as_compare_v1";
 export const MAX_COMPARE = 3;
@@ -134,7 +134,7 @@ async function renderTray() {
       const vehicle = vehicleMap.get(id);
       if (!vehicle) return "";
       return `<div class="compare-thumb" title="${escapeHtml(vehicleTitle(vehicle))}">
-        <img src="${escapeHtml(resolveAsset(vehicle.images?.[0]))}" alt="${escapeHtml(vehicleTitle(vehicle))}">
+        <img src="${escapeHtml(resolveAsset(vehicle.images?.[0], 800))}" alt="${escapeHtml(vehicleTitle(vehicle))}">
         <button type="button" data-compare-remove="${escapeHtml(id)}" aria-label="Remove ${escapeHtml(vehicleTitle(vehicle))} from comparison">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -210,7 +210,7 @@ function renderCompareTable(vehicles) {
           ${vehicles
             .map(
               (v) => `<th scope="col">
-                <img src="${escapeHtml(resolveAsset(v.images?.[0]))}" alt="${escapeHtml(vehicleTitle(v))}">
+                <img src="${escapeHtml(resolveAsset(v.images?.[0], 800))}" alt="${escapeHtml(vehicleTitle(v))}">
                 <strong>${escapeHtml(vehicleTitle(v))}</strong>
                 <span>${escapeHtml(v.trim || v.bodyStyle)}</span>
                 <a class="link-arrow" style="justify-content:center;margin-top:6px;font-size:11px" href="${escapeHtml(vehicleHref(v.id))}">View details <span class="material-symbols-outlined">arrow_forward</span></a>

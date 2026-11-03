@@ -1,16 +1,16 @@
 /**
  * Dealer portal controller: access guard, navigation, dashboard and actions.
  */
-import { requireAdmin, signOutUser, userInitials } from "../auth.js?v=20261102f";
-import { carsAndBidsVehicles } from "../demo-data.js?v=20261102f";
+import { requireAdmin, signOutUser, userInitials } from "../auth.js?v=20261103a";
+import { carsAndBidsVehicles } from "../demo-data.js?v=20261103a";
 import {
   getAllVehicles,
   importVehicles,
   listLeads,
   resetDemoInventory,
   seedDemoInventory,
-} from "../data-store.js?v=20261102f";
-import { showToast } from "../ui.js?v=20261102f";
+} from "../data-store.js?v=20261103a";
+import { showToast } from "../ui.js?v=20261103a";
 import {
   escapeHtml,
   formatCurrency,
@@ -18,7 +18,7 @@ import {
   qs,
   qsa,
   timeAgo,
-} from "../utils.js?v=20261102f";
+} from "../utils.js?v=20261103a";
 import {
   LEAD_STATUS_LABELS,
   assetPath,
@@ -28,11 +28,11 @@ import {
   timeValue,
   vehicleName,
   vehicleThumb,
-} from "./helpers.js?v=20261102f";
-import { initInventory, renderInventory } from "./inventory.js?v=20261102f";
-import { initLeads, renderLeads } from "./leads.js?v=20261102f";
-import { initCommandPalette } from "./palette.js?v=20261102f";
-import { initTeam, refreshTeam } from "./team.js?v=20261102f";
+} from "./helpers.js?v=20261103a";
+import { initInventory, renderInventory } from "./inventory.js?v=20261103a";
+import { initLeads, renderLeads } from "./leads.js?v=20261103a";
+import { initCommandPalette } from "./palette.js?v=20261103a";
+import { initTeam, refreshTeam } from "./team.js?v=20261103a";
 
 const VIEW_META = {
   overview: { title: "Overview", subtitle: "Showroom performance at a glance." },
@@ -101,7 +101,7 @@ function mostViewedMarkup(list) {
     .map(
       (vehicle) => `
       <a class="adm-viewed__row" href="../vehicle.html?id=${encodeURIComponent(vehicle.id)}" target="_blank" rel="noopener" style="text-decoration:none">
-        <img class="adm-viewed__img" src="${escapeHtml(assetPath(vehicleThumb(vehicle)))}" alt="" loading="lazy" width="54" height="38">
+        <img class="adm-viewed__img" src="${escapeHtml(assetPath(vehicleThumb(vehicle), 160))}" alt="" loading="lazy" width="54" height="38">
         <span class="adm-viewed__text">
           <strong>${escapeHtml(vehicleName(vehicle))}</strong>
           <span>${escapeHtml(vehicle.stockNumber || "")} · ${formatCurrency(Number(vehicle.price) || 0)}</span>

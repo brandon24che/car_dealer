@@ -1,6 +1,7 @@
 /**
  * Small DOM / formatting / URL helpers shared across the site.
  */
+import { cloudinaryUrl } from "./cloudinary.js?v=20261103a";
 
 export const qs = (selector, root = document) => root.querySelector(selector);
 export const qsa = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -109,10 +110,11 @@ export function getBasePath() {
   return MODULE_BASE;
 }
 
-/** Resolve a stored image path (relative demo path or absolute URL). */
-export function resolveAsset(path) {
+/** Resolve a stored image path and cap Cloudinary delivery width when given. */
+export function resolveAsset(path, width = 0) {
   if (!path) return `${getBasePath()}assets/placeholder-car.svg`;
-  if (/^(https?:|data:|blob:)/i.test(path)) return path;
+  if (/^https?:/i.test(path)) return cloudinaryUrl(path, width);
+  if (/^(data:|blob:)/i.test(path)) return path;
   return `${getBasePath()}${path.replace(/^\.?\//, "")}`;
 }
 

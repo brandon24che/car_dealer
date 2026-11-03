@@ -2,9 +2,9 @@
  * Shared UI shell: promo bar, header, mobile nav, footer, location selector,
  * menu sheet, modal engine and toast notifications.
  */
-import { authReady, getCachedUser, getCurrentUser, signOutUser, userInitials, watchUser } from "./auth.js?v=20261102f";
-import { initFavoritesSync } from "./favorites.js?v=20261102f";
-import { waLink } from "./whatsapp.js?v=20261102f";
+import { authReady, getCachedUser, getCurrentUser, signOutUser, userInitials, watchUser } from "./auth.js?v=20261103a";
+import { initFavoritesSync } from "./favorites.js?v=20261103a";
+import { waLink } from "./whatsapp.js?v=20261103a";
 import {
   escapeHtml,
   getBasePath,
@@ -15,7 +15,7 @@ import {
   timeAgo,
   trapFocus,
   truncate,
-} from "./utils.js?v=20261102f";
+} from "./utils.js?v=20261103a";
 
 const LOCATION_KEY = "as_location_v1";
 const LOCATIONS = ["Dallas, TX", "Plano, TX", "Fort Worth, TX", "Arlington, TX", "Irving, TX"];
@@ -415,7 +415,7 @@ function dealerNotifyItems(leads, seenAt) {
 }
 
 async function buildNotifications(user) {
-  const { listLeads, listMyLeads } = await import("./data-store.js?v=20261102f");
+  const { listLeads, listMyLeads } = await import("./data-store.js?v=20261103a");
   const seenAt = notifySeenAt(user);
   const items = user.isAdmin
     ? dealerNotifyItems(await listLeads({ limit: 30 }), seenAt)

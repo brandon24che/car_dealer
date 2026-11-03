@@ -1,11 +1,11 @@
 /**
  * Sell / trade-in page: live valuation, photo uploads and offer submission.
  */
-import { isDemoConfigured, saveValuation, uploadValuationImage } from "../data-store.js?v=20261102f";
-import { requireAccount } from "../account-gate.js?v=20261102f";
-import { getCurrentUser, watchUser } from "../auth.js?v=20261102f";
-import { mountShell, setButtonLoading, showToast } from "../ui.js?v=20261102f";
-import { waLink } from "../whatsapp.js?v=20261102f";
+import { saveValuation, uploadValuationImage } from "../data-store.js?v=20261103a";
+import { requireAccount } from "../account-gate.js?v=20261103a";
+import { getCurrentUser, watchUser } from "../auth.js?v=20261103a";
+import { mountShell, setButtonLoading, showToast } from "../ui.js?v=20261103a";
+import { waLink } from "../whatsapp.js?v=20261103a";
 import {
   clamp,
   formatCurrency,
@@ -13,7 +13,7 @@ import {
   isValidEmail,
   isValidPhone,
   qs,
-} from "../utils.js?v=20261102f";
+} from "../utils.js?v=20261103a";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const MAX_PHOTOS = 4;
@@ -221,34 +221,6 @@ function bindPhotos() {
   });
 }
 
-/** Demo mode keeps a small data URL; Firebase mode uploads to Storage. */
-function downscalePhoto(file, maxWidth = 720, quality = 0.62) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error("Could not read that photo."));
-    reader.onload = () => {
-      const image = new Image();
-      image.onerror = () => reject(new Error("Could not decode that photo."));
-      image.onload = () => {
-        const scale = Math.min(1, maxWidth / image.width);
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.round(image.width * scale);
-        canvas.height = Math.round(image.height * scale);
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL("image/jpeg", quality));
-      };
-      image.src = reader.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-async function encodePhoto(file) {
-  if (isDemoConfigured()) return downscalePhoto(file);
-  return uploadValuationImage(file);
-}
-
 /* ------------------------------------------------------------------ */
 /* Validation + submit                                                 */
 /* ------------------------------------------------------------------ */
@@ -340,12 +312,20 @@ async function handleSubmit(event) {
   setButtonLoading(button, true, "Sending details…");
 
   const uploaded = [];
+  let failedPhotos = 0;
   for (const photo of photos) {
     try {
-      uploaded.push(await encodePhoto(photo.file));
+      uploaded.push(await uploadValuationImage(photo.file));
     } catch (error) {
       console.warn("[AutoSelect] valuation photo failed", error);
+      failedPhotos += 1;
     }
+  }
+  if (failedPhotos) {
+    showToast(
+      `${failedPhotos} photo${failedPhotos === 1 ? "" : "s"} could not be uploaded, but your details were sent.`,
+      "info"
+    );
   }
 
   try {

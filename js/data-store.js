@@ -9,9 +9,10 @@ import {
   firebaseReady,
   firebaseSdk,
   isFirebaseConfigured,
-} from "./firebase-config.js?v=20261102f";
-import { getCurrentUser } from "./auth.js?v=20261102f";
-import { demoVehicles, demoReviews } from "./demo-data.js?v=20261102f";
+} from "./firebase-config.js?v=20261103a";
+import { getCurrentUser } from "./auth.js?v=20261103a";
+import { demoVehicles, demoReviews } from "./demo-data.js?v=20261103a";
+import { uploadImage } from "./cloudinary.js?v=20261103a";
 import {
   debounce,
   escapeHtml,
@@ -22,7 +23,7 @@ import {
   storageSet,
   truncate,
   uid,
-} from "./utils.js?v=20261102f";
+} from "./utils.js?v=20261103a";
 
 const KEYS = {
   vehicles: "as_demo_vehicles_v1",
@@ -1238,98 +1239,40 @@ async function compressImage(file, maxWidth = 1200, quality = 0.78) {
   return canvas.toDataURL("image/jpeg", quality);
 }
 
-let storageReady = null;
-
 /**
- * A missing bucket makes the Storage SDK retry for minutes, so probe the
- * bucket first and embed images immediately when Storage is not provisioned.
- */
-async function storageBucketAvailable() {
-  if (storageReady !== null) return storageReady;
-  const bucket = firebaseSdk.app?.options?.storageBucket;
-  if (!bucket) {
-    storageReady = false;
-    return storageReady;
-  }
-  try {
-    const response = await fetch(
-      `https://firebasestorage.googleapis.com/v0/b/${bucket}/o`,
-      { method: "GET" }
-    );
-    storageReady = response.status !== 404;
-  } catch {
-    storageReady = false;
-  }
-  return storageReady;
-}
-
-/**
- * Uploads an image to Firebase Storage, or embeds a compressed copy in the
- * listing when Storage is not provisioned for the project.
- * @returns {Promise<string>} public URL or data URL
+ * Uploads a vehicle photo to Cloudinary. In demo mode an unreachable CDN falls
+ * back to a small embedded copy so local development still works offline.
+ * @returns {Promise<string>} public Cloudinary URL (data URL only in demo)
  */
 export async function uploadVehicleImage(file, vehicleId = "vehicle") {
-  if (!file || !/^image\//.test(file.type)) {
-    throw new Error("Please choose an image file (JPG, PNG or WebP).");
+  try {
+    return await uploadImage(file, {
+      folder: `car_dealer/vehicles/${vehicleId}`,
+      tags: ["vehicle", vehicleId],
+    });
+  } catch (error) {
+    if (!isDemoConfigured()) throw error;
+    console.warn("[AutoSelect] Cloudinary unavailable; keeping a demo-only copy", error);
+    return compressForFirestore(file);
   }
-  if (file.size > 8 * 1024 * 1024) {
-    throw new Error("Images must be smaller than 8 MB.");
-  }
-  const f = await live();
-  if (f && f.storage && (await storageBucketAvailable())) {
-    try {
-      const m = f.storageModule;
-      const safeName = file.name.replace(/[^a-z0-9.]+/gi, "-").toLowerCase();
-      const ref = m.ref(f.storage, `vehicles/${vehicleId}/${Date.now()}-${safeName}`);
-      await m.uploadBytes(ref, file, { contentType: file.type });
-      return m.getDownloadURL(ref);
-    } catch (error) {
-      if (storageUnavailable(error)) return compressForFirestore(file);
-      throw storageUploadError(error);
-    }
-  }
-  return compressForFirestore(file);
 }
 
-/** Trade-in photos are uploaded by the public, so they live outside vehicles/. */
+/** Trade-in photos belong to the owner's car, so they get their own folder. */
 export async function uploadValuationImage(file) {
-  if (!file || !/^image\//.test(file.type)) {
-    throw new Error("Please choose an image file (JPG, PNG or WebP).");
+  const month = new Date().toISOString().slice(0, 7);
+  try {
+    return await uploadImage(file, {
+      folder: `car_dealer/valuations/${month}`,
+      tags: ["valuation"],
+    });
+  } catch (error) {
+    if (!isDemoConfigured()) throw error;
+    console.warn("[AutoSelect] Cloudinary unavailable; keeping a demo-only copy", error);
+    return compressForFirestore(file, 800, 0.6);
   }
-  if (file.size > 8 * 1024 * 1024) {
-    throw new Error("Images must be smaller than 8 MB.");
-  }
-  const f = await live();
-  if (f && f.storage && (await storageBucketAvailable())) {
-    try {
-      const m = f.storageModule;
-      const safeName = file.name.replace(/[^a-z0-9.]+/gi, "-").toLowerCase();
-      const ref = m.ref(f.storage, `valuations/${Date.now()}-${safeName}`);
-      await m.uploadBytes(ref, file, { contentType: file.type });
-      return m.getDownloadURL(ref);
-    } catch (error) {
-      if (storageUnavailable(error)) return compressForFirestore(file, 800, 0.6);
-      throw storageUploadError(error);
-    }
-  }
-  return compressForFirestore(file, 800, 0.6);
 }
 
-function storageUnavailable(error) {
-  const code = error?.code || "";
-  const message = String(error?.message || "");
-  return (
-    code === "storage/bucket-not-found" ||
-    code === "storage/unknown" ||
-    /bucket[\s\S]*not[\s\S]*found/i.test(message) ||
-    /\b404\b/.test(message)
-  );
-}
-
-/**
- * Firebase Storage requires a provisioned bucket (Blaze plan). Until one
- * exists, photos are embedded as compressed data URLs so listings still work.
- */
+/** Offline demo fallback: embeds a compressed copy so the listing still renders. */
 async function compressForFirestore(file, maxWidth = 900, quality = 0.62) {
   let data = await compressImage(file, maxWidth, quality);
   for (const [width, nextQuality] of [[720, 0.5], [600, 0.42]]) {
@@ -1337,26 +1280,9 @@ async function compressForFirestore(file, maxWidth = 900, quality = 0.62) {
     data = await compressImage(file, width, nextQuality);
   }
   if (data.length > 300000) {
-    throw new Error(
-      "That photo is too large to embed without Firebase Storage. Try a smaller image or use Add by URL."
-    );
+    throw new Error("That photo is too large. Try a smaller image or use Add by URL.");
   }
   return data;
-}
-
-function storageUploadError(error) {
-  const code = error?.code || "";
-  if (
-    code === "storage/unauthorized" ||
-    code === "storage/bucket-not-found" ||
-    code === "storage/unknown" ||
-    code === "storage/retry-limit-exceeded"
-  ) {
-    return new Error(
-      "Photo upload failed. Confirm Firebase Storage is enabled for this project and storage.rules is deployed, then try again."
-    );
-  }
-  return error instanceof Error ? error : new Error("Photo upload failed.");
 }
 
 /* ------------------------------------------------------------------ */

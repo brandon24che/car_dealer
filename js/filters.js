@@ -2,7 +2,7 @@
  * Inventory filter helpers: human labels, removable chips and counts.
  * Shared by the inventory page, home search card and admin previews.
  */
-import { escapeHtml, formatCurrency, humanFuel } from "./utils.js?v=20261102f";
+import { escapeHtml, formatCurrency, humanFuel } from "./utils.js?v=20261103a";
 
 export const SORT_OPTIONS = [
   { value: "featured", label: "Featured Matches" },
