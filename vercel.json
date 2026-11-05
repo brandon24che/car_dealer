@@ -2,13 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "trailingSlash": false,
-  "redirects": [
-    {
-      "source": "/admin",
-      "destination": "/admin/index.html",
-      "permanent": true
-    }
-  ],
   "headers": [
     {
       "source": "/assets/(.*)",
