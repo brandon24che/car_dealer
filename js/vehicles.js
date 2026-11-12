@@ -2,9 +2,9 @@
  * Vehicle presentation helpers: card markup, labels and card interactions.
  * Used by the home, inventory, saved, quiz and vehicle pages.
  */
-import { isFavorite, toggleFavorite } from "./favorites.js?v=20261103a";
-import { estimateMonthly, roundPayment } from "./finance.js?v=20261103a";
-import { openModal, showToast } from "./ui.js?v=20261103a";
+import { isFavorite, toggleFavorite } from "./favorites.js?v=20261112a";
+import { estimateMonthly, roundPayment } from "./finance.js?v=20261112a";
+import { openModal, showToast } from "./ui.js?v=20261112a";
 import {
   bodyStyleIcon,
   escapeHtml,
@@ -12,8 +12,8 @@ import {
   formatMileage,
   resolveAsset,
   truncate,
-} from "./utils.js?v=20261103a";
-import { vehicleInquiryMessage, waLink, WHATSAPP_SVG } from "./whatsapp.js?v=20261103a";
+} from "./utils.js?v=20261112a";
+import { vehicleInquiryMessage, waLink, WHATSAPP_SVG } from "./whatsapp.js?v=20261112a";
 
 let bound = false;
 
@@ -322,7 +322,7 @@ async function checkAvailability(id, title = "this vehicle") {
   openModal(modal);
 
   try {
-    const { getVehicle } = await import("./data-store.js?v=20261103a");
+    const { getVehicle } = await import("./data-store.js?v=20261112a");
     const vehicle = await getVehicle(id);
     if (!vehicle) {
       if (body) {

@@ -13,10 +13,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/variables.css?v=20261103a">
-  <link rel="stylesheet" href="../css/base.css?v=20261103a">
-  <link rel="stylesheet" href="../css/components.css?v=20261103a">
-  <link rel="stylesheet" href="../css/pages/admin.css?v=20261103b">
+  <link rel="stylesheet" href="../css/variables.css?v=20261112a">
+  <link rel="stylesheet" href="../css/base.css?v=20261112a">
+  <link rel="stylesheet" href="../css/components.css?v=20261112a">
+  <link rel="stylesheet" href="../css/pages/admin.css?v=20261112a">
 </head>
 <body class="admin-body is-loading">
   <a class="skip-link" href="#adminContent">Skip to content</a>
@@ -58,6 +58,10 @@
         <button class="admin-nav-item" type="button" data-view="leads">
           <span class="material-symbols-outlined" aria-hidden="true">forum</span>Leads
           <span class="admin-nav-item__count" data-count-leads>—</span>
+        </button>
+        <button class="admin-nav-item" type="button" data-view="reviews">
+          <span class="material-symbols-outlined" aria-hidden="true">reviews</span>Reviews
+          <span class="admin-nav-item__count" data-count-reviews>—</span>
         </button>
         <button class="admin-nav-item" type="button" data-view="team" data-super-only hidden>
           <span class="material-symbols-outlined" aria-hidden="true">group</span>Team
@@ -335,6 +339,133 @@
               <div class="adm-skeleton" aria-hidden="true"><span style="width:88%"></span><span style="width:69%"></span><span style="width:92%"></span><span style="width:74%"></span></div>
             </div>
           </div>
+        </section>
+
+        <section class="adm-view" data-view-panel="reviews" aria-labelledby="reviewsTitle" hidden>
+          <h2 class="sr-only" id="reviewsTitle">Reviews</h2>
+
+          <div class="adm-stats">
+            <article class="adm-stat">
+              <div class="adm-stat__top">
+                <span class="adm-stat__icon adm-stat__icon--green"><span class="material-symbols-outlined" aria-hidden="true">reviews</span></span>
+                <span class="adm-stat__delta" data-rv-stat-vehicles>— car reviews</span>
+              </div>
+              <div>
+                <div class="adm-stat__value" data-rv-stat-total>—</div>
+                <div class="adm-stat__label">Published reviews</div>
+              </div>
+            </article>
+            <article class="adm-stat">
+              <div class="adm-stat__top">
+                <span class="adm-stat__icon adm-stat__icon--orange"><span class="material-symbols-outlined" aria-hidden="true">star</span></span>
+                <span class="adm-stat__delta" data-rv-stat-badge>—</span>
+              </div>
+              <div>
+                <div class="adm-stat__value" data-rv-stat-average>—</div>
+                <div class="adm-stat__label">Average rating</div>
+              </div>
+            </article>
+            <article class="adm-stat">
+              <div class="adm-stat__top">
+                <span class="adm-stat__icon adm-stat__icon--navy"><span class="material-symbols-outlined" aria-hidden="true">pending_actions</span></span>
+                <span class="adm-stat__delta">ready to polish</span>
+              </div>
+              <div>
+                <div class="adm-stat__value" data-rv-stat-pending>—</div>
+                <div class="adm-stat__label">Suggested drafts</div>
+              </div>
+            </article>
+            <article class="adm-stat">
+              <div class="adm-stat__top">
+                <span class="adm-stat__icon"><span class="material-symbols-outlined" aria-hidden="true">public</span></span>
+                <span class="adm-stat__delta" data-rv-stat-site>— website</span>
+              </div>
+              <div>
+                <div class="adm-stat__value" data-rv-stat-verified>—</div>
+                <div class="adm-stat__label">Verified buyers</div>
+              </div>
+            </article>
+          </div>
+
+          <section class="adm-review-hero" aria-labelledby="reviewHeroTitle">
+            <div class="adm-review-hero__copy">
+              <span class="adm-review-hero__eyebrow"><span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span>Review studio</span>
+              <h2 id="reviewHeroTitle">Turn happy buyers into showroom proof</h2>
+              <p>Approve the suggested reviews below, or write your own and publish it to the homepage or to one specific car. Drafts stay private until you approve them.</p>
+              <div class="adm-review-hero__actions">
+                <button class="btn btn--primary" type="button" data-review-new>
+                  <span class="material-symbols-outlined" aria-hidden="true">edit_note</span>Write a review
+                </button>
+                <span class="adm-review-hero__progress">
+                  <strong data-rv-progress>—</strong> of <span data-rv-progress-total>20</span> suggestions handled
+                </span>
+              </div>
+            </div>
+            <div class="adm-review-hero__meter" aria-hidden="true">
+              <div class="adm-review-hero__bar"><span data-rv-progress-bar style="width:0%"></span></div>
+              <div class="adm-review-hero__stars">
+                <span class="material-symbols-outlined icon-fill">star</span>
+                <span class="material-symbols-outlined icon-fill">star</span>
+                <span class="material-symbols-outlined icon-fill">star</span>
+                <span class="material-symbols-outlined icon-fill">star</span>
+                <span class="material-symbols-outlined icon-fill">star</span>
+              </div>
+              <p>Reviews with photos and a car attached convert 3× better on listing pages.</p>
+            </div>
+          </section>
+
+          <section class="adm-panel" aria-labelledby="reviewQueueTitle">
+            <div class="adm-panel__head">
+              <div>
+                <h2 id="reviewQueueTitle">Suggested reviews</h2>
+                <p><span data-rv-queue-count>—</span> drafts waiting for your edit and approval.</p>
+              </div>
+              <div class="adm-seg" role="group" aria-label="Filter suggested reviews">
+                <button class="is-active" type="button" data-rv-filter="all">All</button>
+                <button type="button" data-rv-filter="site">Website</button>
+                <button type="button" data-rv-filter="vehicle">Cars</button>
+              </div>
+            </div>
+            <div class="adm-panel__body">
+              <div class="adm-sugg-grid" data-review-suggestions>
+                <div class="adm-skeleton" aria-hidden="true"><span style="width:90%"></span><span style="width:74%"></span><span style="width:86%"></span><span style="width:62%"></span></div>
+              </div>
+              <div class="adm-sugg-more">
+                <button class="btn btn--ghost btn--sm" type="button" data-rv-more hidden>
+                  <span class="material-symbols-outlined" aria-hidden="true">expand_more</span><span data-rv-more-label>Show more suggestions</span>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section class="adm-panel" aria-labelledby="publishedReviewsTitle">
+            <div class="adm-panel__head">
+              <div>
+                <h2 id="publishedReviewsTitle">Published reviews</h2>
+                <p>Live on the homepage and the matching car pages.</p>
+              </div>
+              <button class="btn btn--primary btn--sm" type="button" data-review-new>
+                <span class="material-symbols-outlined" aria-hidden="true">add</span>Add review
+              </button>
+            </div>
+            <div class="adm-toolbar">
+              <div class="adm-search">
+                <span class="material-symbols-outlined" aria-hidden="true">search</span>
+                <label class="sr-only" for="admReviewSearch">Search published reviews</label>
+                <input class="input" id="admReviewSearch" type="search" placeholder="Search reviewer, city, car or text" autocomplete="off" data-rv-search>
+              </div>
+              <label class="sr-only" for="admReviewScope">Filter published reviews</label>
+              <select class="select" id="admReviewScope" data-rv-scope>
+                <option value="all">All reviews</option>
+                <option value="site">Website only</option>
+                <option value="vehicle">Car reviews only</option>
+              </select>
+              <span class="adm-toolbar__count">Showing <strong data-rv-shown>0</strong></span>
+            </div>
+            <div data-review-list>
+              <div class="adm-skeleton" aria-hidden="true"><span style="width:84%"></span><span style="width:70%"></span><span style="width:88%"></span><span style="width:64%"></span></div>
+            </div>
+          </section>
         </section>
 
         <section class="adm-view" data-view-panel="team" aria-labelledby="teamTitle" hidden>
@@ -704,6 +835,107 @@
     </form>
   </dialog>
 
+  <dialog class="adm-dialog adm-dialog--review" id="reviewDialog" aria-labelledby="reviewDialogTitle">
+    <div class="adm-dialog__head">
+      <div>
+        <h2 id="reviewDialogTitle">Write a review</h2>
+        <p id="reviewDialogSubtitle">Publish to the homepage or attach it to a specific car.</p>
+      </div>
+      <button class="adm-dialog__close" type="button" data-review-cancel aria-label="Close dialog">
+        <span class="material-symbols-outlined" aria-hidden="true">close</span>
+      </button>
+    </div>
+    <form class="adm-dialog__form" id="reviewForm" novalidate>
+      <div class="adm-dialog__body">
+        <div class="adm-dialog__error" data-review-error hidden>
+          <span class="material-symbols-outlined" aria-hidden="true">error</span>
+          <p role="alert"></p>
+        </div>
+
+        <div class="adm-review-editor">
+          <div class="adm-review-fields">
+            <div class="af-grid af-grid--3">
+              <div class="af-field" data-rv-field="name">
+                <label class="label" for="rvName">Reviewer name *</label>
+                <input class="input" id="rvName" name="name" type="text" maxlength="80" placeholder="Jordan M." autocomplete="off">
+                <p class="af-field__error" data-rv-error="name" hidden></p>
+              </div>
+              <div class="af-field">
+                <label class="label" for="rvCity">City</label>
+                <input class="input" id="rvCity" name="city" type="text" maxlength="80" placeholder="Dallas, TX" autocomplete="off">
+              </div>
+            </div>
+
+            <div class="af-field">
+              <span class="label" id="rvRatingLabel">Rating *</span>
+              <div class="adm-stars" role="radiogroup" aria-labelledby="rvRatingLabel" data-rv-stars>
+                <button class="adm-star" type="button" role="radio" aria-checked="false" aria-label="1 star" data-rv-star="1"><span class="material-symbols-outlined" aria-hidden="true">star</span></button>
+                <button class="adm-star" type="button" role="radio" aria-checked="false" aria-label="2 stars" data-rv-star="2"><span class="material-symbols-outlined" aria-hidden="true">star</span></button>
+                <button class="adm-star" type="button" role="radio" aria-checked="false" aria-label="3 stars" data-rv-star="3"><span class="material-symbols-outlined" aria-hidden="true">star</span></button>
+                <button class="adm-star" type="button" role="radio" aria-checked="false" aria-label="4 stars" data-rv-star="4"><span class="material-symbols-outlined" aria-hidden="true">star</span></button>
+                <button class="adm-star" type="button" role="radio" aria-checked="true" aria-label="5 stars" data-rv-star="5"><span class="material-symbols-outlined" aria-hidden="true">star</span></button>
+                <span class="adm-stars__value" data-rv-rating-label>5.0 · Excellent</span>
+              </div>
+            </div>
+
+            <div class="af-field" data-rv-field="text">
+              <label class="label" for="rvText">Review *</label>
+              <textarea class="input adm-review-textarea" id="rvText" name="text" rows="6" maxlength="1200" placeholder="What did the buyer love? Keep it specific — the delivery, the inspection, the financing."></textarea>
+              <div class="adm-review-count"><span data-rv-count>0</span> / 1200</div>
+              <p class="af-field__error" data-rv-error="text" hidden></p>
+            </div>
+
+            <div class="af-grid af-grid--3">
+              <div class="af-field">
+                <label class="label" for="rvTarget">Show review on</label>
+                <select class="select" id="rvTarget" name="target" data-rv-target>
+                  <option value="">Whole website (homepage)</option>
+                </select>
+              </div>
+              <div class="af-field">
+                <label class="label" for="rvDate">Review date</label>
+                <input class="input" id="rvDate" name="createdAt" type="date">
+              </div>
+            </div>
+
+            <label class="af-switch">
+              <input type="checkbox" id="rvVerified" name="verified">
+              <span><strong>Verified buyer</strong><span>Shows the verified badge on the review card.</span></span>
+            </label>
+          </div>
+
+          <aside class="adm-review-preview" aria-label="Live review preview">
+            <p class="adm-review-preview__label"><span class="material-symbols-outlined" aria-hidden="true">visibility</span>Live preview</p>
+            <article class="adm-preview-card">
+              <header>
+                <span class="adm-preview-card__avatar" data-rv-preview-avatar>JM</span>
+                <div>
+                  <strong data-rv-preview-name>Jordan M.</strong>
+                  <span data-rv-preview-meta>Dallas, TX · Nov 8, 2026</span>
+                </div>
+                <span class="adm-preview-card__stars" data-rv-preview-stars aria-hidden="true"></span>
+              </header>
+              <p data-rv-preview-text>Your review text will appear here as you type.</p>
+              <footer>
+                <span class="adm-preview-card__target" data-rv-preview-target><span class="material-symbols-outlined" aria-hidden="true">public</span>Website</span>
+                <span class="badge badge--verified" data-rv-preview-verified><span class="material-symbols-outlined">verified</span>Verified</span>
+              </footer>
+            </article>
+            <p class="adm-review-preview__hint">Car reviews appear on that vehicle's page and the homepage. Website reviews appear on the homepage only.</p>
+          </aside>
+        </div>
+      </div>
+      <div class="adm-dialog__foot adm-dialog__foot--review">
+        <button class="btn btn--ghost" type="button" data-review-save-draft>
+          <span class="material-symbols-outlined" aria-hidden="true">draft</span>Save draft
+        </button>
+        <button class="btn btn--primary" type="submit" data-review-submit>
+          <span class="material-symbols-outlined" aria-hidden="true">cloud_upload</span>Publish review
+        </button>
+      </div>
+    </form>
+  </dialog>
+
   <dialog class="adm-dialog adm-dialog--sm" id="confirmDialog" aria-labelledby="confirmTitle">
     <div class="adm-confirm__body">
       <div class="adm-confirm__icon" id="confirmIcon"><span class="material-symbols-outlined" aria-hidden="true">warning</span></div>
@@ -782,6 +1014,6 @@
   <noscript>
     <p style="padding:24px;text-align:center;font-family:system-ui">The dealer portal needs JavaScript enabled.</p>
   </noscript>
-  <script type="module" src="../js/admin/admin.js?v=20261103b"></script>
+  <script type="module" src="../js/admin/admin.js?v=20261112a"></script>
 </body>
 </html>

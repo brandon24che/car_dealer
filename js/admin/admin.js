@@ -1,16 +1,16 @@
 /**
  * Dealer portal controller: access guard, navigation, dashboard and actions.
  */
-import { requireAdmin, signOutUser, userInitials } from "../auth.js?v=20261103a";
-import { carsAndBidsVehicles } from "../demo-data.js?v=20261103a";
+import { requireAdmin, signOutUser, userInitials } from "../auth.js?v=20261112a";
+import { carsAndBidsVehicles } from "../demo-data.js?v=20261112a";
 import {
   getAllVehicles,
   importVehicles,
   listLeads,
   resetDemoInventory,
   seedDemoInventory,
-} from "../data-store.js?v=20261103a";
-import { showToast } from "../ui.js?v=20261103a";
+} from "../data-store.js?v=20261112a";
+import { showToast } from "../ui.js?v=20261112a";
 import {
   escapeHtml,
   formatCurrency,
@@ -18,7 +18,7 @@ import {
   qs,
   qsa,
   timeAgo,
-} from "../utils.js?v=20261103a";
+} from "../utils.js?v=20261112a";
 import {
   LEAD_STATUS_LABELS,
   assetPath,
@@ -28,16 +28,18 @@ import {
   timeValue,
   vehicleName,
   vehicleThumb,
-} from "./helpers.js?v=20261103a";
-import { initInventory, renderInventory } from "./inventory.js?v=20261103a";
-import { initLeads, renderLeads } from "./leads.js?v=20261103b";
-import { initCommandPalette } from "./palette.js?v=20261103a";
-import { initTeam, refreshTeam } from "./team.js?v=20261103a";
+} from "./helpers.js?v=20261112a";
+import { initInventory, renderInventory } from "./inventory.js?v=20261112a";
+import { initLeads, renderLeads } from "./leads.js?v=20261112a";
+import { initCommandPalette } from "./palette.js?v=20261112a";
+import { initReviews, refreshReviews, resetReviewStudio } from "./reviews.js?v=20261112a";
+import { initTeam, refreshTeam } from "./team.js?v=20261112a";
 
 const VIEW_META = {
   overview: { title: "Overview", subtitle: "Showroom performance at a glance." },
   inventory: { title: "Inventory", subtitle: "Manage listings, pricing and availability." },
   leads: { title: "Leads", subtitle: "Follow up on every concierge request." },
+  reviews: { title: "Reviews", subtitle: "Approve owner stories and publish them to the showroom." },
   team: { title: "Team", subtitle: "Portal admins and access control." },
 };
 
@@ -247,12 +249,17 @@ function renderFatal(error) {
       <p>Check your connection and try again. If Firebase is configured, confirm your admin role and security rules.</p>
       <button class="btn btn--ghost btn--sm" type="button" data-retry-admin><span class="material-symbols-outlined" aria-hidden="true">refresh</span>Retry</button>
     </div>`;
-  ["[data-inventory-body]", "[data-leads-body]", "[data-most-viewed]", "[data-recent-leads]"].forEach(
-    (selector) => {
-      const node = qs(selector);
-      if (node) node.innerHTML = markup;
-    }
-  );
+  [
+    "[data-inventory-body]",
+    "[data-leads-body]",
+    "[data-most-viewed]",
+    "[data-recent-leads]",
+    "[data-review-suggestions]",
+    "[data-review-list]",
+  ].forEach((selector) => {
+    const node = qs(selector);
+    if (node) node.innerHTML = markup;
+  });
 }
 
 async function loadData({ silent = false } = {}) {
@@ -268,6 +275,7 @@ async function loadData({ silent = false } = {}) {
     renderInventory(vehicles);
     renderLeads(leads);
     renderDashboard();
+    await refreshReviews(vehicles);
   } catch (error) {
     renderFatal(error);
     showToast("Could not refresh portal data.", "error");
@@ -375,6 +383,7 @@ async function resetInventory() {
       showToast("Reset is only available in demo mode with Firebase disconnected.", "info");
       return;
     }
+    resetReviewStudio();
     showToast("Demo inventory and reviews restored.", "success");
     await loadData({ silent: true });
     showView("overview");
@@ -475,6 +484,10 @@ async function boot() {
     onSaved: () => showView("inventory"),
   });
   initLeads();
+  initReviews({
+    getVehicles: () => state.vehicles,
+    confirmAction,
+  });
   initCommandPalette({
     getVehicles: () => state.vehicles,
     showView,

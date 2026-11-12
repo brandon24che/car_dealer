@@ -3,43 +3,45 @@
  * inspection report, test-drive reservation and similar vehicles.
  */
 import {
+  getReviewsForVehicle,
   getSimilarVehicles,
   getVehicle,
   incrementViewCount,
   saveLead,
   saveTestDrive,
-} from "../data-store.js?v=20261103a";
-import { requireAccount } from "../account-gate.js?v=20261103a";
-import { getCurrentUser } from "../auth.js?v=20261103a";
-import { isFavorite, subscribeFavorites, toggleFavorite } from "../favorites.js?v=20261103a";
-import { FINANCE_DEFAULTS, monthlyPayment, roundPayment } from "../finance.js?v=20261103a";
-import { bindRange, mountShell, openModal, setButtonLoading, showToast } from "../ui.js?v=20261103a";
+} from "../data-store.js?v=20261112a";
+import { requireAccount } from "../account-gate.js?v=20261112a";
+import { getCurrentUser } from "../auth.js?v=20261112a";
+import { isFavorite, subscribeFavorites, toggleFavorite } from "../favorites.js?v=20261112a";
+import { FINANCE_DEFAULTS, monthlyPayment, roundPayment } from "../finance.js?v=20261112a";
+import { bindRange, mountShell, openModal, setButtonLoading, showToast } from "../ui.js?v=20261112a";
 import {
   escapeHtml,
   formatCurrency,
   formatDate,
   formatMilesExact,
   getParam,
+  initials,
   isValidEmail,
   isValidPhone,
   qs,
   qsa,
   resolveAsset,
-} from "../utils.js?v=20261103a";
+} from "../utils.js?v=20261112a";
 import {
   initVehicleCards,
   renderVehicleCards,
   shortEngine,
   shortTransmission,
   vehicleTitle,
-} from "../vehicles.js?v=20261103a";
+} from "../vehicles.js?v=20261112a";
 import {
   DEALER_NAME,
   DEALER_PHONE_DISPLAY,
   vehicleCheckoutMessage,
   waLink,
   WHATSAPP_SVG,
-} from "../whatsapp.js?v=20261103a";
+} from "../whatsapp.js?v=20261112a";
 
 const root = qs("#vehicleRoot");
 let currentVehicle = null;
@@ -1087,6 +1089,70 @@ function bindTestDriveModal() {
 }
 
 /* ------------------------------------------------------------------ */
+/* Owner reviews                                                       */
+/* ------------------------------------------------------------------ */
+
+function reviewStars(rating) {
+  const full = Math.round(Number(rating) || 0);
+  return `<span class="veh-review__stars" aria-label="${Number(rating) || 0} out of 5 stars">${Array.from(
+    { length: 5 },
+    (_, index) =>
+      `<span class="material-symbols-outlined${index < full ? " icon-fill" : ""}" aria-hidden="true">star</span>`
+  ).join("")}</span>`;
+}
+
+function reviewCard(review) {
+  return `<article class="veh-review">
+    <header class="veh-review__head">
+      <span class="veh-review__avatar" aria-hidden="true">${escapeHtml(initials(review.name))}</span>
+      <div class="veh-review__who">
+        <strong>${escapeHtml(review.name)}</strong>
+        <span>${escapeHtml(review.city || "Dallas, TX")} · ${escapeHtml(formatDate(review.createdAt))}</span>
+      </div>
+      ${reviewStars(review.rating)}
+    </header>
+    <p class="veh-review__text">“${escapeHtml(review.text)}”</p>
+    <footer class="veh-review__foot">
+      <span class="veh-review__vehicle">${escapeHtml(review.vehicle || "AutoSelect purchase")}</span>
+      ${
+        review.verified
+          ? `<span class="veh-review__verified"><span class="material-symbols-outlined" aria-hidden="true">verified</span>Verified owner</span>`
+          : ""
+      }
+    </footer>
+  </article>`;
+}
+
+async function renderVehicleReviews(vehicle) {
+  const host = qs("#vehicleReviews");
+  if (!host) return;
+  try {
+    const reviews = await getReviewsForVehicle(vehicleTitle(vehicle), 3);
+    if (!reviews.length) return;
+    const average = reviews.reduce((total, review) => total + Number(review.rating || 0), 0) / reviews.length;
+    host.innerHTML = `<section class="panel" aria-labelledby="vehReviewsTitle">
+      <div class="veh-lower__head">
+        <div>
+          <span class="veh-reviews__eyebrow">Owner stories</span>
+          <h2 id="vehReviewsTitle">What ${escapeHtml(vehicle.model)} buyers say</h2>
+        </div>
+        <span class="veh-reviews__score">
+          <strong>${average.toFixed(1)}</strong>
+          ${reviewStars(average)}
+          <span>${reviews.length} verified review${reviews.length === 1 ? "" : "s"}</span>
+        </span>
+      </div>
+      <div class="veh-lower__body">
+        <div class="veh-reviews__grid">${reviews.map(reviewCard).join("")}</div>
+      </div>
+    </section>`;
+    host.hidden = false;
+  } catch (error) {
+    console.warn("[AutoSelect] vehicle reviews", error);
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /* Similar vehicles                                                    */
 /* ------------------------------------------------------------------ */
 
@@ -1269,7 +1335,9 @@ async function loadVehicle() {
     applySeo(vehicle);
     bindVehicleActions(vehicle);
 
+    qs("#vehicleReviews")?.remove();
     qs("#similarSection")?.remove();
+    root.insertAdjacentHTML("beforeend", '<div class="veh-reviews" id="vehicleReviews" hidden></div>');
     root.insertAdjacentHTML("beforeend", '<div class="veh-similar" id="similarSection" hidden></div>');
 
     const viewKey = `as_viewed_${vehicle.id}`;
@@ -1282,7 +1350,7 @@ async function loadVehicle() {
       /* storage unavailable */
     }
 
-    await renderSimilar(vehicle);
+    await Promise.all([renderVehicleReviews(vehicle), renderSimilar(vehicle)]);
   } catch (error) {
     console.error("[AutoSelect] vehicle page", error);
     qs("[data-veh-skeleton]")?.remove();

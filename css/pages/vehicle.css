@@ -1152,3 +1152,92 @@ body.modal-open .veh-sticky { opacity: 0; visibility: hidden; pointer-events: no
   .veh-sticky .btn span:not(.material-symbols-outlined) { font-size: 11px; }
   .veh-sticky .btn { padding: 0 10px; }
 }
+
+/* Owner reviews -------------------------------------------------------- */
+.veh-reviews { margin-top: 30px; }
+.veh-reviews__eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+.veh-reviews__score {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--slate);
+}
+.veh-reviews__score strong {
+  font-family: var(--font-display);
+  font-size: 24px;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--ink);
+}
+.veh-reviews__grid { display: grid; gap: 12px; }
+.veh-review {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: linear-gradient(160deg, #fff, var(--surface-soft));
+  box-shadow: var(--shadow-1);
+}
+.veh-review__head { display: flex; align-items: center; gap: 9px; }
+.veh-review__avatar {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--navy);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.veh-review__who { min-width: 0; display: grid; gap: 1px; }
+.veh-review__who strong { font-size: 12px; color: var(--ink); line-height: 1.3; }
+.veh-review__who span { font-size: 10px; color: var(--slate); }
+.veh-review__stars { margin-left: auto; display: inline-flex; gap: 1px; color: #cbd5e1; flex-shrink: 0; }
+.veh-review__stars .material-symbols-outlined { font-size: 15px; }
+.veh-review__stars .icon-fill { color: #f59e0b; }
+.veh-reviews__score .veh-review__stars .material-symbols-outlined { font-size: 14px; }
+.veh-review__text { font-size: 12px; line-height: 1.65; color: var(--slate-strong); }
+.veh-review__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 9px;
+  border-top: 1px dashed var(--border);
+}
+.veh-review__vehicle { font-size: 10px; font-weight: 600; color: var(--blue); }
+.veh-review__verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--green-ink);
+}
+.veh-review__verified .material-symbols-outlined { font-size: 14px; }
+
+@media (min-width: 640px) {
+  .veh-reviews__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  .veh-reviews { margin-top: 36px; }
+  .veh-reviews__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+}

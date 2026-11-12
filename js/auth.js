@@ -8,8 +8,8 @@ import {
   firebaseReady,
   firebaseSdk,
   isFirebaseConfigured,
-} from "./firebase-config.js?v=20261103a";
-import { initials, storageGet, storageSet, storageRemove } from "./utils.js?v=20261103a";
+} from "./firebase-config.js?v=20261112a";
+import { initials, storageGet, storageSet, storageRemove } from "./utils.js?v=20261112a";
 
 const DEMO_ACCOUNTS = "as_demo_accounts_v1";
 const DEMO_SESSION = "as_demo_session_v1";

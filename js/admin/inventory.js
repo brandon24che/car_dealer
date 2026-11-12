@@ -7,16 +7,16 @@ import {
   deleteVehicle,
   saveVehicle,
   uploadVehicleImage,
-} from "../data-store.js?v=20261103a";
-import { setButtonLoading, showToast } from "../ui.js?v=20261103a";
-import { escapeHtml, formatCurrency, formatMileage, qs, qsa } from "../utils.js?v=20261103a";
+} from "../data-store.js?v=20261112a";
+import { setButtonLoading, showToast } from "../ui.js?v=20261112a";
+import { escapeHtml, formatCurrency, formatMileage, qs, qsa } from "../utils.js?v=20261112a";
 import {
   assetPath,
   downloadCsv,
   leadDate,
   vehicleName,
   vehicleThumb,
-} from "./helpers.js?v=20261103a";
+} from "./helpers.js?v=20261112a";
 
 const MAX_IMAGES = 24;
 const MAX_EMBEDDED = 4;

@@ -9,10 +9,10 @@ import {
   firebaseReady,
   firebaseSdk,
   isFirebaseConfigured,
-} from "./firebase-config.js?v=20261103a";
-import { getCurrentUser } from "./auth.js?v=20261103a";
-import { demoVehicles, demoReviews } from "./demo-data.js?v=20261103a";
-import { uploadImage } from "./cloudinary.js?v=20261103a";
+} from "./firebase-config.js?v=20261112a";
+import { getCurrentUser } from "./auth.js?v=20261112a";
+import { demoVehicles, demoReviews } from "./demo-data.js?v=20261112a";
+import { uploadImage } from "./cloudinary.js?v=20261112a";
 import {
   debounce,
   escapeHtml,
@@ -23,7 +23,7 @@ import {
   storageSet,
   truncate,
   uid,
-} from "./utils.js?v=20261103a";
+} from "./utils.js?v=20261112a";
 
 const KEYS = {
   vehicles: "as_demo_vehicles_v1",
@@ -100,6 +100,12 @@ function writeLocalVehicles(list) {
 
 function localReviews() {
   return storageGet(KEYS.reviews, clone(demoReviews));
+}
+
+function writeLocalReviews(list) {
+  storageSet(KEYS.reviews, list);
+  clearCache();
+  window.dispatchEvent(new CustomEvent("as:reviews-changed"));
 }
 
 /**
@@ -613,22 +619,136 @@ export async function incrementViewCount(id) {
 /* Reviews                                                             */
 /* ------------------------------------------------------------------ */
 
-export async function getReviews(limit = 6) {
+const REVIEW_MAX = 500;
+
+function reviewTime(value) {
+  if (!value) return 0;
+  const date = value?.toDate ? value.toDate() : new Date(value);
+  const time = date.getTime();
+  return Number.isNaN(time) ? 0 : time;
+}
+
+function sortReviews(list) {
+  return [...list].sort((a, b) => reviewTime(b.createdAt) - reviewTime(a.createdAt));
+}
+
+function normalizeReview(review) {
+  const rating = Math.min(5, Math.max(1, Math.round(Number(review.rating) || 5)));
+  return {
+    ...review,
+    name: String(review.name || "").trim(),
+    city: String(review.city || "").trim(),
+    text: String(review.text || "").trim(),
+    vehicle: String(review.vehicle || "").trim(),
+    rating,
+    verified: Boolean(review.verified),
+  };
+}
+
+/** Newest reviews first. Used by the home page and the dealer review studio. */
+export async function listReviews({ limit = REVIEW_MAX } = {}) {
   const f = await live();
   if (f) {
     try {
       const m = f.firestoreModule;
+      const snap = await m.getDocs(
+        m.query(
+          m.collection(f.db, "reviews"),
+          m.orderBy("createdAt", "desc"),
+          m.limit(Math.max(1, Number(limit) || REVIEW_MAX))
+        )
+      );
+      return snap.docs.map((doc) => normalizeReview(docToVehicle(doc)));
+    } catch (error) {
+      throw firestoreWriteError(error, "load reviews");
+    }
+  }
+  return sortReviews(localReviews()).slice(0, limit).map(normalizeReview);
+}
+
+/** Reviews written about one vehicle, matched on its "2022 BMW 3 Series" label. */
+export async function getReviewsForVehicle(vehicleLabel, limit = 4) {
+  const target = String(vehicleLabel || "").trim().toLowerCase();
+  if (!target) return [];
+  const reviews = await listReviews({ limit: 300 }).catch(() => []);
+  return reviews
+    .filter((review) => String(review.vehicle || "").trim().toLowerCase() === target)
+    .slice(0, limit);
+}
+
+export async function getReviews(limit = 6) {
+  const f = await live();
+  if (f) {
+    try {
       if (!(await firestoreCollectionIsEmpty("reviews"))) {
-        const snap = await m.getDocs(
-          m.query(m.collection(f.db, "reviews"), m.orderBy("createdAt", "desc"), m.limit(limit))
-        );
-        if (!snap.empty) return snap.docs.map(docToVehicle);
+        return await listReviews({ limit });
       }
     } catch (error) {
       console.warn("[AutoSelect] reviews fallback", error);
     }
   }
-  return localReviews().slice(0, limit);
+  return sortReviews(localReviews()).slice(0, limit).map(normalizeReview);
+}
+
+/**
+ * Create or update a review. Only the fields allowed by the `reviews` rules are
+ * written, so publishing from the portal works with the deployed rules.
+ */
+export async function saveReview(input = {}) {
+  const name = truncate(String(input.name || "").trim(), 80);
+  const text = truncate(String(input.text || "").trim(), 1200);
+  if (!name) throw new Error("Add the reviewer's name before publishing.");
+  if (!text) throw new Error("Write the review text before publishing.");
+  const city = truncate(String(input.city || "").trim(), 80);
+  const vehicle = truncate(String(input.vehicle || "").trim(), 120);
+  const rating = Math.min(5, Math.max(1, Math.round(Number(input.rating) || 5)));
+  const order = Number.isFinite(Number(input.order)) ? Number(input.order) : 0;
+  const record = { name, city, rating, text, verified: Boolean(input.verified), vehicle, order };
+
+  const requested = input.createdAt ? new Date(input.createdAt) : new Date();
+  const created = Number.isNaN(requested.getTime()) ? new Date() : requested;
+  const iso = created.toISOString();
+
+  const f = await live();
+  if (f) {
+    try {
+      const m = f.firestoreModule;
+      if (input.id) {
+        const patch = input.createdAt ? { ...record, createdAt: m.Timestamp.fromDate(created) } : record;
+        await m.updateDoc(m.doc(f.db, "reviews", input.id), patch);
+        return { id: input.id, ...record, createdAt: iso };
+      }
+      const createdAt = input.createdAt ? m.Timestamp.fromDate(created) : m.serverTimestamp();
+      const ref = await m.addDoc(m.collection(f.db, "reviews"), { ...record, createdAt });
+      return { id: ref.id, ...record, createdAt: iso };
+    } catch (error) {
+      throw firestoreWriteError(error, "save review");
+    }
+  }
+
+  const list = localReviews();
+  const id = input.id || `rev-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+  const next = { id, ...record, createdAt: iso };
+  const index = list.findIndex((review) => review.id === id);
+  if (index >= 0) list[index] = { ...list[index], ...next };
+  else list.unshift(next);
+  writeLocalReviews(list);
+  return next;
+}
+
+export async function deleteReview(id) {
+  if (!id) throw new Error("Missing review reference.");
+  const f = await live();
+  if (f) {
+    try {
+      const m = f.firestoreModule;
+      await m.deleteDoc(m.doc(f.db, "reviews", id));
+      return;
+    } catch (error) {
+      throw firestoreWriteError(error, "delete review");
+    }
+  }
+  writeLocalReviews(localReviews().filter((review) => review.id !== id));
 }
 
 /* ------------------------------------------------------------------ */

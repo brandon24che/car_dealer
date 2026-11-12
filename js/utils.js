@@ -1,7 +1,7 @@
 /**
  * Small DOM / formatting / URL helpers shared across the site.
  */
-import { cloudinaryUrl } from "./cloudinary.js?v=20261103a";
+import { cloudinaryUrl } from "./cloudinary.js?v=20261112a";
 
 export const qs = (selector, root = document) => root.querySelector(selector);
 export const qsa = (selector, root = document) => Array.from(root.querySelectorAll(selector));

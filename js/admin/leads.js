@@ -1,8 +1,8 @@
 /**
  * Dealer portal — leads table, filters, status updates, concierge replies and CSV export.
  */
-import { getVehicle, replyToLead, updateLeadStatus } from "../data-store.js?v=20261103a";
-import { getCurrentUser } from "../auth.js?v=20261103a";
+import { getVehicle, replyToLead, updateLeadStatus } from "../data-store.js?v=20261112a";
+import { getCurrentUser } from "../auth.js?v=20261112a";
 import {
   escapeHtml,
   formatCurrency,
@@ -12,9 +12,9 @@ import {
   qsa,
   trapFocus,
   truncate,
-} from "../utils.js?v=20261103a";
-import { showToast } from "../ui.js?v=20261103a";
-import { DEALER_NAME, waLink } from "../whatsapp.js?v=20261103a";
+} from "../utils.js?v=20261112a";
+import { showToast } from "../ui.js?v=20261112a";
+import { DEALER_NAME, waLink } from "../whatsapp.js?v=20261112a";
 import {
   LEAD_STATUSES,
   LEAD_STATUS_LABELS,
@@ -28,7 +28,7 @@ import {
   timeValue,
   vehicleName as vehicleLabel,
   vehicleThumb,
-} from "./helpers.js?v=20261103a";
+} from "./helpers.js?v=20261112a";
 
 let leads = [];
 let filters = { query: "", type: "all", status: "all" };
