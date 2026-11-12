@@ -23,6 +23,7 @@ export function initCommandPalette({ getVehicles, showView, isSuperAdmin }) {
       { group: "Actions", label: "Write a review", hint: "Publish to the site or a specific car", icon: "edit_note", run: () => { showView("reviews"); qs("[data-review-new]")?.click(); } },
       { group: "Actions", label: "Add a vehicle", hint: "Open the listing editor", icon: "add_box", run: () => qs("[data-add-vehicle]")?.click() },
       { group: "Actions", label: "Import Cars & Bids listings", hint: "Publish the 25 bundled auctions", icon: "library_add", run: () => qs("[data-import-auction]")?.click() },
+      { group: "Actions", label: "Import Bring a Trailer demos", hint: "Add 10 recent auctions under $20k", icon: "gavel", run: () => qs("[data-import-bat]")?.click() },
       { group: "Actions", label: "Seed showcase vehicles", hint: "Restore the 49-vehicle catalogue", icon: "auto_awesome", run: () => qs("[data-seed-inventory]")?.click() },
       { group: "Actions", label: "Export leads CSV", hint: "Download the current lead list", icon: "download", run: () => { showView("leads"); qs("[data-export-leads]")?.click(); } },
       { group: "Actions", label: "Export inventory CSV", hint: "Download the current filtered stock", icon: "download", run: () => { showView("inventory"); qs("[data-export-inventory]")?.click(); } },

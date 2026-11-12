@@ -3,6 +3,7 @@
  */
 import { requireAdmin, signOutUser, userInitials } from "../auth.js?v=20261112a";
 import { carsAndBidsVehicles } from "../demo-data.js?v=20261112a";
+import { bringATrailerVehicles } from "./bat-demo.js?v=20261112a";
 import {
   getAllVehicles,
   importVehicles,
@@ -368,6 +369,26 @@ async function importAuctionInventory() {
   }
 }
 
+async function importBatInventory() {
+  const confirmed = await confirmAction({
+    title: "Add the 10 Bring a Trailer demos?",
+    message:
+      "Ten recent BaT-style auction cars priced at or below $20,000 are bundled in the code. They use the site's own stock photos, existing inventory is untouched, and every listing can be edited or deleted afterwards.",
+    confirmLabel: "Add listings",
+    danger: false,
+  });
+  if (!confirmed) return;
+  try {
+    const count = await importVehicles(bringATrailerVehicles);
+    showToast(`${count} Bring a Trailer demo listings added.`, "success");
+    await loadData({ silent: true });
+    showView("inventory");
+  } catch (error) {
+    console.error("[AutoSelect] BaT import failed", error);
+    showToast(error.message || "Could not import the Bring a Trailer listings.", "error");
+  }
+}
+
 async function resetInventory() {
   const confirmed = await confirmAction({
     title: "Reset local demo data?",
@@ -436,6 +457,9 @@ function bindShell() {
   qs("[data-admin-signout]")?.addEventListener("click", signOut);
   qsa("[data-import-auction]").forEach((button) =>
     button.addEventListener("click", importAuctionInventory)
+  );
+  qsa("[data-import-bat]").forEach((button) =>
+    button.addEventListener("click", importBatInventory)
   );
   qsa("[data-seed-inventory]").forEach((button) => button.addEventListener("click", seedInventory));
   qsa("[data-reset-inventory]").forEach((button) => button.addEventListener("click", resetInventory));
