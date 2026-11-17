@@ -742,6 +742,11 @@ async function removeVehicle(id) {
 /* Wiring                                                              */
 /* ------------------------------------------------------------------ */
 
+/** Open the shared vehicle editor from another workspace. */
+export function openVehicleEditor(vehicle) {
+  if (vehicle) openEditor(vehicle);
+}
+
 export function initInventory(options = {}) {
   context = { ...context, ...options };
 

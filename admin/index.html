@@ -51,6 +51,10 @@
         <button class="admin-nav-item is-active" type="button" data-view="overview" aria-current="page">
           <span class="material-symbols-outlined" aria-hidden="true">space_dashboard</span>Overview
         </button>
+        <button class="admin-nav-item" type="button" data-view="home">
+          <span class="material-symbols-outlined" aria-hidden="true">home_work</span>Home page
+          <span class="admin-nav-item__count" data-count-home>—</span>
+        </button>
         <button class="admin-nav-item" type="button" data-view="inventory">
           <span class="material-symbols-outlined" aria-hidden="true">directions_car</span>Inventory
           <span class="admin-nav-item__count" data-count-inventory>—</span>
@@ -239,6 +243,52 @@
                   </div>
                 </div>
               </section>
+            </div>
+          </div>
+        </section>
+
+        <section class="adm-view" data-view-panel="home" aria-labelledby="homeTitle" hidden>
+          <div class="adm-panel">
+            <div class="adm-panel__head">
+              <div>
+                <h2 id="homeTitle">Hand-picked vehicles</h2>
+                <p>The four cars shown in “Verified deals” on the homepage.</p>
+              </div>
+              <div class="adm-panel__head-actions">
+                <span class="adm-home-spots"><strong data-home-count>0 / 4</strong> spots filled</span>
+                <a class="btn btn--ghost btn--sm" href="../index.html#featuredTitle" target="_blank" rel="noopener">
+                  <span class="material-symbols-outlined" aria-hidden="true">open_in_new</span>Preview
+                </a>
+                <button class="btn btn--primary btn--sm" type="button" data-add-vehicle>
+                  <span class="material-symbols-outlined" aria-hidden="true">add</span>Add a vehicle
+                </button>
+              </div>
+            </div>
+            <div class="adm-panel__body">
+              <div class="adm-home-grid" data-home-picks>
+                <div class="adm-skeleton" aria-hidden="true"><span style="width:82%"></span><span style="width:64%"></span><span style="width:90%"></span></div>
+              </div>
+              <p class="adm-home-hint" data-home-hint>Newest featured cars appear first.</p>
+            </div>
+          </div>
+
+          <div class="adm-panel">
+            <div class="adm-panel__head">
+              <div>
+                <h2 id="homeAddTitle">Add or replace a pick</h2>
+                <p>Feature any available car; remove one first when all four spots are filled.</p>
+              </div>
+            </div>
+            <div class="adm-toolbar">
+              <div class="adm-search">
+                <span class="material-symbols-outlined" aria-hidden="true">search</span>
+                <label class="sr-only" for="admHomeSearch">Search inventory</label>
+                <input class="input" id="admHomeSearch" type="search" placeholder="Search make, model, stock or VIN" autocomplete="off" data-home-search>
+              </div>
+              <span class="adm-toolbar__count">Showing <strong data-home-shown>0</strong> cars</span>
+            </div>
+            <div class="adm-panel__body adm-panel__body--flush" data-home-candidates>
+              <div class="adm-skeleton" aria-hidden="true"><span style="width:76%"></span><span style="width:88%"></span><span style="width:64%"></span></div>
             </div>
           </div>
         </section>

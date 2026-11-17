@@ -30,6 +30,7 @@ import {
   vehicleName,
   vehicleThumb,
 } from "./helpers.js?v=20261112a";
+import { initHomepage, refreshHomepage } from "./homepage.js?v=20261112a";
 import { initInventory, renderInventory } from "./inventory.js?v=20261112a";
 import { initLeads, renderLeads } from "./leads.js?v=20261112a";
 import { initCommandPalette } from "./palette.js?v=20261112a";
@@ -38,6 +39,7 @@ import { initTeam, refreshTeam } from "./team.js?v=20261112a";
 
 const VIEW_META = {
   overview: { title: "Overview", subtitle: "Showroom performance at a glance." },
+  home: { title: "Home page", subtitle: "Choose the cars shown in Hand-Picked Vehicles." },
   inventory: { title: "Inventory", subtitle: "Manage listings, pricing and availability." },
   leads: { title: "Leads", subtitle: "Follow up on every concierge request." },
   reviews: { title: "Reviews", subtitle: "Approve owner stories and publish them to the showroom." },
@@ -257,6 +259,8 @@ function renderFatal(error) {
     "[data-recent-leads]",
     "[data-review-suggestions]",
     "[data-review-list]",
+    "[data-home-picks]",
+    "[data-home-candidates]",
   ].forEach((selector) => {
     const node = qs(selector);
     if (node) node.innerHTML = markup;
@@ -274,6 +278,7 @@ async function loadData({ silent = false } = {}) {
     state.leads = leads;
     state.loaded = true;
     renderInventory(vehicles);
+    refreshHomepage(vehicles);
     renderLeads(leads);
     renderDashboard();
     await refreshReviews(vehicles);
@@ -505,7 +510,11 @@ async function boot() {
   initInventory({
     reload: () => loadData({ silent: true }),
     confirmAction,
-    onSaved: () => showView("inventory"),
+    onSaved: () => showView(state.view),
+  });
+  initHomepage({
+    getVehicles: () => state.vehicles,
+    reload: () => loadData({ silent: true }),
   });
   initLeads();
   initReviews({

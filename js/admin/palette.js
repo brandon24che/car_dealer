@@ -17,6 +17,7 @@ export function initCommandPalette({ getVehicles, showView, isSuperAdmin }) {
   const baseCommands = () => {
     const list = [
       { group: "Go to", label: "Overview", hint: "Dashboard and metrics", icon: "space_dashboard", run: () => showView("overview") },
+      { group: "Go to", label: "Home page picks", hint: "Curate Hand-Picked Vehicles", icon: "home_work", run: () => showView("home") },
       { group: "Go to", label: "Inventory", hint: "Manage stock, pricing and photos", icon: "directions_car", run: () => showView("inventory") },
       { group: "Go to", label: "Leads", hint: "Concierge, test drives and trade-ins", icon: "forum", run: () => showView("leads") },
       { group: "Go to", label: "Reviews", hint: "Approve owner stories and publish them", icon: "reviews", run: () => showView("reviews") },
