@@ -248,6 +248,119 @@
         </section>
 
         <section class="adm-view" data-view-panel="home" aria-labelledby="homeTitle" hidden>
+          <div class="adm-panel adm-hero-panel" data-super-only>
+            <div class="adm-panel__head">
+              <div>
+                <h2 id="heroEditorTitle">Hero section</h2>
+                <p>Headline, copy, proof points and background photo for the homepage hero. Super admin only.</p>
+              </div>
+              <div class="adm-panel__head-actions">
+                <span class="adm-hero-status" data-hero-status role="status" aria-live="polite">
+                  <span class="material-symbols-outlined" aria-hidden="true">check_circle</span>
+                  <span data-hero-status-text>Saved</span>
+                </span>
+                <a class="btn btn--ghost btn--sm" href="../index.html" target="_blank" rel="noopener">
+                  <span class="material-symbols-outlined" aria-hidden="true">open_in_new</span>Open homepage
+                </a>
+              </div>
+            </div>
+            <div class="adm-panel__body">
+              <div class="adm-hero-editor">
+                <form class="adm-hero-form" id="heroForm" novalidate>
+                  <div class="adm-hero-field">
+                    <label class="label" for="heroBadge">Badge</label>
+                    <input class="input" id="heroBadge" type="text" maxlength="80" autocomplete="off" data-hero-field="badge">
+                    <span class="adm-hero-count" data-hero-count="badge">0 / 80</span>
+                  </div>
+                  <div class="adm-hero-field">
+                    <label class="label" for="heroHeadline">Headline</label>
+                    <textarea class="input adm-hero-textarea" id="heroHeadline" rows="2" maxlength="160" data-hero-field="headline"></textarea>
+                    <span class="adm-hero-count" data-hero-count="headline">0 / 160</span>
+                  </div>
+                  <div class="adm-hero-field">
+                    <label class="label" for="heroSubheadline">Supporting copy</label>
+                    <textarea class="input adm-hero-textarea" id="heroSubheadline" rows="3" maxlength="400" data-hero-field="subheadline"></textarea>
+                    <span class="adm-hero-count" data-hero-count="subheadline">0 / 400</span>
+                  </div>
+
+                  <div class="adm-hero-field">
+                    <span class="label">Proof points</span>
+                    <div class="adm-hero-stats">
+                      <div class="adm-hero-stat" data-hero-stat-row>
+                        <input class="input" type="text" maxlength="40" aria-label="First proof point value" data-hero-stat-value>
+                        <input class="input" type="text" maxlength="60" aria-label="First proof point label" data-hero-stat-label>
+                      </div>
+                      <div class="adm-hero-stat" data-hero-stat-row>
+                        <input class="input" type="text" maxlength="40" aria-label="Second proof point value" data-hero-stat-value>
+                        <input class="input" type="text" maxlength="60" aria-label="Second proof point label" data-hero-stat-label>
+                      </div>
+                      <div class="adm-hero-stat" data-hero-stat-row>
+                        <input class="input" type="text" maxlength="40" aria-label="Third proof point value" data-hero-stat-value>
+                        <input class="input" type="text" maxlength="60" aria-label="Third proof point label" data-hero-stat-label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="adm-hero-photo">
+                    <div class="adm-hero-photo__thumb" data-hero-photo-thumb></div>
+                    <div class="adm-hero-photo__fields">
+                      <label class="label" for="heroImage">Background photo</label>
+                      <div class="adm-hero-photo__actions">
+                        <button class="btn btn--ghost btn--sm" type="button" data-hero-upload>
+                          <span class="material-symbols-outlined" aria-hidden="true">upload</span>Upload photo
+                        </button>
+                        <button class="btn btn--ghost btn--sm" type="button" data-hero-default-image>Site default</button>
+                        <input type="file" accept="image/jpeg,image/png,image/webp" data-hero-file hidden>
+                      </div>
+                      <input class="input" id="heroImage" type="text" maxlength="800" placeholder="https://res.cloudinary.com/... or assets/cars/photo.jpg" autocomplete="off" data-hero-field="image">
+                    </div>
+                  </div>
+
+                  <div class="adm-hero-row">
+                    <div class="adm-hero-field">
+                      <span class="label">Focal point</span>
+                      <div class="adm-seg" role="group" aria-label="Background photo focal point">
+                        <button class="adm-seg__btn" type="button" data-hero-position="left">Left</button>
+                        <button class="adm-seg__btn is-active" type="button" data-hero-position="center">Center</button>
+                        <button class="adm-seg__btn" type="button" data-hero-position="right">Right</button>
+                      </div>
+                    </div>
+                    <div class="adm-hero-field">
+                      <label class="label" for="heroOpacity">Photo strength <span class="adm-hero-opacity" data-hero-opacity>26%</span></label>
+                      <input class="range" id="heroOpacity" type="range" min="0" max="60" step="1" data-hero-field="imageOpacity">
+                    </div>
+                  </div>
+
+                  <div class="adm-hero-actions">
+                    <button class="btn btn--ghost" type="button" data-hero-restore>Restore defaults</button>
+                    <button class="btn btn--primary" type="submit" data-hero-save>
+                      <span class="material-symbols-outlined" aria-hidden="true">save</span>
+                      <span data-hero-save-text>Save hero</span>
+                    </button>
+                  </div>
+                </form>
+
+                <aside class="adm-hero-preview" aria-label="Hero live preview">
+                  <div class="adm-hero-preview__label"><span></span>Live preview</div>
+                  <div class="adm-hero-preview__frame">
+                    <div class="adm-hero-preview__media" data-hero-preview-media></div>
+                    <div class="adm-hero-preview__content">
+                      <span class="adm-hero-preview__badge"><span class="material-symbols-outlined" aria-hidden="true">verified</span><span data-hero-preview-badge></span></span>
+                      <h3 data-hero-preview-headline></h3>
+                      <p data-hero-preview-subheadline></p>
+                      <div class="adm-hero-preview__stats">
+                        <div><strong data-hero-preview-stat-value></strong><span data-hero-preview-stat-label></span></div>
+                        <div><strong data-hero-preview-stat-value></strong><span data-hero-preview-stat-label></span></div>
+                        <div><strong data-hero-preview-stat-value></strong><span data-hero-preview-stat-label></span></div>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="adm-hero-preview__meta" data-hero-meta>Changes appear on the homepage after saving.</p>
+                </aside>
+              </div>
+            </div>
+          </div>
+
           <div class="adm-panel">
             <div class="adm-panel__head">
               <div>

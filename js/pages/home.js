@@ -2,8 +2,9 @@
  * Home marketplace: live inventory counts, search handoff, featured stock and
  * verified reviews.
  */
+import { cloudinaryUrl } from "../cloudinary.js?v=20261112a";
 import { initCompare } from "../compare.js?v=20261112a";
-import { getBodyStyleCounts, getFacets, getFeaturedVehicles, getReviews, queryVehicles } from "../data-store.js?v=20261112a";
+import { getBodyStyleCounts, getFacets, getFeaturedVehicles, getHeroSettings, getReviews, queryVehicles } from "../data-store.js?v=20261112a";
 import { homeSearchUrl } from "../router-params.js?v=20261112a";
 import { bindRange, mountShell, renderStars } from "../ui.js?v=20261112a";
 import {
@@ -19,6 +20,36 @@ import {
 import { initVehicleCards, renderVehicleCards } from "../vehicles.js?v=20261112a";
 
 const state = { body: "" };
+const HERO_POSITIONS = { left: "18% 50%", center: "50% 50%", right: "82% 50%" };
+
+/** Applies the hero copy, stats and background photo saved in the portal. */
+function applyHero(hero) {
+  if (!hero) return;
+  const badge = qs("[data-hero-badge]");
+  const title = qs("#heroTitle");
+  const lede = qs("[data-hero-lede]");
+  if (badge) badge.textContent = hero.badge;
+  if (title) title.textContent = hero.headline;
+  if (lede) lede.textContent = hero.subheadline;
+
+  qsa("[data-hero-stat-value]").forEach((node, index) => {
+    node.textContent = hero.stats[index]?.value || "";
+  });
+  qsa("[data-hero-stat-label]").forEach((node, index) => {
+    node.textContent = hero.stats[index]?.label || "";
+  });
+
+  const media = qs("[data-hero-media]");
+  if (!media) return;
+  const image = cloudinaryUrl(String(hero.image || "").trim(), 1600).replace(/[()"'\\]/g, "");
+  if (image) {
+    media.style.backgroundImage = `url("${image}")`;
+    media.style.backgroundPosition = HERO_POSITIONS[hero.imagePosition] || HERO_POSITIONS.right;
+    media.style.opacity = String(hero.imageOpacity);
+  } else {
+    media.style.backgroundImage = "none";
+  }
+}
 
 function renderBodyTiles(counts) {
   const host = qs("#bodyTiles");
@@ -173,6 +204,10 @@ async function init() {
   initCompare();
   fillYearOptions();
   bindSearch();
+
+  getHeroSettings()
+    .then(applyHero)
+    .catch((error) => console.warn("[AutoSelect] hero settings unavailable", error));
 
   const [counts, facets, featured, reviews] = await Promise.all([
     getBodyStyleCounts().catch(() => ({})),

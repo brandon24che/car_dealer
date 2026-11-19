@@ -752,6 +752,119 @@ export async function deleteReview(id) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Site content — homepage hero                                        */
+/* ------------------------------------------------------------------ */
+
+const SITE_SETTINGS_KEY = "as_site_settings_v1";
+const HERO_POSITIONS = ["left", "center", "right"];
+
+export const DEFAULT_HERO = Object.freeze({
+  badge: "AutoSelect Certified Inventory",
+  headline: "Find Your Perfect Car. Drive Your Next Chapter.",
+  subheadline:
+    "Over 1,450+ 150-point inspected pre-owned vehicles with CARFAX history and guaranteed transparent pricing in Dallas, TX.",
+  image: "assets/cars/suv-black-luxury.jpg",
+  imagePosition: "right",
+  imageOpacity: 0.26,
+  stats: [
+    { value: "1,450+", label: "Inspected Cars" },
+    { value: "100%", label: "Fixed Price" },
+    { value: "7 Days", label: "Money-Back" },
+  ],
+});
+
+function heroText(value, max, fallback = "") {
+  const text = String(value ?? "").trim().slice(0, max);
+  return text || fallback;
+}
+
+function normalizeHero(input = {}) {
+  const source = input && typeof input === "object" ? input : {};
+  const stats = Array.isArray(source.stats) ? source.stats : [];
+  return {
+    badge: heroText(source.badge, 80, DEFAULT_HERO.badge),
+    headline: heroText(source.headline, 160, DEFAULT_HERO.headline),
+    subheadline: heroText(source.subheadline, 400, DEFAULT_HERO.subheadline),
+    image: String(source.image ?? DEFAULT_HERO.image).trim().slice(0, 800),
+    imagePosition: HERO_POSITIONS.includes(source.imagePosition)
+      ? source.imagePosition
+      : DEFAULT_HERO.imagePosition,
+    imageOpacity: Math.min(
+      0.7,
+      Math.max(0, Number(source.imageOpacity ?? DEFAULT_HERO.imageOpacity) || 0)
+    ),
+    stats: DEFAULT_HERO.stats.map((fallback, index) => {
+      const entry = stats[index] || {};
+      return {
+        value: heroText(entry.value, 40, fallback.value),
+        label: heroText(entry.label, 60, fallback.label),
+      };
+    }),
+  };
+}
+
+/** Homepage hero copy + photo. Public read; saved by a super admin. */
+export async function getSiteSettings() {
+  const f = await live();
+  if (f) {
+    try {
+      const m = f.firestoreModule;
+      const snap = await m.getDoc(m.doc(f.db, "settings", "homepage"));
+      if (snap.exists()) {
+        const data = snap.data();
+        return {
+          hero: normalizeHero(data.hero),
+          updatedAt: data.updatedAt || null,
+          updatedBy: String(data.updatedBy || ""),
+        };
+      }
+    } catch (error) {
+      console.warn("[AutoSelect] site settings unavailable", error);
+    }
+    // Live mode never reads the demo copy: the doc is authoritative.
+    return { hero: normalizeHero(DEFAULT_HERO), updatedAt: null, updatedBy: "" };
+  }
+  const stored = storageGet(SITE_SETTINGS_KEY, null);
+  return {
+    hero: normalizeHero(stored?.hero),
+    updatedAt: stored?.updatedAt || null,
+    updatedBy: String(stored?.updatedBy || ""),
+  };
+}
+
+export async function getHeroSettings() {
+  return (await getSiteSettings()).hero;
+}
+
+export async function saveSiteSettings(heroInput = {}) {
+  const hero = normalizeHero(heroInput);
+  const f = await live();
+  if (f) {
+    try {
+      const m = f.firestoreModule;
+      const updatedBy = f.auth?.currentUser?.uid || "";
+      await m.setDoc(
+        m.doc(f.db, "settings", "homepage"),
+        { hero, updatedAt: m.serverTimestamp(), updatedBy },
+        { merge: true }
+      );
+      return { hero, updatedAt: new Date(), updatedBy };
+    } catch (error) {
+      throw firestoreWriteError(error, "save the homepage hero");
+    }
+  }
+  const record = { hero, updatedAt: nowIso(), updatedBy: getCurrentUser()?.uid || "" };
+  storageSet(SITE_SETTINGS_KEY, record);
+  window.dispatchEvent(new CustomEvent("as:site-settings-changed"));
+  return { hero, updatedAt: record.updatedAt, updatedBy: record.updatedBy };
+}
+
+/** Hero art is hosted on Cloudinary with the public unsigned preset. */
+export async function uploadHeroImage(file) {
+  return uploadImage(file, { folder: "car_dealer/hero", tags: ["hero"] });
+}
+
+/* ------------------------------------------------------------------ */
 /* Leads / test drives / valuations / quiz results                     */
 /* ------------------------------------------------------------------ */
 

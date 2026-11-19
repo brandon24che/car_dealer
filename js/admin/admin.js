@@ -30,6 +30,7 @@ import {
   vehicleName,
   vehicleThumb,
 } from "./helpers.js?v=20261112a";
+import { initHeroEditor } from "./hero.js?v=20261112a";
 import { initHomepage, refreshHomepage } from "./homepage.js?v=20261112a";
 import { initInventory, renderInventory } from "./inventory.js?v=20261112a";
 import { initLeads, renderLeads } from "./leads.js?v=20261112a";
@@ -39,7 +40,7 @@ import { initTeam, refreshTeam } from "./team.js?v=20261112a";
 
 const VIEW_META = {
   overview: { title: "Overview", subtitle: "Showroom performance at a glance." },
-  home: { title: "Home page", subtitle: "Choose the cars shown in Hand-Picked Vehicles." },
+  home: { title: "Home page", subtitle: "Edit the hero and choose the cars shown in Hand-Picked Vehicles." },
   inventory: { title: "Inventory", subtitle: "Manage listings, pricing and availability." },
   leads: { title: "Leads", subtitle: "Follow up on every concierge request." },
   reviews: { title: "Reviews", subtitle: "Approve owner stories and publish them to the showroom." },
@@ -528,6 +529,7 @@ async function boot() {
   });
 
   if (user.isSuperAdmin) {
+    initHeroEditor();
     initTeam({ confirmAction });
     refreshTeam();
   }

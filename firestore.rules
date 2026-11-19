@@ -128,6 +128,53 @@ service cloud.firestore {
     }
 
     /* ------------------------------------------------------------------ */
+    /* Site content — public hero, super-admin managed                     */
+    /* ------------------------------------------------------------------ */
+
+    function validHeroSettings() {
+      let d = request.resource.data;
+      let h = d.hero;
+      return d.keys().hasOnly(['hero', 'updatedAt', 'updatedBy'])
+        && h is map
+        && h.keys().hasOnly([
+          'badge', 'headline', 'subheadline', 'image',
+          'imagePosition', 'imageOpacity', 'stats'
+        ])
+        && filledText(h.badge, 80)
+        && filledText(h.headline, 160)
+        && text(h.subheadline, 400)
+        && text(h.image, 800)
+        && h.imagePosition in ['left', 'center', 'right']
+        && h.imageOpacity is number
+        && h.imageOpacity >= 0
+        && h.imageOpacity <= 0.7
+        && h.stats is list
+        && h.stats.size() == 3
+        && h.stats[0] is map
+        && h.stats[0].keys().hasOnly(['value', 'label'])
+        && filledText(h.stats[0].value, 40)
+        && filledText(h.stats[0].label, 60)
+        && h.stats[1] is map
+        && h.stats[1].keys().hasOnly(['value', 'label'])
+        && filledText(h.stats[1].value, 40)
+        && filledText(h.stats[1].label, 60)
+        && h.stats[2] is map
+        && h.stats[2].keys().hasOnly(['value', 'label'])
+        && filledText(h.stats[2].value, 40)
+        && filledText(h.stats[2].label, 60)
+        && d.updatedAt is timestamp
+        && text(d.updatedBy, 128);
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow create, update: if isSuperAdmin()
+        && docId == 'homepage'
+        && validHeroSettings();
+      allow delete: if false;
+    }
+
+    /* ------------------------------------------------------------------ */
     /* Users — own profile, dealer read access                             */
     /* ------------------------------------------------------------------ */
 

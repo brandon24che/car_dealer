@@ -2474,3 +2474,199 @@
   .adm-cand { grid-template-columns: auto minmax(0, 1fr); }
   .adm-cand .btn { grid-column: 1 / -1; justify-content: center; }
 }
+
+/* Hero editor ---------------------------------------------------------- */
+.adm-hero-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: var(--r-full);
+  background: var(--green-soft);
+  color: var(--green-ink);
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.adm-hero-status .material-symbols-outlined { font-size: 14px; }
+.adm-hero-status.is-dirty { background: var(--orange-soft); color: var(--orange-ink); }
+
+.adm-hero-editor { display: grid; gap: 22px; }
+.adm-hero-form { display: grid; gap: 16px; min-width: 0; }
+.adm-hero-field { position: relative; display: grid; gap: 6px; min-width: 0; }
+.adm-hero-field .label { margin: 0; }
+.adm-hero-count {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 10px;
+  color: var(--slate);
+  pointer-events: none;
+}
+.adm-hero-textarea {
+  min-height: 62px;
+  resize: vertical;
+  line-height: 1.55;
+  font-family: var(--font-body);
+}
+.adm-hero-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.adm-hero-stat {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface-soft);
+}
+.adm-hero-stat input:last-child { font-size: 11px; }
+
+.adm-hero-photo {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface-soft);
+}
+.adm-hero-photo__thumb {
+  aspect-ratio: 16 / 10;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: var(--subtle) center / cover no-repeat;
+}
+.adm-hero-photo__thumb.is-empty {
+  background-image: linear-gradient(135deg, #e2e8f0, #f8fafc) !important;
+}
+.adm-hero-photo__fields { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.adm-hero-photo__actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.adm-hero-photo__actions .btn { gap: 4px; }
+
+.adm-hero-row { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: end; }
+.adm-hero-opacity { color: var(--ink); font-weight: 700; }
+.adm-hero-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.adm-hero-actions .btn--primary { min-width: 150px; justify-content: center; }
+
+.adm-hero-preview { display: grid; gap: 10px; align-content: start; }
+.adm-hero-preview__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--slate);
+}
+.adm-hero-preview__label span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.14);
+}
+.adm-hero-preview__frame {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 300px;
+  padding: 26px 22px;
+  border-radius: var(--r-lg);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(37, 99, 235, 0.38) 0%, transparent 55%),
+    linear-gradient(125deg, #0b132b 0%, #1c2541 58%, #101a38 100%);
+  color: #fff;
+  box-shadow: var(--shadow-2);
+}
+.adm-hero-preview__media {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 62%;
+  background: url("../../assets/cars/suv-black-luxury.jpg") right 58% / cover no-repeat;
+  opacity: 0.26;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 72%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 72%);
+  z-index: -1;
+  transition: opacity var(--speed), background-position var(--speed);
+}
+.adm-hero-preview__frame::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 45%;
+  background: linear-gradient(to top, rgba(11, 19, 43, 0.55), transparent);
+  pointer-events: none;
+  z-index: -1;
+}
+.adm-hero-preview__content { position: relative; max-width: 320px; }
+.adm-hero-preview__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: var(--r-full);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.09);
+  color: #dbeafe;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.adm-hero-preview__badge .material-symbols-outlined { font-size: 12px; color: var(--green); }
+.adm-hero-preview__content h3 {
+  margin: 12px 0 8px;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 1.16;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.adm-hero-preview__content p { margin: 0; color: #cbd5e1; font-size: 11px; line-height: 1.6; }
+.adm-hero-preview__stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 16px; }
+.adm-hero-preview__stats > div {
+  padding: 8px 9px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.adm-hero-preview__stats strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: #fff;
+}
+.adm-hero-preview__stats span {
+  display: block;
+  margin-top: 1px;
+  font-size: 7.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #cbd5e1;
+}
+.adm-hero-preview__meta { margin: 0; font-size: 10.5px; color: var(--slate); }
+
+@media (min-width: 1080px) {
+  .adm-hero-editor { grid-template-columns: minmax(0, 1fr) minmax(300px, 380px); align-items: start; }
+  .adm-hero-preview { position: sticky; top: 18px; }
+}
+
+@media (max-width: 639px) {
+  .adm-hero-stats { grid-template-columns: 1fr; }
+  .adm-hero-row { grid-template-columns: 1fr; }
+  .adm-hero-photo { grid-template-columns: 1fr; }
+  .adm-hero-photo__thumb { max-height: 120px; }
+  .adm-hero-actions { flex-direction: column-reverse; }
+  .adm-hero-actions .btn { width: 100%; justify-content: center; }
+  .adm-hero-preview__content h3 { font-size: 19px; }
+  .adm-panel__head-actions { flex-wrap: wrap; }
+  .adm-hero-panel .adm-panel__head { flex-direction: column; align-items: flex-start; }
+  .adm-hero-panel .adm-panel__head-actions { width: 100%; justify-content: space-between; }
+}

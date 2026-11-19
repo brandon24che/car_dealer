@@ -30,6 +30,16 @@ export function initCommandPalette({ getVehicles, showView, isSuperAdmin }) {
       { group: "Actions", label: "Export inventory CSV", hint: "Download the current filtered stock", icon: "download", run: () => { showView("inventory"); qs("[data-export-inventory]")?.click(); } },
     ];
     if (isSuperAdmin()) {
+      list.push({
+        group: "Actions",
+        label: "Edit homepage hero",
+        hint: "Headline, copy and background photo",
+        icon: "wallpaper",
+        run: () => {
+          showView("home");
+          requestAnimationFrame(() => qs("#heroForm")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+        },
+      });
       list.push({ group: "Actions", label: "Add a dealer admin", hint: "Super admin only", icon: "person_add", run: () => { showView("team"); qs("[data-add-admin]")?.click(); } });
       list.push({ group: "Go to", label: "Team", hint: "Admins and portal access", icon: "group", run: () => showView("team") });
     }
